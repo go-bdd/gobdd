@@ -6,14 +6,14 @@ import (
 )
 
 func add(ctx Context) error {
-	res := ctx.getIntParam(0) + ctx.getIntParam(1)
-	ctx.set("sumRes", res)
+	res := ctx.GetIntParam(0) + ctx.GetIntParam(1)
+	ctx.Set("sumRes", res)
 	return nil
 }
 
 func check(ctx Context) error {
-	expected := ctx.getIntParam(0)
-	received := ctx.getInt("sumRes")
+	expected := ctx.GetIntParam(0)
+	received := ctx.GetInt("sumRes")
 
 	if expected != received {
 		return errors.New("the math does not work for you")
