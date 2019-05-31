@@ -17,7 +17,7 @@ func newContext() Context  {
 	}
 }
 
-func (ctx Context) getIntParam(i int) int {
+func (ctx Context) GetIntParam(i int) int {
 	if i >= len(ctx.params) {
 		panic(fmt.Sprintf("the param with index %d does not exist", i))
 	}
@@ -32,11 +32,11 @@ func (ctx Context) getIntParam(i int) int {
 	return param
 }
 
-func (ctx Context) set(key string, value interface{}) {
+func (ctx Context) Set(key string, value interface{}) {
 	ctx.values[key] = value
 }
 
-func (ctx Context) getInt(key string) int {
+func (ctx Context) GetInt(key string) int {
 	if _, ok := ctx.values[key]; !ok {
 		panic(fmt.Sprintf("the key %s does not exist", key))
 	}
