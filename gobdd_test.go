@@ -23,7 +23,7 @@ func check(ctx Context) error {
 }
 
 func TestScenarios(t *testing.T) {
-	suite := NewSuite(t)
+	suite := NewSuite(t, NewSuiteOptions())
 	suite.AddStep(`I add (\d+) and (\d+)`, add)
 	suite.AddStep(`I the result should equal (\d+)`, check)
 	suite.Run()
