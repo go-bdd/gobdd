@@ -24,7 +24,15 @@ func check(ctx Context) error {
 
 func TestScenarios(t *testing.T) {
 	suite := NewSuite(t, NewSuiteOptions())
-	suite.AddStep(`I add (\d+) and (\d+)`, add)
-	suite.AddStep(`I the result should equal (\d+)`, check)
+	err := suite.AddStep(`I add (\d+) and (\d+)`, add)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = suite.AddStep(`I the result should equal (\d+)`, check)
+	if err != nil {
+		t.Fatal(err)
+	}
+	
 	suite.Run()
 }
