@@ -54,7 +54,7 @@ func (suite *Suite) AddStep(step interface{}, f StepFunc) error {
 	case []byte:
 		regex = regexp.MustCompile(string(t))
 	default:
-		return errors.New(fmt.Sprintf("expecting expr to be a *regexp.Regexp or a string, got type: %T", step))
+		return fmt.Errorf("expecting expr to be a *regexp.Regexp or a string, got type: %T", step)
 	}
 
 	suite.steps = append(suite.steps, StepDef{
@@ -83,7 +83,7 @@ func (suite *Suite) Run() {
 func (suite *Suite) executeFeature(file string) error {
 	f, err := os.Open(file)
 	if err != nil {
-		return errors.New(fmt.Sprintf("cannot open file %s", file))
+		return fmt.Errorf("cannot open file %s", file)
 	}
 	defer f.Close()
 	fileIO := bufio.NewReader(f)
