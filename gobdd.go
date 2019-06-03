@@ -13,24 +13,37 @@ import (
 )
 
 type Suite struct {
-	t *testing.T
-	steps []StepDef
+	t       *testing.T
+	steps   []StepDef
+	options SuiteOptions
+}
+
+type SuiteOptions struct {
+	featuresPaths string
+}
+
+func NewSuiteOptions() SuiteOptions {
+	return SuiteOptions{
+		featuresPaths: "features/*.feature",
+	}
 }
 
 type StepFunc func(ctx Context) error
 
 type StepDef struct {
 	expr *regexp.Regexp
-	f StepFunc
+	f    StepFunc
 }
 
-func NewSuite(t *testing.T) *Suite {
+func NewSuite(t *testing.T, options SuiteOptions) *Suite {
 	return &Suite{
-		t: t,
+		t:       t,
+		steps:   []StepDef{},
+		options: options,
 	}
 }
 
-func (suite *Suite) AddStep(step interface{}, f StepFunc)  {
+func (suite *Suite) AddStep(step interface{}, f StepFunc) error {
 	var regex *regexp.Regexp
 
 	switch t := step.(type) {
@@ -41,13 +54,15 @@ func (suite *Suite) AddStep(step interface{}, f StepFunc)  {
 	case []byte:
 		regex = regexp.MustCompile(string(t))
 	default:
-		panic(fmt.Sprintf("expecting expr to be a *regexp.Regexp or a string, got type: %T", step))
+		return errors.New(fmt.Sprintf("expecting expr to be a *regexp.Regexp or a string, got type: %T", step))
 	}
 
 	suite.steps = append(suite.steps, StepDef{
-		expr:regex,
-		f: f,
+		expr: regex,
+		f:    f,
 	})
+
+	return nil
 }
 
 func (suite *Suite) Run() {
@@ -56,39 +71,47 @@ func (suite *Suite) Run() {
 		suite.t.Fatalf("cannot find features/ directory")
 	}
 
-	for _, file := range files  {
-		f, err := os.Open(file)
+	for _, file := range files {
+		err = suite.executeFeature(file)
 		if err != nil {
-			suite.t.Fatalf("cannot find features/ directory")
+			suite.t.Error(err)
 		}
-		fileIO := bufio.NewReader(f)
-		doc, err := gherkin.ParseGherkinDocument(fileIO)
-		if err != nil {
-			suite.t.Fatalf("error while loading document: %s", err)
-		}
-
-		_ = f.Close()
-
-		if doc.Feature == nil {
-			continue
-		}
-
-		suite.runFeature(doc.Feature)
 	}
 }
 
-func (suite *Suite) runFeature(feature *gherkin.Feature) {
+func (suite *Suite) executeFeature(file string) error {
+	f, err := os.Open(file)
+	if err != nil {
+		return errors.New(fmt.Sprintf("cannot open file %s", file))
+	}
+	defer f.Close()
+	fileIO := bufio.NewReader(f)
+	doc, err := gherkin.ParseGherkinDocument(fileIO)
+	if err != nil {
+		suite.t.Fatalf("error while loading document: %s", err)
+	}
+
+	if doc.Feature == nil {
+		return nil
+	}
+
+	return suite.runFeature(doc.Feature)
+}
+
+func (suite *Suite) runFeature(feature *gherkin.Feature) error {
 	fmt.Printf("Feature: %s\n", feature.Name)
+	hasErrors := false
 
 	for _, s := range feature.Children {
 		scenario := s.(*gherkin.Scenario)
 		fmt.Printf("  Scenario: %s\n", scenario.Name)
 		ctx := newContext()
 
-		for _, step := range scenario.Steps  {
+		for _, step := range scenario.Steps {
 			fmt.Printf("    %s: %s\n", step.Keyword, step.Text)
 			def, err := suite.findStepDef(step.Text)
 			if err != nil {
+				hasErrors = true
 				suite.t.Errorf("cannot find step definition for step '%s'", step.Text)
 				continue
 			}
@@ -98,10 +121,17 @@ func (suite *Suite) runFeature(feature *gherkin.Feature) {
 
 			err = def.f(ctx)
 			if err != nil {
+				hasErrors = true
 				suite.t.Error(err)
 			}
 		}
 	}
+
+	if hasErrors {
+		return errors.New("the feature contains errors")
+	}
+
+	return nil
 }
 
 func (suite *Suite) findStepDef(text string) (StepDef, error) {
