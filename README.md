@@ -85,22 +85,44 @@ So, for the step below there are two params available:
 suite.AddStep(`I add (\d+) and (\d+)`, add)
 ```
 
-* `ctx.GetIntParam(0)` ->
+* `ctx.GetIntParam(0)` -> returns the first parameter
+* `ctx.GetIntParam(3)` -> returns the second parameter
 
+If the parameter does not exist the test will fail.
 
+## Example
 
+```go
+func add(ctx Context) error {
+	res := ctx.GetIntParam(0) + ctx.GetIntParam(1)
+	ctx.Set("sumRes", res)
+	return nil
+}
 
+func check(ctx Context) error {
+	expected := ctx.GetIntParam(0)
+	received := ctx.GetInt("sumRes")
 
+	if expected != received {
+		return errors.New("the math does not work for you")
+	}
 
+	return nil
+}
 
+func TestScenarios(t *testing.T) {
+	suite := NewSuite(t, NewSuiteOptions())
+	suite.AddStep(`I add (\d+) and (\d+)`, add)
+	suite.AddStep(`I the result should equal (\d+)`, check)
+	suite.Run()
+}
+```
 
+and the feature file:
 
-
-
-
-
-
-
-
-
-
+```gherkin
+Feature: math operations
+  Scenario: add two digits
+    When I add 1 and 2
+    Then I the result should equal 3
+```

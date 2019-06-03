@@ -1,2 +1,4 @@
 github.com/cucumber/gherkin-go v5.1.0+incompatible h1:RCvyVI6KQLI2IJkijZBeJcE4K3U7DnhQ1RjD7VV+AIk=
 github.com/cucumber/gherkin-go v5.1.0+incompatible/go.mod h1:bYJ65F+CDEAL70FXAu7/ef4ayC/NhRXO8zEW3IB21w0=
+github.com/logrusorgru/aurora v0.0.0-20190428105938-cea283e61946 h1:z+WaKrgu3kCpcdnbK9YG+JThpOCd1nU5jO5ToVmSlR4=
+github.com/logrusorgru/aurora v0.0.0-20190428105938-cea283e61946/go.mod h1:7rIyQOR62GCctdiQpZ/zOJlFyk6y+94wXzv6RNZgaR4=

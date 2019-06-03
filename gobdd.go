@@ -74,7 +74,8 @@ func (suite *Suite) Run() {
 	for _, file := range files {
 		err = suite.executeFeature(file)
 		if err != nil {
-			suite.t.Error(err)
+			suite.t.Fail()
+			printError(err)
 		}
 	}
 }
@@ -88,7 +89,8 @@ func (suite *Suite) executeFeature(file string) error {
 	fileIO := bufio.NewReader(f)
 	doc, err := gherkin.ParseGherkinDocument(fileIO)
 	if err != nil {
-		suite.t.Fatalf("error while loading document: %s", err)
+		suite.t.Fail()
+		printErrorf("error while loading document: %s", err)
 	}
 
 	if doc.Feature == nil {
@@ -99,36 +101,46 @@ func (suite *Suite) executeFeature(file string) error {
 }
 
 func (suite *Suite) runFeature(feature *gherkin.Feature) error {
-	fmt.Printf("Feature: %s\n", feature.Name)
+	printFeature(feature.Name)
 	hasErrors := false
 
 	for _, s := range feature.Children {
-		scenario := s.(*gherkin.Scenario)
-		fmt.Printf("  Scenario: %s\n", scenario.Name)
-		ctx := newContext()
-
-		for _, step := range scenario.Steps {
-			fmt.Printf("    %s: %s\n", step.Keyword, step.Text)
-			def, err := suite.findStepDef(step.Text)
+		scenario, ok := s.(*gherkin.Scenario)
+		if ok {
+			err := suite.runScenario(scenario)
 			if err != nil {
 				hasErrors = true
-				suite.t.Errorf("cannot find step definition for step '%s'", step.Text)
-				continue
-			}
-
-			b := def.expr.FindSubmatch([]byte(step.Text))
-			ctx.setParams(b[1:])
-
-			err = def.f(ctx)
-			if err != nil {
-				hasErrors = true
-				suite.t.Error(err)
 			}
 		}
 	}
 
 	if hasErrors {
 		return errors.New("the feature contains errors")
+	}
+
+	return nil
+}
+
+func (suite *Suite) runScenario(scenario *gherkin.Scenario) error {
+	printScenario(scenario.Name)
+	ctx := newContext()
+
+	for _, step := range scenario.Steps {
+		printStep(step)
+		def, err := suite.findStepDef(step.Text)
+		if err != nil {
+			suite.t.Errorf("cannot find step definition for step '%s'", step.Text)
+			continue
+		}
+
+		b := def.expr.FindSubmatch([]byte(step.Text))
+		ctx.setParams(b[1:])
+
+		err = def.f(ctx)
+		if err != nil {
+			printError(err)
+			suite.t.Fail()
+		}
 	}
 
 	return nil
