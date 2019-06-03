@@ -86,7 +86,7 @@ suite.AddStep(`I add (\d+) and (\d+)`, add)
 ```
 
 * `ctx.GetIntParam(0)` -> returns the first parameter
-* `ctx.GetIntParam(3)` -> returns the second parameter
+* `ctx.GetIntParam(1)` -> returns the second parameter
 
 If the parameter does not exist the test will fail.
 
