@@ -12,14 +12,14 @@ import (
 	"github.com/cucumber/gherkin-go"
 )
 
-// Suite holds all the information about the suite (options, steps to execute etc)
+// Holds all the information about the suite (options, steps to execute etc)
 type Suite struct {
 	t       *testing.T
 	steps   []stepDef
 	options SuiteOptions
 }
 
-// SuiteOptions holds all the information about how the suite or features/steps should be configured
+// Holds all the information about how the suite or features/steps should be configured
 type SuiteOptions struct {
 	featuresPaths string
 	ignoreTags    []string
@@ -33,14 +33,14 @@ func NewSuiteOptions() SuiteOptions {
 	}
 }
 
-// WithFeaturesPath configures a pattern (regexp) where feature can be found
+// Configures a pattern (regexp) where feature can be found.
 // The default value is "features/*.feature"
 func (options SuiteOptions) WithFeaturesPath(path string) SuiteOptions {
 	options.featuresPaths = path
 	return options
 }
 
-// WithIgnoredTags configures which tags should be skipped while executing a suite
+// Configures which tags should be skipped while executing a suite
 // Every tag has to start with @
 func (options SuiteOptions) WithIgnoredTags(tags []string) SuiteOptions {
 	options.ignoreTags = tags
@@ -55,7 +55,7 @@ type stepDef struct {
 	f    StepFunc
 }
 
-// NewSuite creates a new suites with given configuration and empty steps defined
+// Creates a new suites with given configuration and empty steps defined
 func NewSuite(t *testing.T, options SuiteOptions) *Suite {
 	return &Suite{
 		t:       t,
@@ -64,12 +64,13 @@ func NewSuite(t *testing.T, options SuiteOptions) *Suite {
 	}
 }
 
-// AddStep add a step to the suite
+// Adds a step to the suite
 // The first parameter is the step definition which can be:
 //
 // * string which will be converted to a regexp
 // * [] byte which will be converted to a regexp as well
 // * regexp
+//
 // No other types are supported
 //
 // The second parameter is a function which will be executed when while running a scenario one of the steps will match
@@ -96,7 +97,7 @@ func (suite *Suite) AddStep(step interface{}, f StepFunc) error {
 	return nil
 }
 
-// Run executes the suite with given options and defined steps
+// Cxecutes the suite with given options and defined steps
 func (suite *Suite) Run() {
 	files, err := filepath.Glob(suite.options.featuresPaths)
 	if err != nil {
