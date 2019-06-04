@@ -66,6 +66,7 @@ func NewSuite(t *testing.T, options SuiteOptions) *Suite {
 
 // AddStep add a step to the suite
 // The first parameter is the step definition which can be:
+//
 // * string which will be converted to a regexp
 // * [] byte which will be converted to a regexp as well
 // * regexp
