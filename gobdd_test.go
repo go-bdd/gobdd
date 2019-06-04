@@ -22,14 +22,30 @@ func check(ctx Context) error {
 	return nil
 }
 
+func fail(ctx Context) error {
+	return errors.New("the step should never be executed")
+}
+
 func TestScenarios(t *testing.T) {
-	suite := NewSuite(t, NewSuiteOptions())
+	suite := NewSuite(t, NewSuiteOptions().WithFeaturesPath("features/example.feature"))
 	err := suite.AddStep(`I add (\d+) and (\d+)`, add)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	err = suite.AddStep(`I the result should equal (\d+)`, check)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	suite.Run()
+}
+
+func TestIgnoredTags(t *testing.T) {
+	options := NewSuiteOptions().WithFeaturesPath("features/tags.feature")
+	options = options.WithIgnoredTags([]string{"@ignore"})
+	suite := NewSuite(t, options)
+	err := suite.AddStep(`fail the test`, fail)
 	if err != nil {
 		t.Fatal(err)
 	}

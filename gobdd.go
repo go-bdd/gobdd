@@ -12,37 +12,67 @@ import (
 	"github.com/cucumber/gherkin-go"
 )
 
+// Suite holds all the information about the suite (options, steps to execute etc)
 type Suite struct {
 	t       *testing.T
-	steps   []StepDef
+	steps   []stepDef
 	options SuiteOptions
 }
 
+// SuiteOptions holds all the information about how the suite or features/steps should be configured
 type SuiteOptions struct {
 	featuresPaths string
+	ignoreTags    []string
 }
 
+// NewSuiteOptions creates a new suite configuration with default values
 func NewSuiteOptions() SuiteOptions {
 	return SuiteOptions{
 		featuresPaths: "features/*.feature",
+		ignoreTags:    []string{},
 	}
 }
 
+// WithFeaturesPath configures a pattern (regexp) where feature can be found
+// The default value is "features/*.feature"
+func (options SuiteOptions) WithFeaturesPath(path string) SuiteOptions {
+	options.featuresPaths = path
+	return options
+}
+
+// WithIgnoredTags configures which tags should be skipped while executing a suite
+// Every tag has to start with @
+func (options SuiteOptions) WithIgnoredTags(tags []string) SuiteOptions {
+	options.ignoreTags = tags
+	return options
+}
+
+// StepFunc every step function have to be compatible with this type
 type StepFunc func(ctx Context) error
 
-type StepDef struct {
+type stepDef struct {
 	expr *regexp.Regexp
 	f    StepFunc
 }
 
+// NewSuite creates a new suites with given configuration and empty steps defined
 func NewSuite(t *testing.T, options SuiteOptions) *Suite {
 	return &Suite{
 		t:       t,
-		steps:   []StepDef{},
+		steps:   []stepDef{},
 		options: options,
 	}
 }
 
+// AddStep add a step to the suite
+// The first parameter is the step definition which can be:
+// * string which will be converted to a regexp
+// * [] byte which will be converted to a regexp as well
+// * regexp
+// No other types are supported
+//
+// The second parameter is a function which will be executed when while running a scenario one of the steps will match
+// the given pattern
 func (suite *Suite) AddStep(step interface{}, f StepFunc) error {
 	var regex *regexp.Regexp
 
@@ -57,7 +87,7 @@ func (suite *Suite) AddStep(step interface{}, f StepFunc) error {
 		return fmt.Errorf("expecting expr to be a *regexp.Regexp or a string, got type: %T", step)
 	}
 
-	suite.steps = append(suite.steps, StepDef{
+	suite.steps = append(suite.steps, stepDef{
 		expr: regex,
 		f:    f,
 	})
@@ -65,8 +95,9 @@ func (suite *Suite) AddStep(step interface{}, f StepFunc) error {
 	return nil
 }
 
+// Run executes the suite with given options and defined steps
 func (suite *Suite) Run() {
-	files, err := filepath.Glob("features/*.feature")
+	files, err := filepath.Glob(suite.options.featuresPaths)
 	if err != nil {
 		suite.t.Fatalf("cannot find features/ directory")
 	}
@@ -107,6 +138,9 @@ func (suite *Suite) runFeature(feature *gherkin.Feature) error {
 	for _, s := range feature.Children {
 		scenario, ok := s.(*gherkin.Scenario)
 		if ok {
+			if suite.skipScenario(scenario.Tags, suite.options.ignoreTags) {
+				continue
+			}
 			err := suite.runScenario(scenario)
 			if err != nil {
 				hasErrors = true
@@ -146,7 +180,7 @@ func (suite *Suite) runScenario(scenario *gherkin.Scenario) error {
 	return nil
 }
 
-func (suite *Suite) findStepDef(text string) (StepDef, error) {
+func (suite *Suite) findStepDef(text string) (stepDef, error) {
 	for _, step := range suite.steps {
 		if !step.expr.MatchString(text) {
 			continue
@@ -155,5 +189,25 @@ func (suite *Suite) findStepDef(text string) (StepDef, error) {
 		return step, nil
 	}
 
-	return StepDef{}, errors.New("cannot find step definition")
+	return stepDef{}, errors.New("cannot find step definition")
+}
+
+func (suite *Suite) skipScenario(scenarioTags []*gherkin.Tag, ignoreTags []string) bool {
+	for _, tag := range scenarioTags {
+		if contains(ignoreTags, tag.Name) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// contains tells whether a contains x.
+func contains(a []string, x string) bool {
+	for _, n := range a {
+		if x == n {
+			return true
+		}
+	}
+	return false
 }

@@ -5,6 +5,9 @@ import (
 	"strconv"
 )
 
+// Context holds two types of data:
+// * data saved by previously executed steps
+// * parameters which were received from the step definition
 type Context struct {
 	values map[string]interface{}
 	params [][]byte
