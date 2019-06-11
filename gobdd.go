@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/cucumber/gherkin-go"
@@ -97,7 +98,7 @@ func (suite *Suite) AddStep(step interface{}, f StepFunc) error {
 	return nil
 }
 
-// Cxecutes the suite with given options and defined steps
+// Executes the suite with given options and defined steps
 func (suite *Suite) Run() {
 	files, err := filepath.Glob(suite.options.featuresPaths)
 	if err != nil {
@@ -138,12 +139,21 @@ func (suite *Suite) runFeature(feature *gherkin.Feature) error {
 	hasErrors := false
 
 	for _, s := range feature.Children {
-		scenario, ok := s.(*gherkin.Scenario)
-		if ok {
+		if scenario, ok := s.(*gherkin.Scenario); ok {
 			if suite.skipScenario(scenario.Tags, suite.options.ignoreTags) {
 				continue
 			}
 			err := suite.runScenario(scenario)
+			if err != nil {
+				hasErrors = true
+			}
+		}
+
+		if scenario, ok := s.(*gherkin.ScenarioOutline); ok {
+			if suite.skipScenario(scenario.Tags, suite.options.ignoreTags) {
+				continue
+			}
+			err := suite.runScenarioOutline(scenario)
 			if err != nil {
 				hasErrors = true
 			}
@@ -157,17 +167,105 @@ func (suite *Suite) runFeature(feature *gherkin.Feature) error {
 	return nil
 }
 
+func (suite *Suite) runScenarioOutline(outline *gherkin.ScenarioOutline) error {
+	printScenarioOutline(outline.Name)
+
+	for _, ex := range outline.Examples {
+		if len(ex.TableBody) == 0 {
+			continue
+		}
+
+		placeholders := ex.TableHeader.Cells
+		groups := ex.TableBody
+
+		for _, group := range groups {
+			steps := suite.runOutlineStep(outline, placeholders, group)
+			// TODO print it
+
+			ctx := newContext()
+			suite.runSteps(ctx, steps)
+		}
+	}
+	return nil
+}
+
+func (suite *Suite) runOutlineStep(outline *gherkin.ScenarioOutline, placeholders []*gherkin.TableCell, group *gherkin.TableRow) []*gherkin.Step {
+	var steps []*gherkin.Step
+	for _, outlineStep := range outline.Steps {
+		text := outlineStep.Text
+		for i, placeholder := range placeholders {
+			text = strings.Replace(text, "<"+placeholder.Value+">", group.Cells[i].Value, -1)
+		}
+
+		arg := suite.getOutlineArguments(outlineStep, placeholders, group)
+
+		// clone a step
+		step := &gherkin.Step{
+			Node:     outlineStep.Node,
+			Text:     text,
+			Keyword:  outlineStep.Keyword,
+			Argument: arg,
+		}
+		steps = append(steps, step)
+	}
+	return steps
+}
+
+func (suite *Suite) getOutlineArguments(outlineStep *gherkin.Step, placeholders []*gherkin.TableCell, group *gherkin.TableRow) interface{} {
+	arg := outlineStep.Argument
+
+	switch t := outlineStep.Argument.(type) {
+	case *gherkin.DataTable:
+		arg = suite.outlineDataTableArguments(t, placeholders, group)
+		break
+	}
+	return arg
+}
+
+func (suite *Suite) outlineDataTableArguments(t *gherkin.DataTable, placeholders []*gherkin.TableCell, group *gherkin.TableRow) interface{} {
+	tbl := &gherkin.DataTable{
+		Node: t.Node,
+		Rows: make([]*gherkin.TableRow, len(t.Rows)),
+	}
+	for i, row := range t.Rows {
+		cells := make([]*gherkin.TableCell, len(row.Cells))
+		for j, cell := range row.Cells {
+			trans := cell.Value
+			for i, placeholder := range placeholders {
+				trans = strings.Replace(trans, "<"+placeholder.Value+">", group.Cells[i].Value, -1)
+			}
+			cells[j] = &gherkin.TableCell{
+				Node:  cell.Node,
+				Value: trans,
+			}
+		}
+		tbl.Rows[i] = &gherkin.TableRow{
+			Node:  row.Node,
+			Cells: cells,
+		}
+	}
+	return tbl
+}
+
 func (suite *Suite) runScenario(scenario *gherkin.Scenario) error {
 	printScenario(scenario.Name)
 	ctx := newContext()
 
-	for _, step := range scenario.Steps {
+	suite.runSteps(ctx, scenario.Steps)
+
+	return nil
+}
+
+func (suite *Suite) runSteps(ctx Context, steps []*gherkin.Step) {
+	for _, step := range steps {
 		printStep(step)
 		def, err := suite.findStepDef(step.Text)
 		if err != nil {
 			suite.t.Errorf("cannot find step definition for step '%s'", step.Text)
 			continue
 		}
+
+		fmt.Printf("STEP: %s\n", step.Text)
 
 		b := def.expr.FindSubmatch([]byte(step.Text))
 		ctx.setParams(b[1:])
@@ -178,8 +276,19 @@ func (suite *Suite) runScenario(scenario *gherkin.Scenario) error {
 			suite.t.Fail()
 		}
 	}
+}
 
-	return nil
+func (suite *Suite) findOutlineStepDef(text string) (stepDef, error) {
+	for _, step := range suite.steps {
+		submatches := step.expr.FindStringSubmatch(text)
+		if len(submatches) == 0 {
+			continue
+		}
+
+		return step, nil
+	}
+
+	return stepDef{}, errors.New("cannot find step definition")
 }
 
 func (suite *Suite) findStepDef(text string) (stepDef, error) {
