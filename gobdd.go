@@ -236,7 +236,6 @@ func (suite *Suite) getOutlineArguments(outlineStep *gherkin.Step, placeholders 
 	switch t := outlineStep.Argument.(type) {
 	case *gherkin.DataTable:
 		arg = suite.outlineDataTableArguments(t, placeholders, group)
-		break
 	}
 	return arg
 }
@@ -293,19 +292,6 @@ func (suite *Suite) runSteps(ctx Context, steps []*gherkin.Step) {
 			suite.t.Fail()
 		}
 	}
-}
-
-func (suite *Suite) findOutlineStepDef(text string) (stepDef, error) {
-	for _, step := range suite.steps {
-		submatches := step.expr.FindStringSubmatch(text)
-		if len(submatches) == 0 {
-			continue
-		}
-
-		return step, nil
-	}
-
-	return stepDef{}, errors.New("cannot find step definition")
 }
 
 func (suite *Suite) findStepDef(text string) (stepDef, error) {
