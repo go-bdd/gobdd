@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/cucumber/gherkin-go"
@@ -97,7 +99,7 @@ func (suite *Suite) AddStep(step interface{}, f StepFunc) error {
 	return nil
 }
 
-// Cxecutes the suite with given options and defined steps
+// Executes the suite with given options and defined steps
 func (suite *Suite) Run() {
 	files, err := filepath.Glob(suite.options.featuresPaths)
 	if err != nil {
@@ -138,12 +140,21 @@ func (suite *Suite) runFeature(feature *gherkin.Feature) error {
 	hasErrors := false
 
 	for _, s := range feature.Children {
-		scenario, ok := s.(*gherkin.Scenario)
-		if ok {
+		if scenario, ok := s.(*gherkin.Scenario); ok {
 			if suite.skipScenario(scenario.Tags, suite.options.ignoreTags) {
 				continue
 			}
 			err := suite.runScenario(scenario)
+			if err != nil {
+				hasErrors = true
+			}
+		}
+
+		if scenario, ok := s.(*gherkin.ScenarioOutline); ok {
+			if suite.skipScenario(scenario.Tags, suite.options.ignoreTags) {
+				continue
+			}
+			err := suite.runScenarioOutline(scenario)
 			if err != nil {
 				hasErrors = true
 			}
@@ -157,11 +168,114 @@ func (suite *Suite) runFeature(feature *gherkin.Feature) error {
 	return nil
 }
 
+func (suite *Suite) runScenarioOutline(outline *gherkin.ScenarioOutline) error {
+	printScenarioOutline(outline.Name)
+
+	for _, ex := range outline.Examples {
+		if len(ex.TableBody) == 0 {
+			continue
+		}
+
+		placeholders := ex.TableHeader.Cells
+		groups := ex.TableBody
+
+		for _, group := range groups {
+			steps := suite.runOutlineStep(outline, placeholders, group)
+			// TODO print it
+
+			ctx := newContext()
+			suite.runSteps(ctx, steps)
+		}
+	}
+	return nil
+}
+
+func (suite *Suite) runOutlineStep(outline *gherkin.ScenarioOutline, placeholders []*gherkin.TableCell, group *gherkin.TableRow) []*gherkin.Step {
+	var steps []*gherkin.Step
+	for _, outlineStep := range outline.Steps {
+		text := outlineStep.Text
+		for i, placeholder := range placeholders {
+			ph := "<" + placeholder.Value + ">"
+			index := strings.Index(text, ph)
+			originalText := text
+			if index == -1 {
+				continue
+			}
+
+			text = strings.Replace(text, "<"+placeholder.Value+">", group.Cells[i].Value, -1)
+			t := getRegexpForVar(group.Cells[i].Value)
+
+			for _, step := range suite.steps {
+				def, err := suite.findStepDef(originalText)
+				if err != nil {
+					continue
+				}
+
+				expr := strings.Replace(def.expr.String(), ph, t, -1)
+				_ = suite.AddStep(expr, step.f)
+			}
+		}
+
+		arg := suite.getOutlineArguments(outlineStep, placeholders, group)
+
+		// clone a step
+		step := &gherkin.Step{
+			Node:     outlineStep.Node,
+			Text:     text,
+			Keyword:  outlineStep.Keyword,
+			Argument: arg,
+		}
+		steps = append(steps, step)
+	}
+	return steps
+}
+
+func (suite *Suite) getOutlineArguments(outlineStep *gherkin.Step, placeholders []*gherkin.TableCell, group *gherkin.TableRow) interface{} {
+	arg := outlineStep.Argument
+
+	switch t := outlineStep.Argument.(type) {
+	case *gherkin.DataTable:
+		arg = suite.outlineDataTableArguments(t, placeholders, group)
+	}
+	return arg
+}
+
+func (suite *Suite) outlineDataTableArguments(t *gherkin.DataTable, placeholders []*gherkin.TableCell, group *gherkin.TableRow) interface{} {
+	tbl := &gherkin.DataTable{
+		Node: t.Node,
+		Rows: make([]*gherkin.TableRow, len(t.Rows)),
+	}
+	for i, row := range t.Rows {
+		cells := make([]*gherkin.TableCell, len(row.Cells))
+		for j, cell := range row.Cells {
+			trans := cell.Value
+			for i, placeholder := range placeholders {
+				trans = strings.Replace(trans, "<"+placeholder.Value+">", group.Cells[i].Value, -1)
+			}
+			cells[j] = &gherkin.TableCell{
+				Node:  cell.Node,
+				Value: trans,
+			}
+		}
+		tbl.Rows[i] = &gherkin.TableRow{
+			Node:  row.Node,
+			Cells: cells,
+		}
+	}
+	return tbl
+}
+
 func (suite *Suite) runScenario(scenario *gherkin.Scenario) error {
 	printScenario(scenario.Name)
 	ctx := newContext()
 
-	for _, step := range scenario.Steps {
+	suite.runSteps(ctx, scenario.Steps)
+
+	return nil
+}
+
+func (suite *Suite) runSteps(ctx Context, steps []*gherkin.Step) {
+	for _, step := range steps {
 		printStep(step)
 		def, err := suite.findStepDef(step.Text)
 		if err != nil {
@@ -178,8 +292,6 @@ func (suite *Suite) runScenario(scenario *gherkin.Scenario) error {
 			suite.t.Fail()
 		}
 	}
-
-	return nil
 }
 
 func (suite *Suite) findStepDef(text string) (stepDef, error) {
@@ -212,4 +324,18 @@ func contains(a []string, x string) bool {
 		}
 	}
 	return false
+}
+
+func getRegexpForVar(v interface{}) string {
+	s := v.(string)
+
+	if _, err := strconv.Atoi(s); err == nil {
+		return "(\\d+)"
+	}
+
+	if _, err := strconv.ParseFloat(s, 32); err == nil {
+		return "([+-]?([0-9]*[.])?[0-9]+)"
+	}
+
+	return "string"
 }

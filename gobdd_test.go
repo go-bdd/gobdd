@@ -22,7 +22,7 @@ func check(ctx Context) error {
 	return nil
 }
 
-func fail(ctx Context) error {
+func fail(Context) error {
 	return errors.New("the step should never be executed")
 }
 
@@ -33,7 +33,27 @@ func TestScenarios(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = suite.AddStep(`I the result should equal (\d+)`, check)
+	err = suite.AddStep(`the result should equal (\d+)`, check)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	suite.Run()
+}
+
+func TestScenarioOutline(t *testing.T) {
+	suite := NewSuite(t, NewSuiteOptions().WithFeaturesPath("features/outline.feature"))
+	err := suite.AddStep(`I add <digit1> and <digit2>`, func(ctx Context) error {
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = suite.AddStep(`the result should equal <result>`, func(ctx Context) error {
+
+		return nil
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
