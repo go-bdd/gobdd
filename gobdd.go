@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -194,7 +195,25 @@ func (suite *Suite) runOutlineStep(outline *gherkin.ScenarioOutline, placeholder
 	for _, outlineStep := range outline.Steps {
 		text := outlineStep.Text
 		for i, placeholder := range placeholders {
+			ph := "<" + placeholder.Value + ">"
+			index := strings.Index(text, ph)
+			originalText := text
+			if index == -1 {
+				continue
+			}
+
 			text = strings.Replace(text, "<"+placeholder.Value+">", group.Cells[i].Value, -1)
+			t := getRegexpForVar(group.Cells[i].Value)
+
+			for _, step := range suite.steps {
+				def, err := suite.findStepDef(originalText)
+				if err != nil {
+					continue
+				}
+
+				expr := strings.Replace(def.expr.String(), ph, t, -1)
+				_ = suite.AddStep(expr, step.f)
+			}
 		}
 
 		arg := suite.getOutlineArguments(outlineStep, placeholders, group)
@@ -265,8 +284,6 @@ func (suite *Suite) runSteps(ctx Context, steps []*gherkin.Step) {
 			continue
 		}
 
-		fmt.Printf("STEP: %s\n", step.Text)
-
 		b := def.expr.FindSubmatch([]byte(step.Text))
 		ctx.setParams(b[1:])
 
@@ -321,4 +338,18 @@ func contains(a []string, x string) bool {
 		}
 	}
 	return false
+}
+
+func getRegexpForVar(v interface{}) string {
+	s := v.(string)
+
+	if _, err := strconv.Atoi(s); err == nil {
+		return "(\\d+)"
+	}
+
+	if _, err := strconv.ParseFloat(s, 32); err == nil {
+		return "([+-]?([0-9]*[.])?[0-9]+)"
+	}
+
+	return "string"
 }
