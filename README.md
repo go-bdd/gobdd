@@ -1,6 +1,6 @@
 # GOBDD
 
-This is a BDD testing framework. Uses gherkin for the test's syntax.
+This is a BDD testing framework. Uses gherkin for the test's syntax. Project is under active development.
 
 ## Usage
 
