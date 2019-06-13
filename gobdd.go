@@ -138,13 +138,14 @@ func (suite *Suite) executeFeature(file string) error {
 func (suite *Suite) runFeature(feature *gherkin.Feature) error {
 	printFeature(feature.Name)
 	hasErrors := false
+	bkgSteps := []*gherkin.Step{}
 
 	for _, s := range feature.Children {
 		if scenario, ok := s.(*gherkin.Scenario); ok {
 			if suite.skipScenario(scenario.Tags, suite.options.ignoreTags) {
 				continue
 			}
-			err := suite.runScenario(scenario)
+			err := suite.runScenario(scenario, bkgSteps)
 			if err != nil {
 				hasErrors = true
 			}
@@ -154,10 +155,14 @@ func (suite *Suite) runFeature(feature *gherkin.Feature) error {
 			if suite.skipScenario(scenario.Tags, suite.options.ignoreTags) {
 				continue
 			}
-			err := suite.runScenarioOutline(scenario)
+			err := suite.runScenarioOutline(scenario, bkgSteps)
 			if err != nil {
 				hasErrors = true
 			}
+		}
+
+		if bkg, ok := s.(*gherkin.Background); ok {
+			bkgSteps = suite.getBackgroundSteps(bkg)
 		}
 	}
 
@@ -168,7 +173,7 @@ func (suite *Suite) runFeature(feature *gherkin.Feature) error {
 	return nil
 }
 
-func (suite *Suite) runScenarioOutline(outline *gherkin.ScenarioOutline) error {
+func (suite *Suite) runScenarioOutline(outline *gherkin.ScenarioOutline, bkgSteps []*gherkin.Step) error {
 	printScenarioOutline(outline.Name)
 
 	for _, ex := range outline.Examples {
@@ -181,6 +186,7 @@ func (suite *Suite) runScenarioOutline(outline *gherkin.ScenarioOutline) error {
 
 		for _, group := range groups {
 			steps := suite.runOutlineStep(outline, placeholders, group)
+			steps = append(bkgSteps, steps...)
 			// TODO print it
 
 			ctx := newContext()
@@ -265,32 +271,43 @@ func (suite *Suite) outlineDataTableArguments(t *gherkin.DataTable, placeholders
 	return tbl
 }
 
-func (suite *Suite) runScenario(scenario *gherkin.Scenario) error {
+func (suite *Suite) runScenario(scenario *gherkin.Scenario, bkgSteps []*gherkin.Step) error {
 	printScenario(scenario.Name)
 	ctx := newContext()
 
-	suite.runSteps(ctx, scenario.Steps)
+	steps := append(bkgSteps, scenario.Steps...)
+	suite.runSteps(ctx, steps)
 
 	return nil
 }
 
 func (suite *Suite) runSteps(ctx Context, steps []*gherkin.Step) {
 	for _, step := range steps {
-		printStep(step)
-		def, err := suite.findStepDef(step.Text)
-		if err != nil {
-			suite.t.Errorf("cannot find step definition for step '%s'", step.Text)
-			continue
-		}
+		suite.runStep(ctx, step)
+	}
+}
 
-		b := def.expr.FindSubmatch([]byte(step.Text))
-		ctx.setParams(b[1:])
-
-		err = def.f(ctx)
-		if err != nil {
-			printError(err)
-			suite.t.Fail()
+func (suite *Suite) runStep(ctx Context, step *gherkin.Step) {
+	defer func() {
+		if r := recover(); r != nil {
+			suite.t.Error(r)
 		}
+	}()
+
+	printStep(step)
+	def, err := suite.findStepDef(step.Text)
+	if err != nil {
+		suite.t.Errorf("cannot find step definition for step '%s'", step.Text)
+		return
+	}
+
+	b := def.expr.FindSubmatch([]byte(step.Text))
+	ctx.setParams(b[1:])
+
+	err = def.f(ctx)
+	if err != nil {
+		printError(err)
+		suite.t.Fail()
 	}
 }
 
@@ -314,6 +331,10 @@ func (suite *Suite) skipScenario(scenarioTags []*gherkin.Tag, ignoreTags []strin
 	}
 
 	return false
+}
+
+func (suite *Suite) getBackgroundSteps(bkg *gherkin.Background) []*gherkin.Step {
+	return bkg.Steps
 }
 
 // contains tells whether a contains x.

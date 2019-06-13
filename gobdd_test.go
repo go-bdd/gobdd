@@ -61,6 +61,22 @@ func TestScenarioOutline(t *testing.T) {
 	suite.Run()
 }
 
+func TestBackground(t *testing.T) {
+	options := NewSuiteOptions().WithFeaturesPath("features/background.feature")
+	suite := NewSuite(t, options)
+	err := suite.AddStep(`I add (\d+) and (\d+)`, add)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = suite.AddStep(`the result should equal (\d+)`, check)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	suite.Run()
+}
+
 func TestIgnoredTags(t *testing.T) {
 	options := NewSuiteOptions().WithFeaturesPath("features/tags.feature")
 	options = options.WithIgnoredTags([]string{"@ignore"})
