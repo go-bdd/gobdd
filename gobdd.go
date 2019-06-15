@@ -19,6 +19,7 @@ type Suite struct {
 	t       *testing.T
 	steps   []stepDef
 	options SuiteOptions
+	r       *reporter
 }
 
 // Holds all the information about how the suite or features/steps should be configured
@@ -63,6 +64,7 @@ func NewSuite(t *testing.T, options SuiteOptions) *Suite {
 		t:       t,
 		steps:   []stepDef{},
 		options: options,
+		r:       &reporter{},
 	}
 }
 
@@ -77,7 +79,7 @@ func NewSuite(t *testing.T, options SuiteOptions) *Suite {
 //
 // The second parameter is a function which will be executed when while running a scenario one of the steps will match
 // the given pattern
-func (suite *Suite) AddStep(step interface{}, f StepFunc) error {
+func (s *Suite) AddStep(step interface{}, f StepFunc) error {
 	var regex *regexp.Regexp
 
 	switch t := step.(type) {
@@ -91,7 +93,7 @@ func (suite *Suite) AddStep(step interface{}, f StepFunc) error {
 		return fmt.Errorf("expecting expr to be a *regexp.Regexp or a string, got type: %T", step)
 	}
 
-	suite.steps = append(suite.steps, stepDef{
+	s.steps = append(s.steps, stepDef{
 		expr: regex,
 		f:    f,
 	})
@@ -100,22 +102,22 @@ func (suite *Suite) AddStep(step interface{}, f StepFunc) error {
 }
 
 // Executes the suite with given options and defined steps
-func (suite *Suite) Run() {
-	files, err := filepath.Glob(suite.options.featuresPaths)
+func (s *Suite) Run() {
+	files, err := filepath.Glob(s.options.featuresPaths)
 	if err != nil {
-		suite.t.Fatalf("cannot find features/ directory")
+		s.t.Fatalf("cannot find features/ directory")
 	}
 
 	for _, file := range files {
-		err = suite.executeFeature(file)
+		err = s.executeFeature(file)
 		if err != nil {
-			suite.t.Fail()
+			s.t.Fail()
 			printError(err)
 		}
 	}
 }
 
-func (suite *Suite) executeFeature(file string) error {
+func (s *Suite) executeFeature(file string) error {
 	f, err := os.Open(file)
 	if err != nil {
 		return fmt.Errorf("cannot open file %s", file)
@@ -124,7 +126,7 @@ func (suite *Suite) executeFeature(file string) error {
 	fileIO := bufio.NewReader(f)
 	doc, err := gherkin.ParseGherkinDocument(fileIO)
 	if err != nil {
-		suite.t.Fail()
+		s.t.Fail()
 		printErrorf("error while loading document: %s", err)
 	}
 
@@ -132,29 +134,29 @@ func (suite *Suite) executeFeature(file string) error {
 		return nil
 	}
 
-	return suite.runFeature(doc.Feature)
+	return s.runFeature(doc.Feature)
 }
 
-func (suite *Suite) runFeature(feature *gherkin.Feature) error {
-	printFeature(feature.Name)
+func (s *Suite) runFeature(feature *gherkin.Feature) error {
+	s.r.start()
 	hasErrors := false
 
-	for _, s := range feature.Children {
-		if scenario, ok := s.(*gherkin.Scenario); ok {
-			if suite.skipScenario(scenario.Tags, suite.options.ignoreTags) {
+	for _, child := range feature.Children {
+		if scenario, ok := child.(*gherkin.Scenario); ok {
+			if s.skipScenario(scenario.Tags, s.options.ignoreTags) {
 				continue
 			}
-			err := suite.runScenario(scenario)
+			err := s.runScenario(scenario)
 			if err != nil {
 				hasErrors = true
 			}
 		}
 
-		if scenario, ok := s.(*gherkin.ScenarioOutline); ok {
-			if suite.skipScenario(scenario.Tags, suite.options.ignoreTags) {
+		if scenario, ok := child.(*gherkin.ScenarioOutline); ok {
+			if s.skipScenario(scenario.Tags, s.options.ignoreTags) {
 				continue
 			}
-			err := suite.runScenarioOutline(scenario)
+			err := s.runScenarioOutline(scenario)
 			if err != nil {
 				hasErrors = true
 			}
@@ -168,8 +170,8 @@ func (suite *Suite) runFeature(feature *gherkin.Feature) error {
 	return nil
 }
 
-func (suite *Suite) runScenarioOutline(outline *gherkin.ScenarioOutline) error {
-	printScenarioOutline(outline.Name)
+func (s *Suite) runScenarioOutline(outline *gherkin.ScenarioOutline) error {
+	s.r.ScenarioOutline(outline)
 
 	for _, ex := range outline.Examples {
 		if len(ex.TableBody) == 0 {
@@ -180,17 +182,17 @@ func (suite *Suite) runScenarioOutline(outline *gherkin.ScenarioOutline) error {
 		groups := ex.TableBody
 
 		for _, group := range groups {
-			steps := suite.runOutlineStep(outline, placeholders, group)
+			steps := s.runOutlineStep(outline, placeholders, group)
 			// TODO print it
 
 			ctx := newContext()
-			suite.runSteps(ctx, steps)
+			s.runSteps(ctx, steps)
 		}
 	}
 	return nil
 }
 
-func (suite *Suite) runOutlineStep(outline *gherkin.ScenarioOutline, placeholders []*gherkin.TableCell, group *gherkin.TableRow) []*gherkin.Step {
+func (s *Suite) runOutlineStep(outline *gherkin.ScenarioOutline, placeholders []*gherkin.TableCell, group *gherkin.TableRow) []*gherkin.Step {
 	var steps []*gherkin.Step
 	for _, outlineStep := range outline.Steps {
 		text := outlineStep.Text
@@ -205,18 +207,18 @@ func (suite *Suite) runOutlineStep(outline *gherkin.ScenarioOutline, placeholder
 			text = strings.Replace(text, "<"+placeholder.Value+">", group.Cells[i].Value, -1)
 			t := getRegexpForVar(group.Cells[i].Value)
 
-			for _, step := range suite.steps {
-				def, err := suite.findStepDef(originalText)
+			for _, step := range s.steps {
+				def, err := s.findStepDef(originalText)
 				if err != nil {
 					continue
 				}
 
 				expr := strings.Replace(def.expr.String(), ph, t, -1)
-				_ = suite.AddStep(expr, step.f)
+				_ = s.AddStep(expr, step.f)
 			}
 		}
 
-		arg := suite.getOutlineArguments(outlineStep, placeholders, group)
+		arg := s.getOutlineArguments(outlineStep, placeholders, group)
 
 		// clone a step
 		step := &gherkin.Step{
@@ -230,17 +232,17 @@ func (suite *Suite) runOutlineStep(outline *gherkin.ScenarioOutline, placeholder
 	return steps
 }
 
-func (suite *Suite) getOutlineArguments(outlineStep *gherkin.Step, placeholders []*gherkin.TableCell, group *gherkin.TableRow) interface{} {
+func (s *Suite) getOutlineArguments(outlineStep *gherkin.Step, placeholders []*gherkin.TableCell, group *gherkin.TableRow) interface{} {
 	arg := outlineStep.Argument
 
 	switch t := outlineStep.Argument.(type) {
 	case *gherkin.DataTable:
-		arg = suite.outlineDataTableArguments(t, placeholders, group)
+		arg = s.outlineDataTableArguments(t, placeholders, group)
 	}
 	return arg
 }
 
-func (suite *Suite) outlineDataTableArguments(t *gherkin.DataTable, placeholders []*gherkin.TableCell, group *gherkin.TableRow) interface{} {
+func (s *Suite) outlineDataTableArguments(t *gherkin.DataTable, placeholders []*gherkin.TableCell, group *gherkin.TableRow) interface{} {
 	tbl := &gherkin.DataTable{
 		Node: t.Node,
 		Rows: make([]*gherkin.TableRow, len(t.Rows)),
@@ -265,21 +267,21 @@ func (suite *Suite) outlineDataTableArguments(t *gherkin.DataTable, placeholders
 	return tbl
 }
 
-func (suite *Suite) runScenario(scenario *gherkin.Scenario) error {
-	printScenario(scenario.Name)
+func (s *Suite) runScenario(scenario *gherkin.Scenario) error {
+	s.r.Scenario(scenario)
 	ctx := newContext()
 
-	suite.runSteps(ctx, scenario.Steps)
+	s.runSteps(ctx, scenario.Steps)
 
 	return nil
 }
 
-func (suite *Suite) runSteps(ctx Context, steps []*gherkin.Step) {
+func (s *Suite) runSteps(ctx Context, steps []*gherkin.Step) {
 	for _, step := range steps {
 		printStep(step)
-		def, err := suite.findStepDef(step.Text)
+		def, err := s.findStepDef(step.Text)
 		if err != nil {
-			suite.t.Errorf("cannot find step definition for step '%s'", step.Text)
+			s.t.Errorf("cannot find step definition for step '%s'", step.Text)
 			continue
 		}
 
@@ -289,13 +291,13 @@ func (suite *Suite) runSteps(ctx Context, steps []*gherkin.Step) {
 		err = def.f(ctx)
 		if err != nil {
 			printError(err)
-			suite.t.Fail()
+			s.t.Fail()
 		}
 	}
 }
 
-func (suite *Suite) findStepDef(text string) (stepDef, error) {
-	for _, step := range suite.steps {
+func (s *Suite) findStepDef(text string) (stepDef, error) {
+	for _, step := range s.steps {
 		if !step.expr.MatchString(text) {
 			continue
 		}
@@ -306,7 +308,7 @@ func (suite *Suite) findStepDef(text string) (stepDef, error) {
 	return stepDef{}, errors.New("cannot find step definition")
 }
 
-func (suite *Suite) skipScenario(scenarioTags []*gherkin.Tag, ignoreTags []string) bool {
+func (s *Suite) skipScenario(scenarioTags []*gherkin.Tag, ignoreTags []string) bool {
 	for _, tag := range scenarioTags {
 		if contains(ignoreTags, tag.Name) {
 			return true
