@@ -4,12 +4,16 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/bkielbasa/gobdd/reporter"
 
 	"github.com/cucumber/gherkin-go"
 )
@@ -19,7 +23,6 @@ type Suite struct {
 	t       *testing.T
 	steps   []stepDef
 	options SuiteOptions
-	r       *reporter
 }
 
 // Holds all the information about how the suite or features/steps should be configured
@@ -64,7 +67,6 @@ func NewSuite(t *testing.T, options SuiteOptions) *Suite {
 		t:       t,
 		steps:   []stepDef{},
 		options: options,
-		r:       &reporter{},
 	}
 }
 
@@ -112,7 +114,6 @@ func (s *Suite) Run() {
 		err = s.executeFeature(file)
 		if err != nil {
 			s.t.Fail()
-			printError(err)
 		}
 	}
 }
@@ -127,7 +128,8 @@ func (s *Suite) executeFeature(file string) error {
 	doc, err := gherkin.ParseGherkinDocument(fileIO)
 	if err != nil {
 		s.t.Fail()
-		printErrorf("error while loading document: %s", err)
+		printErrorf("error while loading document: %s\n", err)
+		return fmt.Errorf("error while loading document: %s\n", err)
 	}
 
 	if doc.Feature == nil {
@@ -138,7 +140,8 @@ func (s *Suite) executeFeature(file string) error {
 }
 
 func (s *Suite) runFeature(feature *gherkin.Feature) error {
-	s.r.start()
+	log.SetOutput(ioutil.Discard)
+	r := reporter.NewFmt()
 	hasErrors := false
 
 	for _, child := range feature.Children {
@@ -146,7 +149,7 @@ func (s *Suite) runFeature(feature *gherkin.Feature) error {
 			if s.skipScenario(scenario.Tags, s.options.ignoreTags) {
 				continue
 			}
-			err := s.runScenario(scenario)
+			err := s.runScenario(scenario, r)
 			if err != nil {
 				hasErrors = true
 			}
@@ -156,12 +159,14 @@ func (s *Suite) runFeature(feature *gherkin.Feature) error {
 			if s.skipScenario(scenario.Tags, s.options.ignoreTags) {
 				continue
 			}
-			err := s.runScenarioOutline(scenario)
+			err := s.runScenarioOutline(scenario, r)
 			if err != nil {
 				hasErrors = true
 			}
 		}
 	}
+
+	r.GenerateReport()
 
 	if hasErrors {
 		return errors.New("the feature contains errors")
@@ -170,9 +175,8 @@ func (s *Suite) runFeature(feature *gherkin.Feature) error {
 	return nil
 }
 
-func (s *Suite) runScenarioOutline(outline *gherkin.ScenarioOutline) error {
-	s.r.ScenarioOutline(outline)
-
+func (s *Suite) runScenarioOutline(outline *gherkin.ScenarioOutline, reporter reporter.Reporter) error {
+	reporter.ScenarioOutline(outline)
 	for _, ex := range outline.Examples {
 		if len(ex.TableBody) == 0 {
 			continue
@@ -186,7 +190,7 @@ func (s *Suite) runScenarioOutline(outline *gherkin.ScenarioOutline) error {
 			// TODO print it
 
 			ctx := newContext()
-			s.runSteps(ctx, steps)
+			s.runSteps(ctx, reporter, steps)
 		}
 	}
 	return nil
@@ -267,20 +271,20 @@ func (s *Suite) outlineDataTableArguments(t *gherkin.DataTable, placeholders []*
 	return tbl
 }
 
-func (s *Suite) runScenario(scenario *gherkin.Scenario) error {
-	s.r.Scenario(scenario)
+func (s *Suite) runScenario(scenario *gherkin.Scenario, reporter reporter.Reporter) error {
+	reporter.Scenario(scenario)
 	ctx := newContext()
 
-	s.runSteps(ctx, scenario.Steps)
+	s.runSteps(ctx, reporter, scenario.Steps)
 
 	return nil
 }
 
-func (s *Suite) runSteps(ctx Context, steps []*gherkin.Step) {
+func (s *Suite) runSteps(ctx Context, reporter reporter.Reporter, steps []*gherkin.Step) {
 	for _, step := range steps {
-		printStep(step)
 		def, err := s.findStepDef(step.Text)
 		if err != nil {
+			reporter.UndefinedStep(step)
 			s.t.Errorf("cannot find step definition for step '%s'", step.Text)
 			continue
 		}
@@ -290,9 +294,12 @@ func (s *Suite) runSteps(ctx Context, steps []*gherkin.Step) {
 
 		err = def.f(ctx)
 		if err != nil {
-			printError(err)
+			reporter.FailedStep(step, err)
 			s.t.Fail()
+			continue
 		}
+
+		reporter.SucceededStep(step)
 	}
 }
 
