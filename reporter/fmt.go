@@ -27,8 +27,12 @@ type fmtReporter struct {
 }
 
 func (r *fmtReporter) Scenario(scenario *gherkin.Scenario) {
-	fmt.Printf("Scenario: %s\n", Green(scenario.Name))
+	fmt.Printf("%s: %s\n", scenario.Keyword, Green(scenario.Name))
 	r.scenarios = append(r.scenarios, scenario)
+}
+
+func (r *fmtReporter) Background(bkg *gherkin.Background) {
+	fmt.Printf("%s: %s\n", bkg.Keyword, Green(bkg.Name))
 }
 
 func (r *fmtReporter) UndefinedStep(step *gherkin.Step) {
@@ -47,7 +51,7 @@ func (r *fmtReporter) FailedStep(step *gherkin.Step, err error) {
 }
 
 func (r *fmtReporter) ScenarioOutline(outline *gherkin.ScenarioOutline) {
-	fmt.Printf("Scenario: %s\n", Green(outline.Name))
+	fmt.Printf("%s: %s\n", outline.Keyword, Green(outline.Name))
 	r.scenarios = append(r.scenarios, outline)
 }
 

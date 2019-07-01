@@ -143,7 +143,7 @@ func (s *Suite) runFeature(feature *gherkin.Feature) error {
 	log.SetOutput(ioutil.Discard)
 	r := reporter.NewFmt()
 	hasErrors := false
-	bkgSteps := []*gherkin.Step{}
+	var bkgSteps *gherkin.Background
 
 	for _, child := range feature.Children {
 		if scenario, ok := child.(*gherkin.Scenario); ok {
@@ -168,7 +168,7 @@ func (s *Suite) runFeature(feature *gherkin.Feature) error {
 		}
 
 		if bkg, ok := child.(*gherkin.Background); ok {
-			bkgSteps = s.getBackgroundSteps(bkg)
+			bkgSteps = bkg
 		}
 	}
 
@@ -181,7 +181,7 @@ func (s *Suite) runFeature(feature *gherkin.Feature) error {
 	return nil
 }
 
-func (s *Suite) runScenarioOutline(outline *gherkin.ScenarioOutline, bkgSteps []*gherkin.Step, reporter reporter.Reporter) error {
+func (s *Suite) runScenarioOutline(outline *gherkin.ScenarioOutline, bkg *gherkin.Background, reporter reporter.Reporter) error {
 	reporter.ScenarioOutline(outline)
 	for _, ex := range outline.Examples {
 		if len(ex.TableBody) == 0 {
@@ -192,9 +192,14 @@ func (s *Suite) runScenarioOutline(outline *gherkin.ScenarioOutline, bkgSteps []
 		groups := ex.TableBody
 
 		for _, group := range groups {
-			steps := s.runOutlineStep(outline, placeholders, group)
-			steps = append(bkgSteps, steps...)
 			ctx := newContext()
+			if bkg != nil {
+				reporter.Background(bkg)
+				steps := s.getBackgroundSteps(bkg)
+				s.runSteps(ctx, reporter, steps)
+			}
+
+			steps := s.runOutlineStep(outline, placeholders, group)
 			s.runSteps(ctx, reporter, steps)
 		}
 	}
@@ -276,12 +281,16 @@ func (s *Suite) outlineDataTableArguments(t *gherkin.DataTable, placeholders []*
 	return tbl
 }
 
-func (s *Suite) runScenario(scenario *gherkin.Scenario, bkgSteps []*gherkin.Step, reporter reporter.Reporter) error {
+func (s *Suite) runScenario(scenario *gherkin.Scenario, bkg *gherkin.Background, reporter reporter.Reporter) error {
 	reporter.Scenario(scenario)
 	ctx := newContext()
 
-	steps := append(bkgSteps, scenario.Steps...)
-	s.runSteps(ctx, reporter, steps)
+	if bkg != nil {
+		reporter.Background(bkg)
+		steps := s.getBackgroundSteps(bkg)
+		s.runSteps(ctx, reporter, steps)
+	}
+	s.runSteps(ctx, reporter, scenario.Steps)
 
 	return nil
 }
@@ -339,7 +348,7 @@ func (s *Suite) skipScenario(scenarioTags []*gherkin.Tag, ignoreTags []string) b
 	return false
 }
 
-func (suite *Suite) getBackgroundSteps(bkg *gherkin.Background) []*gherkin.Step {
+func (s *Suite) getBackgroundSteps(bkg *gherkin.Background) []*gherkin.Step {
 	return bkg.Steps
 }
 

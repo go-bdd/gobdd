@@ -8,4 +8,5 @@ type Reporter interface {
 	SucceededStep(step *gherkin.Step)
 	FailedStep(step *gherkin.Step, err error)
 	ScenarioOutline(outline *gherkin.ScenarioOutline)
+	Background(bkg *gherkin.Background)
 }
