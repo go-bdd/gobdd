@@ -10,13 +10,13 @@ import (
 // * data saved by previously executed steps
 // * parameters which were received from the step definition
 type Context struct {
-	values map[string]interface{}
+	values map[interface{}]interface{}
 	params [][]byte
 }
 
 func newContext() Context {
 	return Context{
-		values: map[string]interface{}{},
+		values: map[interface{}]interface{}{},
 		params: [][]byte{},
 	}
 }
