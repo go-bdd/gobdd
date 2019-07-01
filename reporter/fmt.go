@@ -36,7 +36,7 @@ func (r *fmtReporter) Background(bkg *gherkin.Background) {
 }
 
 func (r *fmtReporter) UndefinedStep(step *gherkin.Step) {
-	fmt.Printf("Undefined step: %s\n", Yellow(step.Text))
+	fmt.Printf("  %s: %s\n", Red("Undefined step"), Yellow(step.Text))
 	r.undefinedSteps = append(r.undefinedSteps, step)
 }
 
