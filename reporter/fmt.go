@@ -62,5 +62,5 @@ func (r fmtReporter) GenerateReport() {
 		fmt.Printf("%d undefined steps\n", len(r.undefinedSteps))
 	}
 
-	fmt.Printf("took %s\ns", time.Since(r.timer).String())
+	fmt.Printf("took %s\n", time.Since(r.timer).String())
 }
