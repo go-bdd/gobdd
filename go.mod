@@ -1,4 +1,4 @@
-module github.com/bkielbasa/gobdd
+module github.com/go-bdd/gobdd
 
 go 1.12
 
