@@ -1,6 +1,6 @@
 # GOBDD
 
-[![GoDoc](https://godoc.org/github.com/bkielbasa/gobdd?status.svg)](https://godoc.org/github.com/bkielbasa/gobdd)
+[![GoDoc](https://godoc.org/github.com/go-bdd/gobdd?status.svg)](https://godoc.org/github.com/go-bdd/gobdd)
 
 This is a BDD testing framework. Uses gherkin for the test's syntax. Project is under active development.
 
