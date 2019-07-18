@@ -1,3 +1,4 @@
+github.com/bkielbasa/gobdd v0.0.0-20190704102538-089c379d8f80 h1:jlcmwsIfXRPqBFmRG7rI+Rf7iRTBD0F3T84xHbKNtWg=
 github.com/cucumber/gherkin-go v5.1.0+incompatible h1:RCvyVI6KQLI2IJkijZBeJcE4K3U7DnhQ1RjD7VV+AIk=
 github.com/cucumber/gherkin-go v5.1.0+incompatible/go.mod h1:bYJ65F+CDEAL70FXAu7/ef4ayC/NhRXO8zEW3IB21w0=
 github.com/logrusorgru/aurora v0.0.0-20190428105938-cea283e61946 h1:z+WaKrgu3kCpcdnbK9YG+JThpOCd1nU5jO5ToVmSlR4=

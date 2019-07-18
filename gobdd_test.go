@@ -3,15 +3,17 @@ package gobdd
 import (
 	"errors"
 	"testing"
+
+	"github.com/go-bdd/gobdd/context"
 )
 
-func add(ctx Context) error {
+func add(ctx context.Context) error {
 	res := ctx.GetIntParam(0) + ctx.GetIntParam(1)
 	ctx.Set("sumRes", res)
 	return nil
 }
 
-func check(ctx Context) error {
+func check(ctx context.Context) error {
 	expected := ctx.GetIntParam(0)
 	received := ctx.GetInt("sumRes")
 
@@ -22,7 +24,7 @@ func check(ctx Context) error {
 	return nil
 }
 
-func fail(Context) error {
+func fail(context.Context) error {
 	return errors.New("the step should never be executed")
 }
 
@@ -43,14 +45,14 @@ func TestScenarios(t *testing.T) {
 
 func TestScenarioOutline(t *testing.T) {
 	suite := NewSuite(t, NewSuiteOptions().WithFeaturesPath("features/outline.feature"))
-	err := suite.AddStep(`I add <digit1> and <digit2>`, func(ctx Context) error {
+	err := suite.AddStep(`I add <digit1> and <digit2>`, func(ctx context.Context) error {
 		return nil
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = suite.AddStep(`the result should equal <result>`, func(ctx Context) error {
+	err = suite.AddStep(`the result should equal <result>`, func(ctx context.Context) error {
 
 		return nil
 	})
