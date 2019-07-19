@@ -13,9 +13,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/bkielbasa/gobdd/reporter"
-
 	"github.com/cucumber/gherkin-go"
+	"github.com/go-bdd/gobdd/context"
+	"github.com/go-bdd/gobdd/reporter"
+	"github.com/go-bdd/gobdd/step"
 )
 
 // Holds all the information about the suite (options, steps to execute etc)
@@ -53,12 +54,9 @@ func (options SuiteOptions) WithIgnoredTags(tags []string) SuiteOptions {
 	return options
 }
 
-// StepFunc every step function have to be compatible with this type
-type StepFunc func(ctx Context) error
-
 type stepDef struct {
 	expr *regexp.Regexp
-	f    StepFunc
+	f    step.Func
 }
 
 // Creates a new suites with given configuration and empty steps defined
@@ -81,7 +79,7 @@ func NewSuite(t *testing.T, options SuiteOptions) *Suite {
 //
 // The second parameter is a function which will be executed when while running a scenario one of the steps will match
 // the given pattern
-func (s *Suite) AddStep(step interface{}, f StepFunc) error {
+func (s *Suite) AddStep(step interface{}, f step.Func) error {
 	var regex *regexp.Regexp
 
 	switch t := step.(type) {
@@ -192,7 +190,7 @@ func (s *Suite) runScenarioOutline(outline *gherkin.ScenarioOutline, bkg *gherki
 		groups := ex.TableBody
 
 		for _, group := range groups {
-			ctx := newContext()
+			ctx := context.New()
 			if bkg != nil {
 				reporter.Background(bkg)
 				steps := s.getBackgroundSteps(bkg)
@@ -283,7 +281,7 @@ func (s *Suite) outlineDataTableArguments(t *gherkin.DataTable, placeholders []*
 
 func (s *Suite) runScenario(scenario *gherkin.Scenario, bkg *gherkin.Background, reporter reporter.Reporter) error {
 	reporter.Scenario(scenario)
-	ctx := newContext()
+	ctx := context.New()
 
 	if bkg != nil {
 		reporter.Background(bkg)
@@ -295,13 +293,13 @@ func (s *Suite) runScenario(scenario *gherkin.Scenario, bkg *gherkin.Background,
 	return nil
 }
 
-func (s *Suite) runSteps(ctx Context, reporter reporter.Reporter, steps []*gherkin.Step) {
+func (s *Suite) runSteps(ctx context.Context, reporter reporter.Reporter, steps []*gherkin.Step) {
 	for _, step := range steps {
 		s.runStep(ctx, reporter, step)
 	}
 }
 
-func (s *Suite) runStep(ctx Context, reporter reporter.Reporter, step *gherkin.Step) {
+func (s *Suite) runStep(ctx context.Context, reporter reporter.Reporter, step *gherkin.Step) {
 	defer func() {
 		if r := recover(); r != nil {
 			s.t.Error(r)
@@ -316,7 +314,7 @@ func (s *Suite) runStep(ctx Context, reporter reporter.Reporter, step *gherkin.S
 	}
 
 	b := def.expr.FindSubmatch([]byte(step.Text))
-	ctx.setParams(b[1:])
+	ctx.SetParams(b[1:])
 	err = def.f(ctx)
 	if err != nil {
 		reporter.FailedStep(step, err)

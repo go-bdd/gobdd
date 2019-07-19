@@ -1,4 +1,4 @@
-package gobdd
+package context
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ type Context struct {
 	params [][]byte
 }
 
-func newContext() Context {
+func New() Context {
 	return Context{
 		values: map[interface{}]interface{}{},
 		params: [][]byte{},
@@ -258,6 +258,6 @@ func (ctx Context) GetInt64(key interface{}) int64 {
 	return value
 }
 
-func (ctx *Context) setParams(params [][]byte) {
+func (ctx *Context) SetParams(params [][]byte) {
 	ctx.params = params
 }
