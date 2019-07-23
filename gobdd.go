@@ -30,6 +30,7 @@ type Suite struct {
 type SuiteOptions struct {
 	featuresPaths string
 	ignoreTags    []string
+	tags          []string
 }
 
 // NewSuiteOptions creates a new suite configuration with default values
@@ -37,6 +38,7 @@ func NewSuiteOptions() SuiteOptions {
 	return SuiteOptions{
 		featuresPaths: "features/*.feature",
 		ignoreTags:    []string{},
+		tags:          []string{},
 	}
 }
 
@@ -44,6 +46,13 @@ func NewSuiteOptions() SuiteOptions {
 // The default value is "features/*.feature"
 func (options SuiteOptions) WithFeaturesPath(path string) SuiteOptions {
 	options.featuresPaths = path
+	return options
+}
+
+// Configures which tags should be skipped while executing a suite
+// Every tag has to start with @
+func (options SuiteOptions) WithTags(tags []string) SuiteOptions {
+	options.tags = tags
 	return options
 }
 
@@ -145,7 +154,7 @@ func (s *Suite) runFeature(feature *gherkin.Feature) error {
 
 	for _, child := range feature.Children {
 		if scenario, ok := child.(*gherkin.Scenario); ok {
-			if s.skipScenario(scenario.Tags, s.options.ignoreTags) {
+			if s.skipScenario(scenario.Tags) {
 				continue
 			}
 			err := s.runScenario(scenario, bkgSteps, r)
@@ -155,7 +164,7 @@ func (s *Suite) runFeature(feature *gherkin.Feature) error {
 		}
 
 		if scenario, ok := child.(*gherkin.ScenarioOutline); ok {
-			if s.skipScenario(scenario.Tags, s.options.ignoreTags) {
+			if s.skipScenario(scenario.Tags) {
 				continue
 			}
 
@@ -336,14 +345,24 @@ func (s *Suite) findStepDef(text string) (stepDef, error) {
 	return stepDef{}, errors.New("cannot find step definition")
 }
 
-func (s *Suite) skipScenario(scenarioTags []*gherkin.Tag, ignoreTags []string) bool {
+func (s *Suite) skipScenario(scenarioTags []*gherkin.Tag) bool {
 	for _, tag := range scenarioTags {
-		if contains(ignoreTags, tag.Name) {
+		if contains(s.options.ignoreTags, tag.Name) {
 			return true
 		}
 	}
 
-	return false
+	if len(s.options.tags) == 0 {
+		return false
+	}
+
+	for _, tag := range scenarioTags {
+		if contains(s.options.tags, tag.Name) {
+			return false
+		}
+	}
+
+	return true
 }
 
 func (s *Suite) getBackgroundSteps(bkg *gherkin.Background) []*gherkin.Step {
