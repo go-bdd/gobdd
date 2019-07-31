@@ -41,6 +41,7 @@ before_script:
 script:
   - golangci-lint run       # run a bunch of code checkers/linters in parallel
   - go test -v -race ./...  # Run all the tests with the race detector enabled
-  - go get golang.org/x/tools/cmd/cover && go get github.com/mattn/goveralls
-  - go clean -modcache
-  - go test -v -covermode=count github.com/mattn/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
+  - go get github.com/philwinder/gocoverage
+  - go get github.com/mattn/goveralls
+  - gocoverage
+  - goveralls -coverprofile=profile.cov -repotoken=$COVERALLS_TOKEN
