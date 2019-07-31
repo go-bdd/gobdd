@@ -6,10 +6,7 @@ language: go
 # Force-enable Go modules. Also force go to use the code in vendor/
 # These will both be unnecessary when Go 1.13 lands.
 env:
-  matrix:
-    - GO111MODULE=on
-  global:
-    secure: SAPXown0h8da9pcaVYJSOP1D+DzeOmFTeC37rFNjhhJxBwQ6iKQ6Mh2+93OdBl39On7iFUn26BmarpRLjRDrlRqtx1sVieraz6ysAGnF4KoBG4r9fmNKx+yuRdPYU9mqiPS7gN8wrEAAr0wb4QLFC+NN72HNY9MzH1LAuhrGgK+ryv3V0LYFrU38/C+Haq41EuXJLG0NAc8OjrJNj9hUCgUIvwWfWPRNv+19i++Ya2uSAkZEbMsldOVQgvZrmPKOc+12CkizZLVVKiM6Ejfn0sAlfrQw5dC8QBJYRmea7HDx4/PCFH3DMZNxaRy9EZJQ3Ht9fQ7jy2WxDi6ga5riBC2TQaEAtrjBFOv9lW3iF7aRo/6ccbZNP42Lmjlv/zVf8dGbZWMF1me4yreaUugkrcBIcAtXtIQWSaXvAITi5hCOZ/9UKfJl1FlM3twcRY7Y9LgsZLiQg9ES8dL7HsGLnFmM9+b/Dpwb+M1YphaN5fAOsbGuuOR8dBKOBdWJthrZ2Sovcu6utA4QZvrOAmUib8qdoT8CRq9SArsix0nNFEYoKyt+TsfO9C41yOlvBzIRiEDEVE7udp2o1j4AXHF1CW3L2YVtE5mcKc6nKmlv9BGJnmV2unkPreZyICdAMnlIvzmjALDd3VLXqxKbetZruxJ0DXytt1r+0p1S/n/EpeI=
+  - GO111MODULE=on
 
 # You don't need to test on very old versions of the Go compiler. It's the user's
 # responsibility to keep their compiler up to date.
@@ -33,7 +30,6 @@ notifications:
 # Make sure golangci-lint is vendored.
 before_script:
   - go install github.com/golangci/golangci-lint/cmd/golangci-lint
-  - go get github.com/mattn/goveralls
 
 # script always runs to completion (set +e). If we have linter issues AND a
 # failing test, we want to see both. Configure golangci-lint with a
@@ -41,5 +37,3 @@ before_script:
 script:
   - golangci-lint run       # run a bunch of code checkers/linters in parallel
   - go test -v -race ./...  # Run all the tests with the race detector enabled
-  - go get golang.org/x/tools/cmd/cover
-  - go test -v -covermode=count -coverprofile=coverage.out $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
