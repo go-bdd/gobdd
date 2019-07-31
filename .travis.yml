@@ -43,4 +43,4 @@ script:
   - go test -v -race ./...  # Run all the tests with the race detector enabled
   - go get golang.org/x/tools/cmd/cover && go get github.com/mattn/goveralls
   - go clean -modcache
-  - go test -v -covermode=count $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
+  - go test -v -covermode=count github.com/mattn/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
