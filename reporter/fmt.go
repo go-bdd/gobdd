@@ -19,16 +19,46 @@ func NewFmt() *fmtReporter {
 }
 
 type fmtReporter struct {
-	timer          time.Time
-	scenarios      []interface{} // *gherkin.Scenario or *gherkin.ScenarioOutline
-	undefinedSteps []*gherkin.Step
-	succeededSteps []*gherkin.Step
-	failedSteps    []*gherkin.Step
+	timer                   time.Time
+	scenarios               []interface{} // *gherkin.Scenario or *gherkin.ScenarioOutline
+	skippedScenarios        []*gherkin.Scenario
+	skippedScenarioOutlines []*gherkin.ScenarioOutline
+	undefinedSteps          []*gherkin.Step
+	succeededSteps          []*gherkin.Step
+	failedSteps             []*gherkin.Step
 }
 
 func (r *fmtReporter) Scenario(scenario *gherkin.Scenario) {
-	fmt.Printf("%s: %s\n", scenario.Keyword, Green(scenario.Name))
+	if len(scenario.Tags) != 0 {
+		for _, tag := range scenario.Tags {
+			fmt.Printf("%s\n", Yellow(tag.Name))
+		}
+	}
+
+	fmt.Printf("%s: %s\n", scenario.Keyword, Gray(10, scenario.Name))
 	r.scenarios = append(r.scenarios, scenario)
+}
+
+func (r *fmtReporter) SkippedScenario(scenario *gherkin.Scenario) {
+	if len(scenario.Tags) != 0 {
+		for _, tag := range scenario.Tags {
+			fmt.Printf("%s\n", Yellow(tag.Name))
+		}
+	}
+
+	fmt.Printf("%s: %s\n", scenario.Keyword, Gray(10, scenario.Name))
+	r.skippedScenarios = append(r.skippedScenarios, scenario)
+}
+
+func (r *fmtReporter) SkippedScenarioOutline(scenario *gherkin.ScenarioOutline) {
+	if len(scenario.Tags) != 0 {
+		for _, tag := range scenario.Tags {
+			fmt.Printf("%s\n", Yellow(tag.Name))
+		}
+	}
+
+	fmt.Printf("%s: %s\n", scenario.Keyword, Blue(scenario.Name))
+	r.skippedScenarioOutlines = append(r.skippedScenarioOutlines, scenario)
 }
 
 func (r *fmtReporter) Background(bkg *gherkin.Background) {
@@ -51,6 +81,11 @@ func (r *fmtReporter) FailedStep(step *gherkin.Step, err error) {
 }
 
 func (r *fmtReporter) ScenarioOutline(outline *gherkin.ScenarioOutline) {
+	if len(outline.Tags) != 0 {
+		for _, tag := range outline.Tags {
+			fmt.Printf("%s\n", Yellow(tag.Name))
+		}
+	}
 	fmt.Printf("%s: %s\n", outline.Keyword, Green(outline.Name))
 	r.scenarios = append(r.scenarios, outline)
 }

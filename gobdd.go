@@ -155,6 +155,7 @@ func (s *Suite) runFeature(feature *gherkin.Feature) error {
 	for _, child := range feature.Children {
 		if scenario, ok := child.(*gherkin.Scenario); ok {
 			if s.skipScenario(scenario.Tags) {
+				r.SkippedScenario(scenario)
 				continue
 			}
 			err := s.runScenario(scenario, bkgSteps, r)
@@ -165,6 +166,7 @@ func (s *Suite) runFeature(feature *gherkin.Feature) error {
 
 		if scenario, ok := child.(*gherkin.ScenarioOutline); ok {
 			if s.skipScenario(scenario.Tags) {
+				r.SkippedScenarioOutline(scenario)
 				continue
 			}
 
