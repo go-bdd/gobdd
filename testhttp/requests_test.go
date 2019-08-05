@@ -8,10 +8,7 @@ import (
 )
 
 func TestValidMethods(t *testing.T) {
-	handler := TestHTTP{
-		handler: testHandler{},
-	}
-
+	handler := Build(testHandler{})
 	methods := []string{"Get", "Post", "Trace", "Options", "Head", "Connect", "Patch", "Put", "Delete"}
 
 	for _, method := range methods {
