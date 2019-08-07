@@ -5,10 +5,13 @@ import (
 	"net/http"
 	"reflect"
 	"testing"
+
+	"github.com/go-bdd/gobdd"
 )
 
 func TestValidMethods(t *testing.T) {
-	handler := Build(testHandler{})
+	s := gobdd.NewSuite(t, gobdd.NewSuiteOptions())
+	handler := Build(s, testHandler{})
 	methods := []string{"Get", "Post", "Trace", "Options", "Head", "Connect", "Patch", "Put", "Delete"}
 
 	for _, method := range methods {
