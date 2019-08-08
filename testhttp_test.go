@@ -14,6 +14,11 @@ func TestHTTP(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 	})
 
+	router.HandleFunc("/json", func(w http.ResponseWriter, req *http.Request) {
+		_, _ = w.Write([]byte(`{"valid": "json"}`))
+		w.WriteHeader(http.StatusOK)
+	})
+
 	testhttp.Build(s, router)
 
 	s.Run()

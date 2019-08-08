@@ -1,7 +1,11 @@
 package testhttp
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"io/ioutil"
 
 	"github.com/go-bdd/gobdd/context"
 	"github.com/go-bdd/gobdd/step"
@@ -26,8 +30,42 @@ func Build(addStep addStepper, h httpHandler) TestHTTP {
 
 	_ = addStep.AddStep(`^I make a (GET|POST|PUT|DELETE|OPTIONS) request to "([^"]*)"$`, testHTTP.makeRequest)
 	_ = addStep.AddStep(`^the response code equals (\d+)$`, testHTTP.statusCodeEquals)
+	_ = addStep.AddStep(`^the response contains a valid JSON$`, testHTTP.validJSON)
+	_ = addStep.AddStep(`^the response is "(.*)"$`, testHTTP.theResponseIs)
 
 	return thhtp
+}
+
+func (t testHTTPMethods) theResponseIs(ctx context.Context) error {
+	expectedResponse := ctx.GetStringParam(0)
+
+	resp := ctx.Get(httpResponse{}).(Response)
+	body, err := ioutil.ReadAll(resp.Body)
+	resp.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+	ctx.Set(httpResponse{}, resp)
+	if err != nil {
+		return fmt.Errorf("an error while reading the body: %s", err)
+	}
+
+	if expectedResponse != string(body) {
+		return errors.New("the body doesn't contain a valid JSON")
+	}
+	return nil
+}
+
+func (t testHTTPMethods) validJSON(ctx context.Context) error {
+	resp := ctx.Get(httpResponse{}).(Response)
+	body, err := ioutil.ReadAll(resp.Body)
+	resp.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+	ctx.Set(httpResponse{}, resp)
+	if err != nil {
+		return fmt.Errorf("an error while reading the body: %s", err)
+	}
+
+	if !json.Valid(body) {
+		return errors.New("the body doesn't contain a valid JSON")
+	}
+	return nil
 }
 
 func (t testHTTPMethods) makeRequest(ctx context.Context) error {
