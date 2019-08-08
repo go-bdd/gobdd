@@ -41,11 +41,10 @@ before_script:
 script:
   - golangci-lint run       # run a bunch of code checkers/linters in parallel
   - go test -v -race ./...  # Run all the tests with the race detector enabled
+
+after_success:
   - go get github.com/philwinder/gocoverage
   - go get github.com/mattn/goveralls
   - gocoverage
   - goveralls -coverprofile=profile.cov -repotoken=$COVERALLS_TOKEN
   - go test -race -coverprofile=coverage.txt -covermode=atomic
-
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
