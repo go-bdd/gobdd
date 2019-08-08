@@ -35,7 +35,9 @@ func TestInvalidMethod(t *testing.T) {
 }
 
 type testHandler struct {
+	body []byte
 }
 
 func (h testHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	_, _ = w.Write(h.body)
 }

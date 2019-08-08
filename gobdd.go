@@ -329,7 +329,7 @@ func (s *Suite) runStep(ctx context.Context, reporter reporter.Reporter, step *g
 	err = def.f(ctx)
 	if err != nil {
 		reporter.FailedStep(step, err)
-		s.t.Fail()
+		s.t.Error(err)
 	} else {
 		reporter.SucceededStep(step)
 	}
