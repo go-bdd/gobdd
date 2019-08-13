@@ -5,3 +5,11 @@
 This is a BDD testing framework. Uses gherkin for the test's syntax. Project is under active development.
 
 More detailed documentation can be found on the docs page: https://go-bdd.github.io/doc/
+
+# Contributing
+All contributions are very much welcome. If you'd like to help with GoBDD development, please see open issues and submit your pull request via GitHub.
+
+# Support
+If you didn't find the answer to your question in the documentation, feel free to ask us directly!
+
+Please join us on the `#watermill` channel on the [Gophers slack](https://gophers.slack.com/): You can get [an invite here](https://gophersinvite.herokuapp.com/).
