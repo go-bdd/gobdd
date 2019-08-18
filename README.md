@@ -13,3 +13,4 @@ All contributions are very much welcome. If you'd like to help with GoBDD develo
 If you didn't find the answer to your question in the documentation, feel free to ask us directly!
 
 Please join us on the `#go-bdd-library` channel on the [Gophers slack](https://gophers.slack.com/): You can get [an invite here](https://gophersinvite.herokuapp.com/).
+You can find updates about the progress on Twiter: [GoBdd](https://twitter.com/Go_BDD).
