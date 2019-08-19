@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 
 	"github.com/go-bdd/gobdd/context"
 	"github.com/go-bdd/gobdd/step"
@@ -71,7 +72,12 @@ func (t testHTTPMethods) validJSON(ctx context.Context) error {
 func (t testHTTPMethods) makeRequest(ctx context.Context) error {
 	method := ctx.GetStringParam(0)
 	url := ctx.GetStringParam(1)
-	resp, err := t.tHTTP.Request(method, url, nil)
+	req, err := http.NewRequest(method, url, nil)
+	if err != nil {
+		return err
+	}
+
+	resp, err := t.tHTTP.MakeRequest(req)
 	if err != nil {
 		return err
 	}
