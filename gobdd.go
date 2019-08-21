@@ -32,6 +32,7 @@ type SuiteOptions struct {
 	ignoreTags     []string
 	tags           []string
 	beforeScenario []func()
+	afterScenario  []func()
 }
 
 // NewSuiteOptions creates a new suite configuration with default values
@@ -41,6 +42,7 @@ func NewSuiteOptions() SuiteOptions {
 		ignoreTags:     []string{},
 		tags:           []string{},
 		beforeScenario: []func(){},
+		afterScenario:  []func(){},
 	}
 }
 
@@ -61,6 +63,12 @@ func (options SuiteOptions) WithTags(tags []string) SuiteOptions {
 // Configures functions that should be executed before every scenario
 func (options SuiteOptions) WithBeforeScenario(f func()) SuiteOptions {
 	options.beforeScenario = append(options.beforeScenario, f)
+	return options
+}
+
+// Configures functions that should be executed after every scenario
+func (options SuiteOptions) WithAfterScenario(f func()) SuiteOptions {
+	options.afterScenario = append(options.afterScenario, f)
 	return options
 }
 
@@ -199,6 +207,8 @@ func (s *Suite) runFeature(feature *gherkin.Feature) error {
 }
 
 func (s *Suite) runScenarioOutline(outline *gherkin.ScenarioOutline, bkg *gherkin.Background, reporter reporter.Reporter) error {
+	s.callBeforeScenarios()
+	defer s.callAfterScenarios()
 	reporter.ScenarioOutline(outline)
 	for _, ex := range outline.Examples {
 		if len(ex.TableBody) == 0 {
@@ -263,6 +273,18 @@ func (s *Suite) runOutlineStep(outline *gherkin.ScenarioOutline, placeholders []
 	return steps
 }
 
+func (s *Suite) callBeforeScenarios() {
+	for _, f := range s.options.beforeScenario {
+		f()
+	}
+}
+
+func (s *Suite) callAfterScenarios() {
+	for _, f := range s.options.afterScenario {
+		f()
+	}
+}
+
 func (s *Suite) getOutlineArguments(outlineStep *gherkin.Step, placeholders []*gherkin.TableCell, group *gherkin.TableRow) interface{} {
 	arg := outlineStep.Argument
 
@@ -299,6 +321,9 @@ func (s *Suite) outlineDataTableArguments(t *gherkin.DataTable, placeholders []*
 }
 
 func (s *Suite) runScenario(scenario *gherkin.Scenario, bkg *gherkin.Background, reporter reporter.Reporter) error {
+	s.callBeforeScenarios()
+
+	defer s.callAfterScenarios()
 	reporter.Scenario(scenario)
 	ctx := context.New()
 
