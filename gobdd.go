@@ -28,17 +28,19 @@ type Suite struct {
 
 // Holds all the information about how the suite or features/steps should be configured
 type SuiteOptions struct {
-	featuresPaths string
-	ignoreTags    []string
-	tags          []string
+	featuresPaths  string
+	ignoreTags     []string
+	tags           []string
+	beforeScenario []func()
 }
 
 // NewSuiteOptions creates a new suite configuration with default values
 func NewSuiteOptions() SuiteOptions {
 	return SuiteOptions{
-		featuresPaths: "features/*.feature",
-		ignoreTags:    []string{},
-		tags:          []string{},
+		featuresPaths:  "features/*.feature",
+		ignoreTags:     []string{},
+		tags:           []string{},
+		beforeScenario: []func(){},
 	}
 }
 
@@ -56,8 +58,14 @@ func (options SuiteOptions) WithTags(tags []string) SuiteOptions {
 	return options
 }
 
+// Configures functions that should be executed before every scenario
+func (options SuiteOptions) WithBeforeScenario(f func()) SuiteOptions {
+	options.beforeScenario = append(options.beforeScenario, f)
+	return options
+}
+
 // Configures which tags should be skipped while executing a suite
-// Every tag has to start with @
+// Every tag has to start with @ otherwise will be ignored
 func (options SuiteOptions) WithIgnoredTags(tags []string) SuiteOptions {
 	options.ignoreTags = tags
 	return options
