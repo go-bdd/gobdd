@@ -139,23 +139,29 @@ func (ctx Context) GetInt64Param(i int) int64 {
 		panic(err)
 	}
 
-	return int64(param)
+	return param
 }
 
 func (ctx Context) Set(key interface{}, value interface{}) {
 	ctx.values[key] = value
 }
 
-func (ctx Context) Get(key interface{}) interface{} {
+func (ctx Context) Get(key interface{}, def ...interface{}) interface{} {
 	if _, ok := ctx.values[key]; !ok {
+		if len(def) == 0 {
+			return def[0]
+		}
 		panic(fmt.Sprintf("the key %s does not exist", key))
 	}
 
 	return ctx.values[key]
 }
 
-func (ctx Context) GetString(key interface{}) string {
+func (ctx Context) GetString(key interface{}, def ...string) string {
 	if _, ok := ctx.values[key]; !ok {
+		if len(def) == 0 {
+			return def[0]
+		}
 		panic(fmt.Sprintf("the key %s does not exist", key))
 	}
 
@@ -167,8 +173,11 @@ func (ctx Context) GetString(key interface{}) string {
 	return value
 }
 
-func (ctx Context) GetFloat64(key interface{}) float64 {
+func (ctx Context) GetFloat64(key interface{}, def ...float64) float64 {
 	if _, ok := ctx.values[key]; !ok {
+		if len(def) == 0 {
+			return def[0]
+		}
 		panic(fmt.Sprintf("the key %s does not exist", key))
 	}
 
@@ -180,8 +189,11 @@ func (ctx Context) GetFloat64(key interface{}) float64 {
 	return value
 }
 
-func (ctx Context) GetFloat32(key interface{}) float32 {
+func (ctx Context) GetFloat32(key interface{}, def ...float32) float32 {
 	if _, ok := ctx.values[key]; !ok {
+		if len(def) == 0 {
+			return def[0]
+		}
 		panic(fmt.Sprintf("the key %s does not exist", key))
 	}
 
@@ -193,8 +205,11 @@ func (ctx Context) GetFloat32(key interface{}) float32 {
 	return value
 }
 
-func (ctx Context) GetInt(key interface{}) int {
+func (ctx Context) GetInt(key interface{}, def ...int) int {
 	if _, ok := ctx.values[key]; !ok {
+		if len(def) == 0 {
+			return def[0]
+		}
 		panic(fmt.Sprintf("the key %s does not exist", key))
 	}
 
@@ -206,8 +221,11 @@ func (ctx Context) GetInt(key interface{}) int {
 	return value
 }
 
-func (ctx Context) GetInt8(key interface{}) int8 {
+func (ctx Context) GetInt8(key interface{}, def ...int8) int8 {
 	if _, ok := ctx.values[key]; !ok {
+		if len(def) == 0 {
+			return def[0]
+		}
 		panic(fmt.Sprintf("the key %s does not exist", key))
 	}
 
@@ -219,8 +237,11 @@ func (ctx Context) GetInt8(key interface{}) int8 {
 	return value
 }
 
-func (ctx Context) GetInt16(key interface{}) int16 {
+func (ctx Context) GetInt16(key interface{}, def ...int16) int16 {
 	if _, ok := ctx.values[key]; !ok {
+		if len(def) == 0 {
+			return def[0]
+		}
 		panic(fmt.Sprintf("the key %s does not exist", key))
 	}
 
@@ -232,8 +253,11 @@ func (ctx Context) GetInt16(key interface{}) int16 {
 	return value
 }
 
-func (ctx Context) GetInt32(key interface{}) int32 {
+func (ctx Context) GetInt32(key interface{}, def ...int32) int32 {
 	if _, ok := ctx.values[key]; !ok {
+		if len(def) == 0 {
+			return def[0]
+		}
 		panic(fmt.Sprintf("the key %s does not exist", key))
 	}
 
@@ -245,14 +269,33 @@ func (ctx Context) GetInt32(key interface{}) int32 {
 	return value
 }
 
-func (ctx Context) GetInt64(key interface{}) int64 {
+func (ctx Context) GetInt64(key interface{}, def ...int64) int64 {
 	if _, ok := ctx.values[key]; !ok {
+		if len(def) == 0 {
+			return def[0]
+		}
 		panic(fmt.Sprintf("the key %s does not exist", key))
 	}
 
 	value, ok := ctx.values[key].(int64)
 	if !ok {
 		panic(fmt.Sprintf("the expected value is not int64 (%T)", key))
+	}
+
+	return value
+}
+
+func (ctx Context) GetBool(key interface{}, def ...bool) bool {
+	if _, ok := ctx.values[key]; !ok {
+		if len(def) == 0 {
+			return def[0]
+		}
+		panic(fmt.Sprintf("the key %s does not exist", key))
+	}
+
+	value, ok := ctx.values[key].(bool)
+	if !ok {
+		panic(fmt.Sprintf("the expected value is not bool (%T)", key))
 	}
 
 	return value
