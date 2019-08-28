@@ -63,7 +63,7 @@ func main() {
 		},
 	}
 
-	f, err := os.Create("context/getparams.go")
+	f, err := os.Create("context/get.go")
 	die(err)
 
 	var tmpl = template.Must(template.New("").Funcs(funcMap).Parse(getTmpl))
@@ -74,7 +74,7 @@ func main() {
 	die(err)
 	f.Close()
 
-	f, err = os.Create("context/getparams_test.go")
+	f, err = os.Create("context/get_test.go")
 	die(err)
 	tmpl = template.Must(template.New("").Funcs(funcMap).Parse(testTmpl))
 	err = tmpl.Execute(f, struct {
