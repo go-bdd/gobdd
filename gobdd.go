@@ -164,17 +164,23 @@ func (s *Suite) executeFeature(file string) error {
 
 func (s *Suite) runFeature(feature *gherkin.Feature) error {
 	log.SetOutput(ioutil.Discard)
-	r := reporter.NewFmt()
+	r := reporter.NewReporter()
+	_ = r.Report(feature)
 	hasErrors := false
 	var bkgSteps *gherkin.Background
 
 	for _, child := range feature.Children {
 		if scenario, ok := child.(*gherkin.Scenario); ok {
 			if s.skipScenario(scenario.Tags) {
-				r.SkippedScenario(scenario)
+				r.Skip(scenario)
 				continue
 			}
-			err := s.runScenario(scenario, bkgSteps, r)
+			ctx := context.New()
+
+			if bkgSteps != nil {
+				s.runSteps(ctx, r, bkgSteps.Steps)
+			}
+			err := s.runScenario(ctx, scenario, bkgSteps, r)
 			if err != nil {
 				hasErrors = true
 			}
@@ -182,11 +188,16 @@ func (s *Suite) runFeature(feature *gherkin.Feature) error {
 
 		if scenario, ok := child.(*gherkin.ScenarioOutline); ok {
 			if s.skipScenario(scenario.Tags) {
-				r.SkippedScenarioOutline(scenario)
+				r.Skip(scenario)
 				continue
 			}
 
-			err := s.runScenarioOutline(scenario, bkgSteps, r)
+			ctx := context.New()
+			if bkgSteps != nil {
+				s.runSteps(ctx, r, bkgSteps.Steps)
+			}
+
+			err := s.runScenarioOutline(scenario, r)
 			if err != nil {
 				hasErrors = true
 			}
@@ -194,11 +205,11 @@ func (s *Suite) runFeature(feature *gherkin.Feature) error {
 
 		if bkg, ok := child.(*gherkin.Background); ok {
 			bkgSteps = bkg
+			_ = r.Report(bkg)
 		}
 	}
 
 	r.GenerateReport()
-
 	if hasErrors {
 		return errors.New("the feature contains errors")
 	}
@@ -206,10 +217,10 @@ func (s *Suite) runFeature(feature *gherkin.Feature) error {
 	return nil
 }
 
-func (s *Suite) runScenarioOutline(outline *gherkin.ScenarioOutline, bkg *gherkin.Background, reporter reporter.Reporter) error {
+func (s *Suite) runScenarioOutline(outline *gherkin.ScenarioOutline, reporter *reporter.Reporter) error {
 	s.callBeforeScenarios()
 	defer s.callAfterScenarios()
-	reporter.ScenarioOutline(outline)
+	_ = reporter.Report(outline)
 	for _, ex := range outline.Examples {
 		if len(ex.TableBody) == 0 {
 			continue
@@ -220,12 +231,6 @@ func (s *Suite) runScenarioOutline(outline *gherkin.ScenarioOutline, bkg *gherki
 
 		for _, group := range groups {
 			ctx := context.New()
-			if bkg != nil {
-				reporter.Background(bkg)
-				steps := s.getBackgroundSteps(bkg)
-				s.runSteps(ctx, reporter, steps)
-			}
-
 			steps := s.runOutlineStep(outline, placeholders, group)
 			s.runSteps(ctx, reporter, steps)
 		}
@@ -320,15 +325,13 @@ func (s *Suite) outlineDataTableArguments(t *gherkin.DataTable, placeholders []*
 	return tbl
 }
 
-func (s *Suite) runScenario(scenario *gherkin.Scenario, bkg *gherkin.Background, reporter reporter.Reporter) error {
+func (s *Suite) runScenario(ctx context.Context, scenario *gherkin.Scenario, bkg *gherkin.Background, reporter *reporter.Reporter) error {
 	s.callBeforeScenarios()
 
 	defer s.callAfterScenarios()
-	reporter.Scenario(scenario)
-	ctx := context.New()
+	_ = reporter.Report(scenario)
 
 	if bkg != nil {
-		reporter.Background(bkg)
 		steps := s.getBackgroundSteps(bkg)
 		s.runSteps(ctx, reporter, steps)
 	}
@@ -337,13 +340,13 @@ func (s *Suite) runScenario(scenario *gherkin.Scenario, bkg *gherkin.Background,
 	return nil
 }
 
-func (s *Suite) runSteps(ctx context.Context, reporter reporter.Reporter, steps []*gherkin.Step) {
+func (s *Suite) runSteps(ctx context.Context, reporter *reporter.Reporter, steps []*gherkin.Step) {
 	for _, step := range steps {
 		s.runStep(ctx, reporter, step)
 	}
 }
 
-func (s *Suite) runStep(ctx context.Context, reporter reporter.Reporter, step *gherkin.Step) {
+func (s *Suite) runStep(ctx context.Context, reporter *reporter.Reporter, step *gherkin.Step) {
 	defer func() {
 		if r := recover(); r != nil {
 			s.t.Error(r)
@@ -352,7 +355,7 @@ func (s *Suite) runStep(ctx context.Context, reporter reporter.Reporter, step *g
 
 	def, err := s.findStepDef(step.Text)
 	if err != nil {
-		reporter.UndefinedStep(step)
+		reporter.Undefined(step)
 		s.t.Errorf("cannot find step definition for step '%s'", step.Text)
 		return
 	}
@@ -361,10 +364,10 @@ func (s *Suite) runStep(ctx context.Context, reporter reporter.Reporter, step *g
 	ctx.SetParams(b[1:])
 	err = def.f(ctx)
 	if err != nil {
-		reporter.FailedStep(step, err)
+		reporter.Failed(step, err)
 		s.t.Error(err)
 	} else {
-		reporter.SucceededStep(step)
+		_ = reporter.Report(step)
 	}
 }
 

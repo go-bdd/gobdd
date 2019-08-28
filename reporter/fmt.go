@@ -2,104 +2,105 @@ package reporter
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/cucumber/gherkin-go"
 	. "github.com/logrusorgru/aurora"
 )
 
-func NewFmt() *fmtReporter {
-	return &fmtReporter{
-		timer:          time.Now(),
-		scenarios:      []interface{}{},
-		undefinedSteps: []*gherkin.Step{},
-		succeededSteps: []*gherkin.Step{},
-		failedSteps:    []*gherkin.Step{},
-	}
-}
-
 type fmtReporter struct {
-	timer                   time.Time
-	scenarios               []interface{} // *gherkin.Scenario or *gherkin.ScenarioOutline
-	skippedScenarios        []*gherkin.Scenario
-	skippedScenarioOutlines []*gherkin.ScenarioOutline
-	undefinedSteps          []*gherkin.Step
-	succeededSteps          []*gherkin.Step
-	failedSteps             []*gherkin.Step
 }
 
-func (r *fmtReporter) Scenario(scenario *gherkin.Scenario) {
+func (r fmtReporter) Step(step *gherkin.Step) {
+	fmt.Printf("   %s %s\n", Yellow(step.Keyword), Green(step.Text))
+}
+
+func (r fmtReporter) Scenario(scenario *gherkin.Scenario) {
 	if len(scenario.Tags) != 0 {
 		for _, tag := range scenario.Tags {
-			fmt.Printf("%s\n", Yellow(tag.Name))
+			fmt.Printf(" %s\n", Yellow(tag.Name))
 		}
 	}
-
-	fmt.Printf("%s: %s\n", scenario.Keyword, Gray(10, scenario.Name))
-	r.scenarios = append(r.scenarios, scenario)
+	fmt.Printf(" %s: %s\n", Yellow(scenario.Keyword), Green(scenario.Name))
 }
 
-func (r *fmtReporter) SkippedScenario(scenario *gherkin.Scenario) {
+func (r fmtReporter) ScenarioOutline(scenario *gherkin.ScenarioOutline) {
 	if len(scenario.Tags) != 0 {
 		for _, tag := range scenario.Tags {
-			fmt.Printf("%s\n", Yellow(tag.Name))
+			fmt.Printf(" %s\n", Yellow(tag.Name))
 		}
 	}
+	fmt.Printf(" %s: %s\n", Yellow(scenario.Keyword), Green(scenario.Name))
 
-	fmt.Printf("%s: %s\n", scenario.Keyword, Gray(10, scenario.Name))
-	r.skippedScenarios = append(r.skippedScenarios, scenario)
+	for _, example := range scenario.Examples {
+		fmt.Printf(" %s:\n", Yellow(example.Keyword))
+	}
+
+	for _, step := range scenario.Steps {
+		fmt.Printf("     %s %s\n", Yellow(step.Keyword), Green(step.Text))
+	}
 }
 
-func (r *fmtReporter) SkippedScenarioOutline(scenario *gherkin.ScenarioOutline) {
-	if len(scenario.Tags) != 0 {
-		for _, tag := range scenario.Tags {
-			fmt.Printf("%s\n", Yellow(tag.Name))
+func (r fmtReporter) Undefined(s *gherkin.Step) {
+	fmt.Printf("   %s %s\n", Red("Undefined step"), Yellow(s.Text))
+}
+
+func (r fmtReporter) Skip(s *gherkin.Step) {
+	fmt.Printf(" %s %s\n", s.Keyword, Gray(10, s.Text))
+}
+
+func (r fmtReporter) Failed(step *gherkin.Step, e error) {
+	fmt.Printf("   %s %s\n", step.Keyword, Red(step.Text))
+}
+
+func (r fmtReporter) Background(background *gherkin.Background) {
+	fmt.Printf("  %s %s\n", Yellow(background.Keyword), Green(background.Name))
+	for _, s := range background.Steps {
+		r.Step(s)
+	}
+}
+
+func (r fmtReporter) Feature(feature *gherkin.Feature) {
+	fmt.Printf("%s %s\n", Yellow(feature.Keyword), Green(feature.Name))
+}
+
+func (r fmtReporter) SkipScenario(s *gherkin.Scenario) {
+	if len(s.Tags) != 0 {
+		for _, tag := range s.Tags {
+			fmt.Printf(" %s\n", Yellow(tag.Name))
 		}
 	}
-
-	fmt.Printf("%s: %s\n", scenario.Keyword, Blue(scenario.Name))
-	r.skippedScenarioOutlines = append(r.skippedScenarioOutlines, scenario)
+	fmt.Printf(" %s: %s\n", Gray(10, s.Keyword), Gray(10, s.Name))
+	for _, step := range s.Steps {
+		r.Skip(step)
+	}
 }
 
-func (r *fmtReporter) Background(bkg *gherkin.Background) {
-	fmt.Printf("%s: %s\n", bkg.Keyword, Green(bkg.Name))
-}
-
-func (r *fmtReporter) UndefinedStep(step *gherkin.Step) {
-	fmt.Printf("  %s: %s\n", Red("Undefined step"), Yellow(step.Text))
-	r.undefinedSteps = append(r.undefinedSteps, step)
-}
-
-func (r *fmtReporter) SucceededStep(step *gherkin.Step) {
-	fmt.Printf("  %s: %s\n", Yellow(step.Keyword), Green(step.Text))
-	r.succeededSteps = append(r.succeededSteps, step)
-}
-
-func (r *fmtReporter) FailedStep(step *gherkin.Step, err error) {
-	fmt.Printf("  %s: %s\n", step.Keyword, Red(step.Text))
-	r.failedSteps = append(r.failedSteps, step)
-}
-
-func (r *fmtReporter) ScenarioOutline(outline *gherkin.ScenarioOutline) {
-	if len(outline.Tags) != 0 {
-		for _, tag := range outline.Tags {
-			fmt.Printf("%s\n", Yellow(tag.Name))
+func (r fmtReporter) SkipScenarioOutline(s *gherkin.ScenarioOutline) {
+	if len(s.Tags) != 0 {
+		for _, tag := range s.Tags {
+			fmt.Printf(" %s\n", Yellow(tag.Name))
 		}
 	}
-	fmt.Printf("%s: %s\n", outline.Keyword, Green(outline.Name))
-	r.scenarios = append(r.scenarios, outline)
+	for _, example := range s.Examples {
+		fmt.Printf(" %s:\n", Gray(10, example.Keyword))
+	}
+
+	fmt.Printf(" %s: %s\n", Gray(10, s.Keyword), Gray(10, s.Name))
+	for _, step := range s.Steps {
+		r.Skip(step)
+	}
 }
 
-func (r fmtReporter) GenerateReport() {
-	fmt.Printf("%d scenarios\n", len(r.scenarios))
-	fmt.Printf("%d steps\n", len(r.succeededSteps))
-	if c := len(r.failedSteps); c > 0 {
-		fmt.Printf("%d failed steps\n", len(r.failedSteps))
+func (r fmtReporter) Report(report executionReport) {
+	fmt.Printf("%d scenarios\n", report.countScenarios)
+	fmt.Printf("%d steps\n", report.countSteps)
+	if c := report.countFailedSteps; c > 0 {
+		fmt.Printf("%d failed steps\n", report.countFailedSteps)
 	}
 
-	if c := len(r.undefinedSteps); c > 0 {
-		fmt.Printf("%d undefined steps\n", len(r.undefinedSteps))
+	if c := report.countUndefined; c > 0 {
+		fmt.Printf("%d undefined steps\n", report.countUndefined)
 	}
 
-	fmt.Printf("took %s\n", time.Since(r.timer).String())
+	fmt.Printf("took %s\n", report.timeTook.String())
 }
