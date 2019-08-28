@@ -133,7 +133,7 @@ func (ctx Context) GetInt64Param(i int) int64 {
 	}
 
 	data := ctx.params[i]
-	param, err := strconv.ParseInt(string(data), 10, 32)
+	param, err := strconv.ParseInt(string(data), 10, 64)
 
 	if err != nil {
 		panic(err)
