@@ -133,129 +133,28 @@ func (ctx Context) GetInt64Param(i int) int64 {
 	}
 
 	data := ctx.params[i]
-	param, err := strconv.ParseInt(string(data), 10, 32)
+	param, err := strconv.ParseInt(string(data), 10, 64)
 
 	if err != nil {
 		panic(err)
 	}
 
-	return int64(param)
+	return param
 }
 
 func (ctx Context) Set(key interface{}, value interface{}) {
 	ctx.values[key] = value
 }
 
-func (ctx Context) Get(key interface{}) interface{} {
+func (ctx Context) Get(key interface{}, defaultValue ...interface{}) interface{} {
 	if _, ok := ctx.values[key]; !ok {
+		if len(defaultValue) == 1 {
+			return defaultValue[0]
+		}
 		panic(fmt.Sprintf("the key %s does not exist", key))
 	}
 
 	return ctx.values[key]
-}
-
-func (ctx Context) GetString(key interface{}) string {
-	if _, ok := ctx.values[key]; !ok {
-		panic(fmt.Sprintf("the key %s does not exist", key))
-	}
-
-	value, ok := ctx.values[key].(string)
-	if !ok {
-		panic(fmt.Sprintf("the expected value is not string (%T)", key))
-	}
-
-	return value
-}
-
-func (ctx Context) GetFloat64(key interface{}) float64 {
-	if _, ok := ctx.values[key]; !ok {
-		panic(fmt.Sprintf("the key %s does not exist", key))
-	}
-
-	value, ok := ctx.values[key].(float64)
-	if !ok {
-		panic(fmt.Sprintf("the expected value is not float64 (%T)", key))
-	}
-
-	return value
-}
-
-func (ctx Context) GetFloat32(key interface{}) float32 {
-	if _, ok := ctx.values[key]; !ok {
-		panic(fmt.Sprintf("the key %s does not exist", key))
-	}
-
-	value, ok := ctx.values[key].(float32)
-	if !ok {
-		panic(fmt.Sprintf("the expected value is not float32 (%T)", key))
-	}
-
-	return value
-}
-
-func (ctx Context) GetInt(key interface{}) int {
-	if _, ok := ctx.values[key]; !ok {
-		panic(fmt.Sprintf("the key %s does not exist", key))
-	}
-
-	value, ok := ctx.values[key].(int)
-	if !ok {
-		panic(fmt.Sprintf("the expected value is not int (%T)", key))
-	}
-
-	return value
-}
-
-func (ctx Context) GetInt8(key interface{}) int8 {
-	if _, ok := ctx.values[key]; !ok {
-		panic(fmt.Sprintf("the key %s does not exist", key))
-	}
-
-	value, ok := ctx.values[key].(int8)
-	if !ok {
-		panic(fmt.Sprintf("the expected value is not int8 (%T)", key))
-	}
-
-	return value
-}
-
-func (ctx Context) GetInt16(key interface{}) int16 {
-	if _, ok := ctx.values[key]; !ok {
-		panic(fmt.Sprintf("the key %s does not exist", key))
-	}
-
-	value, ok := ctx.values[key].(int16)
-	if !ok {
-		panic(fmt.Sprintf("the expected value is not int12 (%T)", key))
-	}
-
-	return value
-}
-
-func (ctx Context) GetInt32(key interface{}) int32 {
-	if _, ok := ctx.values[key]; !ok {
-		panic(fmt.Sprintf("the key %s does not exist", key))
-	}
-
-	value, ok := ctx.values[key].(int32)
-	if !ok {
-		panic(fmt.Sprintf("the expected value is not int32 (%T)", key))
-	}
-
-	return value
-}
-
-func (ctx Context) GetInt64(key interface{}) int64 {
-	if _, ok := ctx.values[key]; !ok {
-		panic(fmt.Sprintf("the key %s does not exist", key))
-	}
-
-	value, ok := ctx.values[key].(int64)
-	if !ok {
-		panic(fmt.Sprintf("the expected value is not int64 (%T)", key))
-	}
-
-	return value
 }
 
 func (ctx *Context) SetParams(params [][]byte) {
