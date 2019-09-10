@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-
+	"github.com/go-bdd/assert"
 	"github.com/go-bdd/gobdd/context"
 	"github.com/go-bdd/gobdd/step"
+	"io/ioutil"
+	"net/http"
 )
 
 type addStepper interface {
@@ -20,7 +20,8 @@ type testHTTPMethods struct {
 	tHTTP TestHTTP
 }
 
-type httpResponse struct{}
+type ResponseKey struct{}
+type RequestKey struct{}
 
 func Build(addStep addStepper, h httpHandler) TestHTTP {
 	thhtp := TestHTTP{
@@ -33,17 +34,48 @@ func Build(addStep addStepper, h httpHandler) TestHTTP {
 	_ = addStep.AddStep(`^the response code equals (\d+)$`, testHTTP.statusCodeEquals)
 	_ = addStep.AddStep(`^the response contains a valid JSON$`, testHTTP.validJSON)
 	_ = addStep.AddStep(`^the response is "(.*)"$`, testHTTP.theResponseIs)
+	_ = addStep.AddStep(`^the response header "(.*)" equals "(.*)"$`, testHTTP.responseHeaderEquals)
+	_ = addStep.AddStep(`^I have a (GET|POST|PUT|DELETE|OPTIONS) request "(.*)"$`, testHTTP.iHaveARequest)
+	_ = addStep.AddStep(`^the request has body "(.*)"$`, testHTTP.theRequestHasBody)
 
 	return thhtp
+}
+
+func (t testHTTPMethods) responseHeaderEquals(ctx context.Context) error {
+	resp := ctx.Get(ResponseKey{}).(Response)
+	headerName := ctx.GetStringParam(0)
+	expected := ctx.GetStringParam(1)
+	given := resp.Header.Get(headerName)
+	return assert.Equals(expected, given)
+}
+
+func (t testHTTPMethods) theRequestHasBody(ctx context.Context) error {
+	req := ctx.Get(RequestKey{}).(http.Request)
+	body := ctx.GetStringParam(0)
+	req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(body)))
+	ctx.Set(RequestKey{}, req)
+	return nil
+}
+
+func (t testHTTPMethods) iHaveARequest(ctx context.Context) error {
+	method := ctx.GetStringParam(0)
+	url := ctx.GetStringParam(1)
+	req, err := http.NewRequest(method, url, nil)
+	if err != nil {
+		return err
+	}
+
+	ctx.Set(RequestKey{}, req)
+	return nil
 }
 
 func (t testHTTPMethods) theResponseIs(ctx context.Context) error {
 	expectedResponse := ctx.GetStringParam(0)
 
-	resp := ctx.Get(httpResponse{}).(Response)
+	resp := ctx.Get(ResponseKey{}).(Response)
 	body, err := ioutil.ReadAll(resp.Body)
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(body))
-	ctx.Set(httpResponse{}, resp)
+	ctx.Set(ResponseKey{}, resp)
 	if err != nil {
 		return fmt.Errorf("an error while reading the body: %s", err)
 	}
@@ -55,10 +87,10 @@ func (t testHTTPMethods) theResponseIs(ctx context.Context) error {
 }
 
 func (t testHTTPMethods) validJSON(ctx context.Context) error {
-	resp := ctx.Get(httpResponse{}).(Response)
+	resp := ctx.Get(ResponseKey{}).(Response)
 	body, err := ioutil.ReadAll(resp.Body)
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(body))
-	ctx.Set(httpResponse{}, resp)
+	ctx.Set(ResponseKey{}, resp)
 	if err != nil {
 		return fmt.Errorf("an error while reading the body: %s", err)
 	}
@@ -82,13 +114,13 @@ func (t testHTTPMethods) makeRequest(ctx context.Context) error {
 		return err
 	}
 
-	ctx.Set(httpResponse{}, resp)
+	ctx.Set(ResponseKey{}, resp)
 	return nil
 }
 
 func (t testHTTPMethods) statusCodeEquals(ctx context.Context) error {
 	expectedStatus := ctx.GetIntParam(0)
-	resp := ctx.Get(httpResponse{}).(Response)
+	resp := ctx.Get(ResponseKey{}).(Response)
 
 	if expectedStatus != resp.Code {
 		return fmt.Errorf("expected status code: %d but %d given", expectedStatus, resp.Code)

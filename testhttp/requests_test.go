@@ -25,10 +25,21 @@ func TestValidMethods(t *testing.T) {
 	}
 }
 
+func TestGettingResponseHeaders(t *testing.T) {
+	s := gobdd.NewSuite(t, gobdd.NewSuiteOptions())
+	handler := Build(s, testHandler{})
+	//handler.
+}
+
 type testHandler struct {
 	body []byte
 }
 
 func (h testHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	for key, values := range r.Header {
+		for _, value := range values {
+			w.Header().Add(key, value)
+		}
+	}
 	_, _ = w.Write(h.body)
 }
