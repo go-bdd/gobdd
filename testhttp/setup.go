@@ -36,9 +36,21 @@ func Build(addStep addStepper, h httpHandler) TestHTTP {
 	_ = addStep.AddStep(`^the response is "(.*)"$`, testHTTP.theResponseIs)
 	_ = addStep.AddStep(`^the response header "(.*)" equals "(.*)"$`, testHTTP.responseHeaderEquals)
 	_ = addStep.AddStep(`^I have a (GET|POST|PUT|DELETE|OPTIONS) request "(.*)"$`, testHTTP.iHaveARequest)
+	_ = addStep.AddStep(`^I set request header "Xyz" to "ZZZ"$`, testHTTP.iSetRequestSetTo)
 	_ = addStep.AddStep(`^the request has body "(.*)"$`, testHTTP.theRequestHasBody)
+	_ = addStep.AddStep(`^I make the request$`, testHTTP.iMakeRequest)
 
 	return thhtp
+}
+
+func (t testHTTPMethods) iSetRequestSetTo(ctx context.Context) error {
+	req := ctx.Get(RequestKey{}).(*http.Request)
+	headerName := ctx.GetStringParam(0)
+	value := ctx.GetStringParam(1)
+	req.Header.Add(headerName, value)
+
+	ctx.Set(RequestKey{}, req)
+	return nil
 }
 
 func (t testHTTPMethods) responseHeaderEquals(ctx context.Context) error {
@@ -46,11 +58,12 @@ func (t testHTTPMethods) responseHeaderEquals(ctx context.Context) error {
 	headerName := ctx.GetStringParam(0)
 	expected := ctx.GetStringParam(1)
 	given := resp.Header.Get(headerName)
+
 	return assert.Equals(expected, given)
 }
 
 func (t testHTTPMethods) theRequestHasBody(ctx context.Context) error {
-	req := ctx.Get(RequestKey{}).(http.Request)
+	req := ctx.Get(RequestKey{}).(*http.Request)
 	body := ctx.GetStringParam(0)
 	req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(body)))
 	ctx.Set(RequestKey{}, req)
@@ -98,6 +111,17 @@ func (t testHTTPMethods) validJSON(ctx context.Context) error {
 	if !json.Valid(body) {
 		return errors.New("the body doesn't contain a valid JSON")
 	}
+	return nil
+}
+
+func (t testHTTPMethods) iMakeRequest(ctx context.Context) error {
+	req := ctx.Get(RequestKey{}).(*http.Request)
+	resp, err := t.tHTTP.MakeRequest(req)
+	if err != nil {
+		return err
+	}
+
+	ctx.Set(ResponseKey{}, resp)
 	return nil
 }
 

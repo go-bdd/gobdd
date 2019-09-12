@@ -149,7 +149,7 @@ func (ctx Context) Get{{ .Name | Title }}(key interface{}, defaultValue ...{{ .N
 		if len(defaultValue) == 1 {
 			return defaultValue[0]
 		}
-		panic(fmt.Sprintf("the key %s does not exist", key))
+		panic(fmt.Sprintf("the key %+v does not exist", key))
 	}
 
 	value, ok := ctx.values[key].({{ .Name }})

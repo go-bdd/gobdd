@@ -25,12 +25,6 @@ func TestValidMethods(t *testing.T) {
 	}
 }
 
-func TestGettingResponseHeaders(t *testing.T) {
-	s := gobdd.NewSuite(t, gobdd.NewSuiteOptions())
-	handler := Build(s, testHandler{})
-	//handler.
-}
-
 type testHandler struct {
 	body []byte
 }

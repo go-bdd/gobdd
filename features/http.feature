@@ -19,3 +19,9 @@ Feature: HTTP requests
     Given I have a GET request "http://google.com"
     When I set the header "XYZ" to "ZYX"
     Then the request has header "XYZ" set to "ZYX"
+
+  Scenario: handling response headers
+    Given I have a GET request "/mirror"
+    And I set request header "Xyz" to "ZZZ"
+    When I make the request
+    Then the response header "Xyz" equals "ZZZ"

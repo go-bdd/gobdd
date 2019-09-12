@@ -21,6 +21,15 @@ func TestHTTP(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 	})
 
+	router.HandleFunc("/mirror", func(w http.ResponseWriter, r *http.Request) {
+		for key, values := range r.Header {
+			for _, value := range values {
+				w.Header().Add(key, value)
+			}
+		}
+		w.WriteHeader(http.StatusOK)
+	})
+
 	_ = s.AddStep(`^the request has method set to (GET|POST|PUT|DELETE|OPTIONS)$`, requestHasMethodSetTo)
 	_ = s.AddStep(`^the url is set to "([^"]*)"$`, urlIsSetTo)
 	_ = s.AddStep(`^the request body is nil$`, requestBodyIsNil)
