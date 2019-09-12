@@ -36,11 +36,20 @@ func Build(addStep addStepper, h httpHandler) TestHTTP {
 	_ = addStep.AddStep(`^the response is "(.*)"$`, testHTTP.theResponseIs)
 	_ = addStep.AddStep(`^the response header "(.*)" equals "(.*)"$`, testHTTP.responseHeaderEquals)
 	_ = addStep.AddStep(`^I have a (GET|POST|PUT|DELETE|OPTIONS) request "(.*)"$`, testHTTP.iHaveARequest)
-	_ = addStep.AddStep(`^I set request header "Xyz" to "ZZZ"$`, testHTTP.iSetRequestSetTo)
+	_ = addStep.AddStep(`^I set request header "(.*)" to "(.*)"$`, testHTTP.iSetRequestSetTo)
+	_ = addStep.AddStep(`^I set request body to "([^"]*)"$`, testHTTP.iSetRequestBodyTo)
 	_ = addStep.AddStep(`^the request has body "(.*)"$`, testHTTP.theRequestHasBody)
 	_ = addStep.AddStep(`^I make the request$`, testHTTP.iMakeRequest)
 
 	return thhtp
+}
+
+func (t testHTTPMethods) iSetRequestBodyTo(ctx context.Context) error {
+	r := ctx.Get(RequestKey{}).(*http.Request)
+	body := ctx.GetStringParam(0)
+	r.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(body)))
+	ctx.Set(RequestKey{}, r)
+	return nil
 }
 
 func (t testHTTPMethods) iSetRequestSetTo(ctx context.Context) error {
