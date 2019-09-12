@@ -34,7 +34,6 @@ func TestHTTP(t *testing.T) {
 	_ = s.AddStep(`^the url is set to "([^"]*)"$`, urlIsSetTo)
 	_ = s.AddStep(`^the request body is nil$`, requestBodyIsNil)
 	_ = s.AddStep(`^I set the header "([^"]*)" to "([^"]*)"$`, ISetHeaderTo)
-	_ = s.AddStep(`^I set the header "([^"]*)" to "([^"]*)"$`, ISetHeaderTo)
 	_ = s.AddStep(`^the request has header "([^"]*)" set to "([^"]*)"$`, requestHasHeaderSetTo)
 	testhttp.Build(s, router)
 

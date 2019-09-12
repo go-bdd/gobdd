@@ -25,7 +25,7 @@ Feature: HTTP requests
     And I set request header "Xyz" to "ZZZ"
     When I make the request
     Then the response header "Xyz" equals "ZZZ"
-    
+
   Scenario: request should have empty body by default
     Given I have a POST request "/mirror"
     When I set request body to "LALA"
