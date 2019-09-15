@@ -30,5 +30,10 @@ type testHandler struct {
 }
 
 func (h testHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	for key, values := range r.Header {
+		for _, value := range values {
+			w.Header().Add(key, value)
+		}
+	}
 	_, _ = w.Write(h.body)
 }

@@ -158,7 +158,7 @@ import (
 
 func (ctx Context) GetBoolParam(i int) bool {
 	if i >= len(ctx.params) {
-		panic(fmt.Sprintf("the param with index %d does not exist", i))
+		panic(fmt.Sprintf("the param with index %+v does not exist", i))
 	}
 
 	v, err := strconv.ParseBool(string(ctx.params[i]))
@@ -171,7 +171,7 @@ func (ctx Context) GetBoolParam(i int) bool {
 
 func (ctx Context) GetStringParam(i int) string {
 	if i >= len(ctx.params) {
-		panic(fmt.Sprintf("the param with index %d does not exist", i))
+		panic(fmt.Sprintf("the param with index %+v does not exist", i))
 	}
 
 	return string(ctx.params[i])
@@ -180,7 +180,7 @@ func (ctx Context) GetStringParam(i int) string {
 {{ range .FloatTypes }}
 func (ctx Context) Get{{ .Name | Title }}Param(i int) {{ .Name }} {
 	if i >= len(ctx.params) {
-		panic(fmt.Sprintf("the param with index %d does not exist", i))
+		panic(fmt.Sprintf("the param with index %+v does not exist", i))
 	}
 
 	data := ctx.params[i]
@@ -196,7 +196,7 @@ func (ctx Context) Get{{ .Name | Title }}Param(i int) {{ .Name }} {
 {{ range .IntTypes }}
 func (ctx Context) Get{{ .Name | Title }}Param(i int) {{ .Name }} {
 	if i >= len(ctx.params) {
-		panic(fmt.Sprintf("the param with index %d does not exist", i))
+		panic(fmt.Sprintf("the param with index %+v does not exist", i))
 	}
 
 	data := ctx.params[i]

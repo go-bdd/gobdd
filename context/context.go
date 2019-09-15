@@ -37,7 +37,7 @@ func (ctx Context) Get(key interface{}, defaultValue ...interface{}) interface{}
 		if len(defaultValue) == 1 {
 			return defaultValue[0]
 		}
-		panic(fmt.Sprintf("the key %s does not exist", key))
+		panic(fmt.Sprintf("the key %+v does not exist", key))
 	}
 
 	return ctx.values[key]

@@ -8,7 +8,7 @@ import (
 
 func (ctx Context) GetBoolParam(i int) bool {
 	if i >= len(ctx.params) {
-		panic(fmt.Sprintf("the param with index %d does not exist", i))
+		panic(fmt.Sprintf("the param with index %+v does not exist", i))
 	}
 
 	v, err := strconv.ParseBool(string(ctx.params[i]))
@@ -21,7 +21,7 @@ func (ctx Context) GetBoolParam(i int) bool {
 
 func (ctx Context) GetStringParam(i int) string {
 	if i >= len(ctx.params) {
-		panic(fmt.Sprintf("the param with index %d does not exist", i))
+		panic(fmt.Sprintf("the param with index %+v does not exist", i))
 	}
 
 	return string(ctx.params[i])
@@ -30,7 +30,7 @@ func (ctx Context) GetStringParam(i int) string {
 
 func (ctx Context) GetFloat32Param(i int) float32 {
 	if i >= len(ctx.params) {
-		panic(fmt.Sprintf("the param with index %d does not exist", i))
+		panic(fmt.Sprintf("the param with index %+v does not exist", i))
 	}
 
 	data := ctx.params[i]
@@ -45,7 +45,7 @@ func (ctx Context) GetFloat32Param(i int) float32 {
 
 func (ctx Context) GetFloat64Param(i int) float64 {
 	if i >= len(ctx.params) {
-		panic(fmt.Sprintf("the param with index %d does not exist", i))
+		panic(fmt.Sprintf("the param with index %+v does not exist", i))
 	}
 
 	data := ctx.params[i]
@@ -61,7 +61,7 @@ func (ctx Context) GetFloat64Param(i int) float64 {
 
 func (ctx Context) GetIntParam(i int) int {
 	if i >= len(ctx.params) {
-		panic(fmt.Sprintf("the param with index %d does not exist", i))
+		panic(fmt.Sprintf("the param with index %+v does not exist", i))
 	}
 
 	data := ctx.params[i]
@@ -76,7 +76,7 @@ func (ctx Context) GetIntParam(i int) int {
 
 func (ctx Context) GetInt8Param(i int) int8 {
 	if i >= len(ctx.params) {
-		panic(fmt.Sprintf("the param with index %d does not exist", i))
+		panic(fmt.Sprintf("the param with index %+v does not exist", i))
 	}
 
 	data := ctx.params[i]
@@ -91,7 +91,7 @@ func (ctx Context) GetInt8Param(i int) int8 {
 
 func (ctx Context) GetInt16Param(i int) int16 {
 	if i >= len(ctx.params) {
-		panic(fmt.Sprintf("the param with index %d does not exist", i))
+		panic(fmt.Sprintf("the param with index %+v does not exist", i))
 	}
 
 	data := ctx.params[i]
@@ -106,7 +106,7 @@ func (ctx Context) GetInt16Param(i int) int16 {
 
 func (ctx Context) GetInt32Param(i int) int32 {
 	if i >= len(ctx.params) {
-		panic(fmt.Sprintf("the param with index %d does not exist", i))
+		panic(fmt.Sprintf("the param with index %+v does not exist", i))
 	}
 
 	data := ctx.params[i]
@@ -121,7 +121,7 @@ func (ctx Context) GetInt32Param(i int) int32 {
 
 func (ctx Context) GetInt64Param(i int) int64 {
 	if i >= len(ctx.params) {
-		panic(fmt.Sprintf("the param with index %d does not exist", i))
+		panic(fmt.Sprintf("the param with index %+v does not exist", i))
 	}
 
 	data := ctx.params[i]
