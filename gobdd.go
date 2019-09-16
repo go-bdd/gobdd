@@ -15,7 +15,6 @@ import (
 
 	"github.com/cucumber/gherkin-go"
 	"github.com/go-bdd/gobdd/context"
-	"github.com/go-bdd/gobdd/reporter"
 	"github.com/go-bdd/gobdd/step"
 )
 
@@ -164,52 +163,51 @@ func (s *Suite) executeFeature(file string) error {
 
 func (s *Suite) runFeature(feature *gherkin.Feature) error {
 	log.SetOutput(ioutil.Discard)
-	r := reporter.NewReporter()
-	_ = r.Report(feature)
 	hasErrors := false
-	var bkgSteps *gherkin.Background
 
-	for _, child := range feature.Children {
-		if scenario, ok := child.(*gherkin.Scenario); ok {
-			if s.skipScenario(scenario.Tags) {
-				r.Skip(scenario)
-				continue
-			}
-			ctx := context.New()
+	s.t.Run(feature.Name, func(t *testing.T) {
+		var bkgSteps *gherkin.Background
 
-			if bkgSteps != nil {
-				s.runSteps(ctx, r, bkgSteps.Steps)
+		for _, child := range feature.Children {
+			if scenario, ok := child.(*gherkin.Scenario); ok {
+				if s.skipScenario(scenario.Tags) {
+					t.Log(fmt.Sprintf("Skipping scenario %s", scenario.Name))
+					continue
+				}
+				ctx := context.New()
+
+				if bkgSteps != nil {
+					s.runSteps(ctx, t, bkgSteps.Steps)
+				}
+				err := s.runScenario(ctx, scenario, bkgSteps, t)
+				if err != nil {
+					hasErrors = true
+				}
 			}
-			err := s.runScenario(ctx, scenario, bkgSteps, r)
-			if err != nil {
-				hasErrors = true
+
+			if scenario, ok := child.(*gherkin.ScenarioOutline); ok {
+				if s.skipScenario(scenario.Tags) {
+					t.Log(fmt.Sprintf("Skipping scenario %s", scenario.Name))
+					continue
+				}
+
+				ctx := context.New()
+				if bkgSteps != nil {
+					s.runSteps(ctx, t, bkgSteps.Steps)
+				}
+
+				err := s.runScenarioOutline(scenario, t)
+				if err != nil {
+					hasErrors = true
+				}
+			}
+
+			if bkg, ok := child.(*gherkin.Background); ok {
+				bkgSteps = bkg
 			}
 		}
+	})
 
-		if scenario, ok := child.(*gherkin.ScenarioOutline); ok {
-			if s.skipScenario(scenario.Tags) {
-				r.Skip(scenario)
-				continue
-			}
-
-			ctx := context.New()
-			if bkgSteps != nil {
-				s.runSteps(ctx, r, bkgSteps.Steps)
-			}
-
-			err := s.runScenarioOutline(scenario, r)
-			if err != nil {
-				hasErrors = true
-			}
-		}
-
-		if bkg, ok := child.(*gherkin.Background); ok {
-			bkgSteps = bkg
-			_ = r.Report(bkg)
-		}
-	}
-
-	r.GenerateReport()
 	if hasErrors {
 		return errors.New("the feature contains errors")
 	}
@@ -217,24 +215,26 @@ func (s *Suite) runFeature(feature *gherkin.Feature) error {
 	return nil
 }
 
-func (s *Suite) runScenarioOutline(outline *gherkin.ScenarioOutline, reporter *reporter.Reporter) error {
+func (s *Suite) runScenarioOutline(outline *gherkin.ScenarioOutline, t *testing.T) error {
 	s.callBeforeScenarios()
 	defer s.callAfterScenarios()
-	_ = reporter.Report(outline)
-	for _, ex := range outline.Examples {
-		if len(ex.TableBody) == 0 {
-			continue
-		}
+	t.Run(fmt.Sprintf("%s %s", outline.Keyword, outline.Name), func(t *testing.T) {
+		for _, ex := range outline.Examples {
+			if len(ex.TableBody) == 0 {
+				continue
+			}
 
-		placeholders := ex.TableHeader.Cells
-		groups := ex.TableBody
+			placeholders := ex.TableHeader.Cells
+			groups := ex.TableBody
 
-		for _, group := range groups {
-			ctx := context.New()
-			steps := s.runOutlineStep(outline, placeholders, group)
-			s.runSteps(ctx, reporter, steps)
+			for _, group := range groups {
+				ctx := context.New()
+				steps := s.runOutlineStep(outline, placeholders, group)
+				s.runSteps(ctx, t, steps)
+			}
 		}
-	}
+	})
+
 	return nil
 }
 
@@ -325,50 +325,50 @@ func (s *Suite) outlineDataTableArguments(t *gherkin.DataTable, placeholders []*
 	return tbl
 }
 
-func (s *Suite) runScenario(ctx context.Context, scenario *gherkin.Scenario, bkg *gherkin.Background, reporter *reporter.Reporter) error {
+func (s *Suite) runScenario(ctx context.Context, scenario *gherkin.Scenario, bkg *gherkin.Background, t *testing.T) error {
 	s.callBeforeScenarios()
 
 	defer s.callAfterScenarios()
-	_ = reporter.Report(scenario)
+	t.Run(scenario.Name, func(t *testing.T) {
+		if bkg != nil {
+			steps := s.getBackgroundSteps(bkg)
+			s.runSteps(ctx, t, steps)
+		}
+		s.runSteps(ctx, t, scenario.Steps)
+	})
 
-	if bkg != nil {
-		steps := s.getBackgroundSteps(bkg)
-		s.runSteps(ctx, reporter, steps)
-	}
-	s.runSteps(ctx, reporter, scenario.Steps)
 
 	return nil
 }
 
-func (s *Suite) runSteps(ctx context.Context, reporter *reporter.Reporter, steps []*gherkin.Step) {
+func (s *Suite) runSteps(ctx context.Context, t *testing.T, steps []*gherkin.Step) {
 	for _, step := range steps {
-		s.runStep(ctx, reporter, step)
+		s.runStep(ctx, t, step)
 	}
 }
 
-func (s *Suite) runStep(ctx context.Context, reporter *reporter.Reporter, step *gherkin.Step) {
+func (s *Suite) runStep(ctx context.Context, t *testing.T, step *gherkin.Step) {
 	defer func() {
 		if r := recover(); r != nil {
-			s.t.Error(r)
+			t.Error(r)
 		}
 	}()
 
 	def, err := s.findStepDef(step.Text)
 	if err != nil {
-		reporter.Undefined(step)
-		s.t.Errorf("cannot find step definition for step '%s'", step.Text)
+		t.Errorf("cannot find step definition for step: %s %s", step.Keyword, step.Text)
 		return
 	}
 
 	b := def.expr.FindSubmatch([]byte(step.Text))
 	ctx.SetParams(b[1:])
-	err = def.f(ctx)
-	if err != nil {
-		reporter.Failed(step, err)
-		s.t.Error(err)
-	} else {
-		_ = reporter.Report(step)
-	}
+	t.Run(step.Text, func(t *testing.T) {
+		err = def.f(ctx)
+		if err != nil {
+
+			t.Errorf(step.Keyword, step.Text, err)
+		}
+	})
 }
 
 func (s *Suite) findStepDef(text string) (stepDef, error) {
