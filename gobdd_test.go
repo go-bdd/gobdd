@@ -81,6 +81,27 @@ func TestIgnoredTags(t *testing.T) {
 	suite.Run()
 }
 
+func TestInvalidFunctionSignature(t *testing.T) {
+	testCases := map[string]struct{
+		f interface{}
+	}{
+		"nil": {},
+		"func without return value": {f: func(ctx context.Context) {}},
+		"func with invalid return value": {f: func(ctx context.Context) int { return 0}},
+		"func without arguments": {f: func() error { return errors.New("")}},
+		"func with invalid first argument": {f: func(i int) error { return errors.New("")}},
+	}
+
+	for name, testCase := range testCases {
+		t.Run(name, func(t *testing.T) {
+			suite := NewSuite(t, NewSuiteOptions())
+			err := suite.AddStep("", testCase.f)
+			if err == nil {
+				t.Errorf("the function has invalid signature; the test should fail")
+			}
+		})
+	}
+}
 
 func add(ctx context.Context, var1, var2 int) error {
 	res := var1 + var2
