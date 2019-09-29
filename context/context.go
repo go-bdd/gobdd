@@ -43,6 +43,3 @@ func (ctx Context) Get(key interface{}, defaultValue ...interface{}) interface{}
 	return ctx.values[key]
 }
 
-func (ctx *Context) SetParams(params [][]byte) {
-	ctx.params = params
-}

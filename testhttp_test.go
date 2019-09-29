@@ -40,9 +40,9 @@ func TestHTTP(t *testing.T) {
 	s.Run()
 }
 
-func requestHasMethodSetTo(ctx context.Context) error {
+func requestHasMethodSetTo(ctx context.Context, method string) error {
 	r := ctx.Get(testhttp.RequestKey{}).(*http.Request)
-	return assert.Equals(ctx.GetStringParam(0), r.Method)
+	return assert.Equals(method, r.Method)
 }
 
 func requestBodyIsNil(ctx context.Context) error {
@@ -50,22 +50,20 @@ func requestBodyIsNil(ctx context.Context) error {
 	return assert.Nil(r.Body)
 }
 
-func urlIsSetTo(ctx context.Context) error {
+func urlIsSetTo(ctx context.Context, url string) error {
 	r := ctx.Get(testhttp.RequestKey{}).(*http.Request)
-	return assert.Equals(ctx.GetStringParam(0), r.URL.String())
+	return assert.Equals(url, r.URL.String())
 }
 
-func ISetHeaderTo(ctx context.Context) error {
+func ISetHeaderTo(ctx context.Context, headerName, value string) error {
 	r := ctx.Get(testhttp.RequestKey{}).(*http.Request)
-	r.Header.Set(ctx.GetStringParam(0), ctx.GetStringParam(1))
+	r.Header.Set(headerName, value)
 	ctx.Set(testhttp.RequestKey{}, r)
 	return nil
 }
 
-func requestHasHeaderSetTo(ctx context.Context) error {
+func requestHasHeaderSetTo(ctx context.Context, headerName,expected  string) error {
 	r := ctx.Get(testhttp.RequestKey{}).(*http.Request)
-	headerName := ctx.GetStringParam(0)
-	expected := ctx.GetStringParam(1)
 	given := r.Header.Get(headerName)
 	return assert.Equals(expected, given)
 }

@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -15,7 +16,6 @@ import (
 
 	"github.com/cucumber/gherkin-go"
 	"github.com/go-bdd/gobdd/context"
-	"github.com/go-bdd/gobdd/step"
 )
 
 // Holds all the information about the suite (options, steps to execute etc)
@@ -80,7 +80,7 @@ func (options SuiteOptions) WithIgnoredTags(tags []string) SuiteOptions {
 
 type stepDef struct {
 	expr *regexp.Regexp
-	f    step.Func
+	f    interface{}
 }
 
 // Creates a new suites with given configuration and empty steps defined
@@ -103,7 +103,7 @@ func NewSuite(t *testing.T, options SuiteOptions) *Suite {
 //
 // The second parameter is a function which will be executed when while running a scenario one of the steps will match
 // the given pattern
-func (s *Suite) AddStep(step interface{}, f step.Func) error {
+func (s *Suite) AddStep(step interface{}, f interface{}) error {
 	var regex *regexp.Regexp
 
 	switch t := step.(type) {
@@ -242,6 +242,7 @@ func (s *Suite) runOutlineStep(outline *gherkin.ScenarioOutline, placeholders []
 	var steps []*gherkin.Step
 	for _, outlineStep := range outline.Steps {
 		text := outlineStep.Text
+
 		for i, placeholder := range placeholders {
 			ph := "<" + placeholder.Value + ">"
 			index := strings.Index(text, ph)
@@ -253,15 +254,13 @@ func (s *Suite) runOutlineStep(outline *gherkin.ScenarioOutline, placeholders []
 			text = strings.Replace(text, "<"+placeholder.Value+">", group.Cells[i].Value, -1)
 			t := getRegexpForVar(group.Cells[i].Value)
 
-			for _, step := range s.steps {
-				def, err := s.findStepDef(originalText)
-				if err != nil {
-					continue
-				}
-
-				expr := strings.Replace(def.expr.String(), ph, t, -1)
-				_ = s.AddStep(expr, step.f)
+			def, err := s.findStepDef(originalText)
+			if err != nil {
+				continue
 			}
+
+			expr := strings.Replace(def.expr.String(), ph, t, -1)
+			_ = s.AddStep(expr, def.f)
 		}
 
 		arg := s.getOutlineArguments(outlineStep, placeholders, group)
@@ -336,8 +335,6 @@ func (s *Suite) runScenario(ctx context.Context, scenario *gherkin.Scenario, bkg
 		}
 		s.runSteps(ctx, t, scenario.Steps)
 	})
-
-
 	return nil
 }
 
@@ -360,27 +357,63 @@ func (s *Suite) runStep(ctx context.Context, t *testing.T, step *gherkin.Step) {
 		return
 	}
 
-	b := def.expr.FindSubmatch([]byte(step.Text))
-	ctx.SetParams(b[1:])
+	params := def.expr.FindSubmatch([]byte(step.Text))[1:]
 	t.Run(step.Text, func(t *testing.T) {
-		err = def.f(ctx)
-		if err != nil {
+		defer func() {
+			if r := recover(); r != nil {
+				t.Errorf("%+v", r)
+			}
+		}()
 
+		d := reflect.ValueOf(def.f)
+		in := []reflect.Value{reflect.ValueOf(ctx)}
+		if len(params) + 1 != d.Type().NumIn() {
+			t.Errorf("the step function %s accepts %d arguments but %d received", d.String(), d.Type().NumIn(), len(params) + 1)
+			return
+		}
+		for i, v := range params {
+			paramType := reflect.ValueOf(v)
+			inType := d.Type().In(i + 1)
+
+			if inType.Kind() == reflect.String {
+				paramType = reflect.ValueOf(string(paramType.Interface().([]uint8)))
+			}
+			if inType.Kind() == reflect.Int {
+				s := paramType.Interface().([]uint8)
+				p, _ := strconv.Atoi(string(s))
+				paramType = reflect.ValueOf(p)
+			}
+			in = append(in, paramType)
+		}
+		v := d.Call(in)[0]
+
+		if !v.IsNil() {
+			err = v.Interface().(error)
 			t.Errorf(step.Keyword, step.Text, err)
 		}
 	})
 }
 
 func (s *Suite) findStepDef(text string) (stepDef, error) {
+	var sd stepDef
+	found := 0
+
 	for _, step := range s.steps {
 		if !step.expr.MatchString(text) {
 			continue
 		}
 
-		return step, nil
+		if l := len(step.expr.FindAll([]byte(text), -1)); l > found {
+			found = l
+			sd = step
+		}
 	}
 
-	return stepDef{}, errors.New("cannot find step definition")
+	if reflect.DeepEqual(sd, stepDef{}) {
+		return sd, errors.New("cannot find step definition")
+	}
+
+	return sd, nil
 }
 
 func (s *Suite) skipScenario(scenarioTags []*gherkin.Tag) bool {

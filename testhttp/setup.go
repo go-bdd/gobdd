@@ -7,13 +7,12 @@ import (
 	"fmt"
 	"github.com/go-bdd/assert"
 	"github.com/go-bdd/gobdd/context"
-	"github.com/go-bdd/gobdd/step"
 	"io/ioutil"
 	"net/http"
 )
 
 type addStepper interface {
-	AddStep(step interface{}, f step.Func) error
+	AddStep(step interface{}, f interface{}) error
 }
 
 type testHTTPMethods struct {
@@ -44,44 +43,36 @@ func Build(addStep addStepper, h httpHandler) TestHTTP {
 	return thhtp
 }
 
-func (t testHTTPMethods) iSetRequestBodyTo(ctx context.Context) error {
+func (t testHTTPMethods) iSetRequestBodyTo(ctx context.Context, body string) error {
 	r := ctx.Get(RequestKey{}).(*http.Request)
-	body := ctx.GetStringParam(0)
 	r.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(body)))
 	ctx.Set(RequestKey{}, r)
 	return nil
 }
 
-func (t testHTTPMethods) iSetRequestSetTo(ctx context.Context) error {
+func (t testHTTPMethods) iSetRequestSetTo(ctx context.Context, headerName, value string) error {
 	req := ctx.Get(RequestKey{}).(*http.Request)
-	headerName := ctx.GetStringParam(0)
-	value := ctx.GetStringParam(1)
 	req.Header.Add(headerName, value)
 
 	ctx.Set(RequestKey{}, req)
 	return nil
 }
 
-func (t testHTTPMethods) responseHeaderEquals(ctx context.Context) error {
+func (t testHTTPMethods) responseHeaderEquals(ctx context.Context, headerName, expected string) error {
 	resp := ctx.Get(ResponseKey{}).(Response)
-	headerName := ctx.GetStringParam(0)
-	expected := ctx.GetStringParam(1)
 	given := resp.Header.Get(headerName)
 
 	return assert.Equals(expected, given)
 }
 
-func (t testHTTPMethods) theRequestHasBody(ctx context.Context) error {
+func (t testHTTPMethods) theRequestHasBody(ctx context.Context, body string) error {
 	req := ctx.Get(RequestKey{}).(*http.Request)
-	body := ctx.GetStringParam(0)
 	req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(body)))
 	ctx.Set(RequestKey{}, req)
 	return nil
 }
 
-func (t testHTTPMethods) iHaveARequest(ctx context.Context) error {
-	method := ctx.GetStringParam(0)
-	url := ctx.GetStringParam(1)
+func (t testHTTPMethods) iHaveARequest(ctx context.Context, method, url string) error {
 	req, err := http.NewRequest(method, url, nil)
 	if err != nil {
 		return err
@@ -91,9 +82,7 @@ func (t testHTTPMethods) iHaveARequest(ctx context.Context) error {
 	return nil
 }
 
-func (t testHTTPMethods) theResponseIs(ctx context.Context) error {
-	expectedResponse := ctx.GetStringParam(0)
-
+func (t testHTTPMethods) theResponseIs(ctx context.Context, expectedResponse string) error {
 	resp := ctx.Get(ResponseKey{}).(Response)
 	body, err := ioutil.ReadAll(resp.Body)
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(body))
@@ -134,9 +123,7 @@ func (t testHTTPMethods) iMakeRequest(ctx context.Context) error {
 	return nil
 }
 
-func (t testHTTPMethods) makeRequest(ctx context.Context) error {
-	method := ctx.GetStringParam(0)
-	url := ctx.GetStringParam(1)
+func (t testHTTPMethods) makeRequest(ctx context.Context, method, url string) error {
 	req, err := http.NewRequest(method, url, nil)
 	if err != nil {
 		return err
@@ -151,8 +138,7 @@ func (t testHTTPMethods) makeRequest(ctx context.Context) error {
 	return nil
 }
 
-func (t testHTTPMethods) statusCodeEquals(ctx context.Context) error {
-	expectedStatus := ctx.GetIntParam(0)
+func (t testHTTPMethods) statusCodeEquals(ctx context.Context, expectedStatus int) error {
 	resp := ctx.Get(ResponseKey{}).(Response)
 
 	if expectedStatus != resp.Code {
