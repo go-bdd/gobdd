@@ -32,9 +32,10 @@ type SuiteOptions struct {
 	tags           []string
 	beforeScenario []func()
 	afterScenario  []func()
+	runInParallel  bool
 }
 
-// NewSuiteOptions creates a new suite configuration with default values
+// creates a new suite configuration with default values
 func NewSuiteOptions() SuiteOptions {
 	return SuiteOptions{
 		featuresPaths:  "features/*.feature",
@@ -43,6 +44,12 @@ func NewSuiteOptions() SuiteOptions {
 		beforeScenario: []func(){},
 		afterScenario:  []func(){},
 	}
+}
+
+// runs tests in parallel
+func (options SuiteOptions) RunInParallel() SuiteOptions {
+	options.runInParallel = true
+	return options
 }
 
 // Configures a pattern (regexp) where feature can be found.
@@ -106,7 +113,7 @@ func NewSuite(t *testing.T, options SuiteOptions) *Suite {
 func (s *Suite) AddStep(step interface{}, f interface{}) error {
 	err := validateStepFunc(f)
 	if err != nil {
-	    return err
+		return err
 	}
 	var regex *regexp.Regexp
 
@@ -134,6 +141,10 @@ func (s *Suite) Run() {
 	files, err := filepath.Glob(s.options.featuresPaths)
 	if err != nil {
 		s.t.Fatalf("cannot find features/ directory")
+	}
+
+	if s.options.runInParallel {
+		s.t.Parallel()
 	}
 
 	for _, file := range files {
@@ -371,8 +382,8 @@ func (s *Suite) runStep(ctx context.Context, t *testing.T, step *gherkin.Step) {
 
 		d := reflect.ValueOf(def.f)
 		in := []reflect.Value{reflect.ValueOf(ctx)}
-		if len(params) + 1 != d.Type().NumIn() {
-			t.Errorf("the step function %s accepts %d arguments but %d received", d.String(), d.Type().NumIn(), len(params) + 1)
+		if len(params)+1 != d.Type().NumIn() {
+			t.Errorf("the step function %s accepts %d arguments but %d received", d.String(), d.Type().NumIn(), len(params)+1)
 			return
 		}
 		for i, v := range params {

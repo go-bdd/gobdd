@@ -7,7 +7,6 @@ import (
 // Holds two types of data:
 //
 // * data saved by previously executed steps
-// * parameters which were received from the step definition
 type Context struct {
 	values map[interface{}]interface{}
 	params [][]byte
@@ -42,4 +41,3 @@ func (ctx Context) Get(key interface{}, defaultValue ...interface{}) interface{}
 
 	return ctx.values[key]
 }
-
