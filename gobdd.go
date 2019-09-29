@@ -104,6 +104,10 @@ func NewSuite(t *testing.T, options SuiteOptions) *Suite {
 // The second parameter is a function which will be executed when while running a scenario one of the steps will match
 // the given pattern
 func (s *Suite) AddStep(step interface{}, f interface{}) error {
+	err := validateStepFunc(f)
+	if err != nil {
+	    return err
+	}
 	var regex *regexp.Regexp
 
 	switch t := step.(type) {
