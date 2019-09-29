@@ -372,17 +372,8 @@ func (s *Suite) runStep(ctx context.Context, t *testing.T, step *gherkin.Step) {
 			return
 		}
 		for i, v := range params {
-			paramType := reflect.ValueOf(v)
 			inType := d.Type().In(i + 1)
-
-			if inType.Kind() == reflect.String {
-				paramType = reflect.ValueOf(string(paramType.Interface().([]uint8)))
-			}
-			if inType.Kind() == reflect.Int {
-				s := paramType.Interface().([]uint8)
-				p, _ := strconv.Atoi(string(s))
-				paramType = reflect.ValueOf(p)
-			}
+			paramType := s.paramType(v, inType)
 			in = append(in, paramType)
 		}
 		v := d.Call(in)[0]
@@ -392,6 +383,19 @@ func (s *Suite) runStep(ctx context.Context, t *testing.T, step *gherkin.Step) {
 			t.Errorf(step.Keyword, step.Text, err)
 		}
 	})
+}
+
+func (s *Suite) paramType(param []byte, inType reflect.Type) reflect.Value {
+	paramType := reflect.ValueOf(param)
+	if inType.Kind() == reflect.String {
+		paramType = reflect.ValueOf(string(paramType.Interface().([]uint8)))
+	}
+	if inType.Kind() == reflect.Int {
+		s := paramType.Interface().([]uint8)
+		p, _ := strconv.Atoi(string(s))
+		paramType = reflect.ValueOf(p)
+	}
+	return paramType
 }
 
 func (s *Suite) findStepDef(text string) (stepDef, error) {
