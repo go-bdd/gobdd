@@ -24,6 +24,7 @@ jobs:
       run: go test ./...
     - name: Code coverage report
       run: |
+        GO111MODULE=on
         curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin
         go get github.com/philwinder/gocoverage
         go get github.com/mattn/goveralls
