@@ -36,7 +36,7 @@ jobs:
           export GOPATH=$HOME/go
           export PATH=$PATH:$GOPATH/bin
           curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin
-          go get github.com/philwinder/gocoverage
-          go get github.com/mattn/goveralls
+          GO111MODULE=auto go get github.com/philwinder/gocoverage
+          GO111MODULE=auto go get github.com/mattn/goveralls
           gocoverage
           goveralls -coverprofile=profile.cov -repotoken=$COVERALLS_TOKEN
