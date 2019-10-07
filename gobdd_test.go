@@ -22,6 +22,21 @@ func TestScenarios(t *testing.T) {
 	suite.Run()
 }
 
+func TestDifferentFuncTypes(t *testing.T) {
+	suite := NewSuite(t, NewSuiteOptions().WithFeaturesPath("features/func_types.feature"))
+	err := suite.AddStep(`I add ([+-]?[0-9]*[.]?[0-9]+) and ([+-]?[0-9]*[.]?[0-9]+)`, addf)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = suite.AddStep(`the result should equal ([+-]?[0-9]*[.]?[0-9]+)`, checkf)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	suite.Run()
+}
+
 func TestScenarioOutline(t *testing.T) {
 	suite := NewSuite(t, NewSuiteOptions().WithFeaturesPath("features/outline.feature"))
 	err := suite.AddStep(`I add <digit1> and <digit2>`, add)
@@ -82,14 +97,14 @@ func TestIgnoredTags(t *testing.T) {
 }
 
 func TestInvalidFunctionSignature(t *testing.T) {
-	testCases := map[string]struct{
+	testCases := map[string]struct {
 		f interface{}
 	}{
-		"nil": {},
-		"func without return value": {f: func(ctx context.Context) {}},
-		"func with invalid return value": {f: func(ctx context.Context) int { return 0}},
-		"func without arguments": {f: func() error { return errors.New("")}},
-		"func with invalid first argument": {f: func(i int) error { return errors.New("")}},
+		"nil":                              {},
+		"func without return value":        {f: func(ctx context.Context) {}},
+		"func with invalid return value":   {f: func(ctx context.Context) int { return 0 }},
+		"func without arguments":           {f: func() error { return errors.New("") }},
+		"func with invalid first argument": {f: func(i int) error { return errors.New("") }},
 	}
 
 	for name, testCase := range testCases {
@@ -103,9 +118,25 @@ func TestInvalidFunctionSignature(t *testing.T) {
 	}
 }
 
+func addf(ctx context.Context, var1, var2 float32) error {
+	res := var1 + var2
+	ctx.Set("sumRes", res)
+	return nil
+}
+
 func add(ctx context.Context, var1, var2 int) error {
 	res := var1 + var2
 	ctx.Set("sumRes", res)
+	return nil
+}
+
+func checkf(ctx context.Context, sum float32) error {
+	received := ctx.GetFloat32("sumRes")
+
+	if sum != received {
+		return errors.New("the math does not work for you")
+	}
+
 	return nil
 }
 

@@ -190,10 +190,6 @@ func (s *Suite) runFeature(feature *gherkin.Feature) error {
 					continue
 				}
 				ctx := context.New()
-
-				if bkgSteps != nil {
-					s.runSteps(ctx, t, bkgSteps.Steps)
-				}
 				err := s.runScenario(ctx, scenario, bkgSteps, t)
 				if err != nil {
 					hasErrors = true
@@ -408,6 +404,16 @@ func (s *Suite) paramType(param []byte, inType reflect.Type) reflect.Value {
 	if inType.Kind() == reflect.Int {
 		s := paramType.Interface().([]uint8)
 		p, _ := strconv.Atoi(string(s))
+		paramType = reflect.ValueOf(p)
+	}
+	if inType.Kind() == reflect.Float32 {
+		s := paramType.Interface().([]uint8)
+		p, _ := strconv.ParseFloat(string(s), 32)
+		paramType = reflect.ValueOf(float32(p))
+	}
+	if inType.Kind() == reflect.Float64 {
+		s := paramType.Interface().([]uint8)
+		p, _ := strconv.ParseFloat(string(s), 32)
 		paramType = reflect.ValueOf(p)
 	}
 	return paramType
