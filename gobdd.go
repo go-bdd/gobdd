@@ -2,6 +2,7 @@ package gobdd
 
 import (
 	"bufio"
+	"context"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -15,7 +16,6 @@ import (
 	"testing"
 
 	"github.com/cucumber/gherkin-go"
-	"github.com/go-bdd/gobdd/context"
 )
 
 // Holds all the information about the suite (options, steps to execute etc)
@@ -189,7 +189,7 @@ func (s *Suite) runFeature(feature *gherkin.Feature) error {
 					t.Log(fmt.Sprintf("Skipping scenario %s", scenario.Name))
 					continue
 				}
-				ctx := context.New()
+				ctx := context.Background()
 				err := s.runScenario(ctx, scenario, bkgSteps, t)
 				if err != nil {
 					hasErrors = true
@@ -202,7 +202,7 @@ func (s *Suite) runFeature(feature *gherkin.Feature) error {
 					continue
 				}
 
-				ctx := context.New()
+				ctx := context.Background()
 				if bkgSteps != nil {
 					s.runSteps(ctx, t, bkgSteps.Steps)
 				}
@@ -239,7 +239,7 @@ func (s *Suite) runScenarioOutline(outline *gherkin.ScenarioOutline, t *testing.
 			groups := ex.TableBody
 
 			for _, group := range groups {
-				ctx := context.New()
+				ctx := context.Background()
 				steps := s.runOutlineStep(outline, placeholders, group)
 				s.runSteps(ctx, t, steps)
 			}
@@ -342,20 +342,22 @@ func (s *Suite) runScenario(ctx context.Context, scenario *gherkin.Scenario, bkg
 	t.Run(scenario.Name, func(t *testing.T) {
 		if bkg != nil {
 			steps := s.getBackgroundSteps(bkg)
-			s.runSteps(ctx, t, steps)
+			ctx = s.runSteps(ctx, t, steps)
 		}
 		s.runSteps(ctx, t, scenario.Steps)
 	})
 	return nil
 }
 
-func (s *Suite) runSteps(ctx context.Context, t *testing.T, steps []*gherkin.Step) {
+func (s *Suite) runSteps(ctx context.Context, t *testing.T, steps []*gherkin.Step) context.Context {
 	for _, step := range steps {
-		s.runStep(ctx, t, step)
+		ctx = s.runStep(ctx, t, step)
 	}
+
+	return ctx
 }
 
-func (s *Suite) runStep(ctx context.Context, t *testing.T, step *gherkin.Step) {
+func (s *Suite) runStep(ctx context.Context, t *testing.T, step *gherkin.Step) context.Context {
 	defer func() {
 		if r := recover(); r != nil {
 			t.Error(r)
@@ -365,7 +367,7 @@ func (s *Suite) runStep(ctx context.Context, t *testing.T, step *gherkin.Step) {
 	def, err := s.findStepDef(step.Text)
 	if err != nil {
 		t.Errorf("cannot find step definition for step: %s %s", step.Keyword, step.Text)
-		return
+		return ctx
 	}
 
 	params := def.expr.FindSubmatch([]byte(step.Text))[1:]
@@ -387,13 +389,18 @@ func (s *Suite) runStep(ctx context.Context, t *testing.T, step *gherkin.Step) {
 			paramType := s.paramType(v, inType)
 			in = append(in, paramType)
 		}
-		v := d.Call(in)[0]
+		retValues := d.Call(in)
+		v := retValues[1]
 
 		if !v.IsNil() {
 			err = v.Interface().(error)
 			t.Errorf(step.Keyword, step.Text, err)
 		}
+
+		ctx = retValues[0].Interface().(context.Context)
 	})
+
+	return ctx
 }
 
 func (s *Suite) paramType(param []byte, inType reflect.Type) reflect.Value {
