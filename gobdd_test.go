@@ -1,10 +1,9 @@
 package gobdd
 
 import (
+	"context"
 	"errors"
 	"testing"
-
-	"github.com/go-bdd/gobdd/context"
 )
 
 func TestScenarios(t *testing.T) {
@@ -118,42 +117,42 @@ func TestInvalidFunctionSignature(t *testing.T) {
 	}
 }
 
-func addf(ctx context.Context, var1, var2 float32) error {
+func addf(ctx context.Context, var1, var2 float32) (context.Context, error) {
 	res := var1 + var2
-	ctx.Set("sumRes", res)
-	return nil
+	ctx = context.WithValue(ctx, "sumRes", res)
+	return ctx, nil
 }
 
-func add(ctx context.Context, var1, var2 int) error {
+func add(ctx context.Context, var1, var2 int) (context.Context, error) {
 	res := var1 + var2
-	ctx.Set("sumRes", res)
-	return nil
+	ctx = context.WithValue(ctx, "sumRes", res)
+	return ctx, nil
 }
 
-func checkf(ctx context.Context, sum float32) error {
-	received := ctx.GetFloat32("sumRes")
+func checkf(ctx context.Context, sum float32) (context.Context, error) {
+	received := ctx.Value("sumRes")
 
 	if sum != received {
-		return errors.New("the math does not work for you")
+		return ctx, errors.New("the math does not work for you")
 	}
 
-	return nil
+	return ctx, nil
 }
 
-func check(ctx context.Context, sum int) error {
-	received := ctx.GetInt("sumRes")
+func check(ctx context.Context, sum int) (context.Context, error) {
+	received := ctx.Value("sumRes")
 
 	if sum != received {
-		return errors.New("the math does not work for you")
+		return ctx, errors.New("the math does not work for you")
 	}
 
-	return nil
+	return ctx, nil
 }
 
-func fail(context.Context) error {
-	return errors.New("the step should never be executed")
+func fail(ctx context.Context) (context.Context, error) {
+	return ctx, errors.New("the step should never be executed")
 }
 
-func pass(context.Context) error {
-	return nil
+func pass(ctx context.Context) (context.Context, error) {
+	return ctx, nil
 }

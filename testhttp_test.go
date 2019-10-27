@@ -1,8 +1,8 @@
 package gobdd
 
 import (
+	"context"
 	"github.com/go-bdd/assert"
-	"github.com/go-bdd/gobdd/context"
 	"net/http"
 	"testing"
 
@@ -40,30 +40,30 @@ func TestHTTP(t *testing.T) {
 	s.Run()
 }
 
-func requestHasMethodSetTo(ctx context.Context, method string) error {
-	r := ctx.Get(testhttp.RequestKey{}).(*http.Request)
-	return assert.Equals(method, r.Method)
+func requestHasMethodSetTo(ctx context.Context, method string) (context.Context, error) {
+	r := ctx.Value(testhttp.RequestKey{}).(*http.Request)
+	return ctx, assert.Equals(method, r.Method)
 }
 
-func requestBodyIsNil(ctx context.Context) error {
-	r := ctx.Get(testhttp.RequestKey{}).(*http.Request)
-	return assert.Nil(r.Body)
+func requestBodyIsNil(ctx context.Context) (context.Context, error) {
+	r := ctx.Value(testhttp.RequestKey{}).(*http.Request)
+	return ctx, assert.Nil(r.Body)
 }
 
-func urlIsSetTo(ctx context.Context, url string) error {
-	r := ctx.Get(testhttp.RequestKey{}).(*http.Request)
-	return assert.Equals(url, r.URL.String())
+func urlIsSetTo(ctx context.Context, url string) (context.Context, error) {
+	r := ctx.Value(testhttp.RequestKey{}).(*http.Request)
+	return ctx, assert.Equals(url, r.URL.String())
 }
 
-func ISetHeaderTo(ctx context.Context, headerName, value string) error {
-	r := ctx.Get(testhttp.RequestKey{}).(*http.Request)
+func ISetHeaderTo(ctx context.Context, headerName, value string) (context.Context, error) {
+	r := ctx.Value(testhttp.RequestKey{}).(*http.Request)
 	r.Header.Set(headerName, value)
-	ctx.Set(testhttp.RequestKey{}, r)
-	return nil
+	ctx = context.WithValue(ctx, testhttp.RequestKey{}, r)
+	return ctx, nil
 }
 
-func requestHasHeaderSetTo(ctx context.Context, headerName,expected  string) error {
-	r := ctx.Get(testhttp.RequestKey{}).(*http.Request)
+func requestHasHeaderSetTo(ctx context.Context, headerName,expected  string) (context.Context, error) {
+	r := ctx.Value(testhttp.RequestKey{}).(*http.Request)
 	given := r.Header.Get(headerName)
-	return assert.Equals(expected, given)
+	return ctx, assert.Equals(expected, given)
 }
