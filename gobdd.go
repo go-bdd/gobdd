@@ -99,38 +99,53 @@ func NewSuite(t *testing.T, options SuiteOptions) *Suite {
 	}
 }
 
-// Adds a step to the suite
-// The first parameter is the step definition which can be:
+// AddStep registers a step in the suite.
 //
-// * string which will be converted to a regexp
-// * [] byte which will be converted to a regexp as well
-// * regexp
+// The second parameter is the step function that gets executed
+// when a step definition matches the provided regular expression.
 //
-// No other types are supported
+// A step function can have any number of parameters (even zero),
+// but it MUST accept a context.Context as the first parameter (if there is any)
+// and MUST return a context and an error:
 //
-// The second parameter is a function which will be executed when while running a scenario one of the steps will match
-// the given pattern
-func (s *Suite) AddStep(step interface{}, f interface{}) error {
-	err := validateStepFunc(f)
+// 	func myStepFunction(ctx context.Context, first int, second int) (context.Context, error) {
+// 		return ctx, nil
+// 	}
+func (s *Suite) AddStep(expr string, step interface{}) error {
+	err := validateStepFunc(step)
 	if err != nil {
 		return err
 	}
-	var regex *regexp.Regexp
 
-	switch t := step.(type) {
-	case *regexp.Regexp:
-		regex = t
-	case string:
-		regex = regexp.MustCompile(t)
-	case []byte:
-		regex = regexp.MustCompile(string(t))
-	default:
-		return fmt.Errorf("expecting expr to be a *regexp.Regexp or a string, got type: %T", step)
+	s.steps = append(s.steps, stepDef{
+		expr: regexp.MustCompile(expr),
+		f:    step,
+	})
+
+	return nil
+}
+
+// AddRegexStep registers a step in the suite.
+//
+// The second parameter is the step function that gets executed
+// when a step definition matches the provided regular expression.
+//
+// A step function can have any number of parameters (even zero),
+// but it MUST accept a context.Context as the first parameter (if there is any)
+// and MUST return a context and an error:
+//
+// 	func myStepFunction(ctx context.Context, first int, second int) (context.Context, error) {
+// 		return ctx, nil
+// 	}
+func (s *Suite) AddRegexStep(expr *regexp.Regexp, step interface{}) error {
+	err := validateStepFunc(step)
+	if err != nil {
+		return err
 	}
 
 	s.steps = append(s.steps, stepDef{
-		expr: regex,
-		f:    f,
+		expr: expr,
+		f:    step,
 	})
 
 	return nil
