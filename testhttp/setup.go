@@ -12,7 +12,7 @@ import (
 )
 
 type addStepper interface {
-	AddStep(step interface{}, f interface{}) error
+	AddStep(definition string, step interface{}) error
 }
 
 type testHTTPMethods struct {
