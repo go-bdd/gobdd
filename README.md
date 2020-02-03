@@ -14,3 +14,5 @@ If you didn't find the answer to your question in the documentation, feel free t
 
 Please join us on the `#go-bdd-library` channel on the [Gophers slack](https://gophers.slack.com/): You can get [an invite here](https://gophersinvite.herokuapp.com/).
 You can find updates about the progress on Twiter: [GoBdd](https://twitter.com/Go_BDD).
+
+You can support my work using [issuehunt](https://issuehunt.io/r/go-bdd) or by [buying me a coffee](https://www.buymeacoffee.com/bklimczak).
