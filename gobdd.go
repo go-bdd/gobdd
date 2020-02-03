@@ -21,7 +21,7 @@ import (
 
 // Holds all the information about the suite (options, steps to execute etc)
 type Suite struct {
-	t           *testing.T
+	t           tester
 	steps       []stepDef
 	options     SuiteOptions
 	stepsErrors []error
@@ -92,8 +92,17 @@ type stepDef struct {
 	f    interface{}
 }
 
+type tester interface {
+	Log(...interface{})
+	Fatal(...interface{})
+	Fatalf(string, ...interface{})
+	Parallel()
+	Fail()
+	Run(name string, f func(t *testing.T)) bool
+}
+
 // Creates a new suites with given configuration and empty steps defined
-func NewSuite(t *testing.T, options SuiteOptions) *Suite {
+func NewSuite(t tester, options SuiteOptions) *Suite {
 	return &Suite{
 		t:       t,
 		steps:   []stepDef{},
@@ -164,6 +173,7 @@ func (s *Suite) Run() {
 			s.t.Log(err)
 		}
 		s.t.Fatal("the test contains invalid step definitions")
+		return
 	}
 
 	files, err := filepath.Glob(s.options.featuresPaths)

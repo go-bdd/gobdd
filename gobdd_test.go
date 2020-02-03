@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"testing"
+
+	"github.com/go-bdd/assert"
 )
 
 func TestScenarios(t *testing.T) {
@@ -69,8 +71,14 @@ func TestInvalidFunctionSignature(t *testing.T) {
 
 	for name, testCase := range testCases {
 		t.Run(name, func(t *testing.T) {
-			suite := NewSuite(t, NewSuiteOptions())
+			tester := &mockTester{}
+			suite := NewSuite(tester, NewSuiteOptions())
 			suite.AddStep("", testCase.f)
+			suite.Run()
+			err := assert.Equals(1, tester.fatalCalled)
+			if err != nil {
+				t.Fatal(err)
+			}
 		})
 	}
 }
@@ -113,4 +121,28 @@ func fail(ctx context.Context) (context.Context, error) {
 
 func pass(ctx context.Context) (context.Context, error) {
 	return ctx, nil
+}
+
+type mockTester struct {
+	fatalCalled int
+}
+
+func (m mockTester) Log(...interface{}) {
+}
+
+func (m *mockTester) Fatal(...interface{}) {
+	m.fatalCalled++
+}
+
+func (m mockTester) Fatalf(string, ...interface{}) {
+}
+
+func (m mockTester) Parallel() {
+}
+
+func (m mockTester) Fail() {
+}
+
+func (m mockTester) Run(name string, f func(t *testing.T)) bool {
+	return true
 }
