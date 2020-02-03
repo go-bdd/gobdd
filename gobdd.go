@@ -21,7 +21,7 @@ import (
 
 // Holds all the information about the suite (options, steps to execute etc)
 type Suite struct {
-	t           tester
+	t           TestingT
 	steps       []stepDef
 	options     SuiteOptions
 	stepsErrors []error
@@ -92,7 +92,7 @@ type stepDef struct {
 	f    interface{}
 }
 
-type tester interface {
+type TestingT interface {
 	Log(...interface{})
 	Fatal(...interface{})
 	Fatalf(string, ...interface{})
@@ -102,7 +102,7 @@ type tester interface {
 }
 
 // Creates a new suites with given configuration and empty steps defined
-func NewSuite(t tester, options SuiteOptions) *Suite {
+func NewSuite(t TestingT, options SuiteOptions) *Suite {
 	return &Suite{
 		t:       t,
 		steps:   []stepDef{},
