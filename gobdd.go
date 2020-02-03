@@ -15,9 +15,8 @@ import (
 	"strings"
 	"testing"
 
-	messages "github.com/cucumber/cucumber-messages-go/v6"
-
-	"github.com/cucumber/gherkin-go/v8"
+	"github.com/cucumber/gherkin-go/v9"
+	"github.com/cucumber/messages-go/v9"
 )
 
 // Holds all the information about the suite (options, steps to execute etc)
@@ -164,7 +163,7 @@ func (s *Suite) executeFeature(file string) error {
 	}
 	defer f.Close()
 	fileIO := bufio.NewReader(f)
-	doc, err := gherkin.ParseGherkinDocument(fileIO)
+	doc, err := gherkin.ParseGherkinDocument(fileIO, (&messages.Incrementing{}).NewId)
 	if err != nil {
 		s.t.Fail()
 		printErrorf("error while loading document: %s\n", err)
