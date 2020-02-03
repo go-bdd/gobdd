@@ -6,13 +6,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/go-bdd/assert"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/go-bdd/assert"
 )
 
 type addStepper interface {
-	AddStep(definition string, step interface{}) error
+	AddStep(definition string, step interface{})
 }
 
 type testHTTPMethods struct {
@@ -29,16 +30,16 @@ func Build(addStep addStepper, h httpHandler) TestHTTP {
 
 	testHTTP := testHTTPMethods{tHTTP: thhtp}
 
-	_ = addStep.AddStep(`^I make a (GET|POST|PUT|DELETE|OPTIONS) request to "([^"]*)"$`, testHTTP.makeRequest)
-	_ = addStep.AddStep(`^the response code equals (\d+)$`, testHTTP.statusCodeEquals)
-	_ = addStep.AddStep(`^the response contains a valid JSON$`, testHTTP.validJSON)
-	_ = addStep.AddStep(`^the response is "(.*)"$`, testHTTP.theResponseIs)
-	_ = addStep.AddStep(`^the response header "(.*)" equals "(.*)"$`, testHTTP.responseHeaderEquals)
-	_ = addStep.AddStep(`^I have a (GET|POST|PUT|DELETE|OPTIONS) request "(.*)"$`, testHTTP.iHaveARequest)
-	_ = addStep.AddStep(`^I set request header "(.*)" to "(.*)"$`, testHTTP.iSetRequestSetTo)
-	_ = addStep.AddStep(`^I set request body to "([^"]*)"$`, testHTTP.iSetRequestBodyTo)
-	_ = addStep.AddStep(`^the request has body "(.*)"$`, testHTTP.theRequestHasBody)
-	_ = addStep.AddStep(`^I make the request$`, testHTTP.iMakeRequest)
+	addStep.AddStep(`^I make a (GET|POST|PUT|DELETE|OPTIONS) request to "([^"]*)"$`, testHTTP.makeRequest)
+	addStep.AddStep(`^the response code equals (\d+)$`, testHTTP.statusCodeEquals)
+	addStep.AddStep(`^the response contains a valid JSON$`, testHTTP.validJSON)
+	addStep.AddStep(`^the response is "(.*)"$`, testHTTP.theResponseIs)
+	addStep.AddStep(`^the response header "(.*)" equals "(.*)"$`, testHTTP.responseHeaderEquals)
+	addStep.AddStep(`^I have a (GET|POST|PUT|DELETE|OPTIONS) request "(.*)"$`, testHTTP.iHaveARequest)
+	addStep.AddStep(`^I set request header "(.*)" to "(.*)"$`, testHTTP.iSetRequestSetTo)
+	addStep.AddStep(`^I set request body to "([^"]*)"$`, testHTTP.iSetRequestBodyTo)
+	addStep.AddStep(`^the request has body "(.*)"$`, testHTTP.theRequestHasBody)
+	addStep.AddStep(`^I make the request$`, testHTTP.iMakeRequest)
 
 	return thhtp
 }

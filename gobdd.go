@@ -21,9 +21,10 @@ import (
 
 // Holds all the information about the suite (options, steps to execute etc)
 type Suite struct {
-	t       *testing.T
-	steps   []stepDef
-	options SuiteOptions
+	t           TestingT
+	steps       []stepDef
+	options     SuiteOptions
+	stepsErrors []error
 }
 
 // Holds all the information about how the suite or features/steps should be configured
@@ -91,8 +92,17 @@ type stepDef struct {
 	f    interface{}
 }
 
+type TestingT interface {
+	Log(...interface{})
+	Fatal(...interface{})
+	Fatalf(string, ...interface{})
+	Parallel()
+	Fail()
+	Run(name string, f func(t *testing.T)) bool
+}
+
 // Creates a new suites with given configuration and empty steps defined
-func NewSuite(t *testing.T, options SuiteOptions) *Suite {
+func NewSuite(t TestingT, options SuiteOptions) *Suite {
 	return &Suite{
 		t:       t,
 		steps:   []stepDef{},
@@ -112,18 +122,23 @@ func NewSuite(t *testing.T, options SuiteOptions) *Suite {
 // 	func myStepFunction(ctx context.Context, first int, second int) (context.Context, error) {
 // 		return ctx, nil
 // 	}
-func (s *Suite) AddStep(expr string, step interface{}) error {
+func (s *Suite) AddStep(expr string, step interface{}) {
 	err := validateStepFunc(step)
 	if err != nil {
-		return err
+		s.stepsErrors = append(s.stepsErrors, err)
+		return
+	}
+
+	compiled, err := regexp.Compile(expr)
+	if err != nil {
+		s.stepsErrors = append(s.stepsErrors, err)
+		return
 	}
 
 	s.steps = append(s.steps, stepDef{
-		expr: regexp.MustCompile(expr),
+		expr: compiled,
 		f:    step,
 	})
-
-	return nil
 }
 
 // AddRegexStep registers a step in the suite.
@@ -138,22 +153,29 @@ func (s *Suite) AddStep(expr string, step interface{}) error {
 // 	func myStepFunction(ctx context.Context, first int, second int) (context.Context, error) {
 // 		return ctx, nil
 // 	}
-func (s *Suite) AddRegexStep(expr *regexp.Regexp, step interface{}) error {
+func (s *Suite) AddRegexStep(expr *regexp.Regexp, step interface{}) {
 	err := validateStepFunc(step)
 	if err != nil {
-		return err
+		s.stepsErrors = append(s.stepsErrors, err)
+		return
 	}
 
 	s.steps = append(s.steps, stepDef{
 		expr: expr,
 		f:    step,
 	})
-
-	return nil
 }
 
 // Executes the suite with given options and defined steps
 func (s *Suite) Run() {
+	if len(s.stepsErrors) > 0 {
+		for _, err := range s.stepsErrors {
+			s.t.Log(err)
+		}
+		s.t.Fatal("the test contains invalid step definitions")
+		return
+	}
+
 	files, err := filepath.Glob(s.options.featuresPaths)
 	if err != nil {
 		s.t.Fatalf("cannot find features/ directory")
@@ -260,11 +282,7 @@ func (s *Suite) stepsFromExample(sourceStep *messages.GherkinDocument_Feature_St
 			}
 
 			expr := strings.Replace(def.expr.String(), ph, t, -1)
-			err = s.AddStep(expr, def.f)
-
-			if err != nil {
-				continue
-			}
+			s.AddStep(expr, def.f)
 		}
 	}
 

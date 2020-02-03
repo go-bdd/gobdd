@@ -2,9 +2,10 @@ package gobdd
 
 import (
 	"context"
-	"github.com/go-bdd/assert"
 	"net/http"
 	"testing"
+
+	"github.com/go-bdd/assert"
 
 	"github.com/go-bdd/gobdd/testhttp"
 )
@@ -30,11 +31,11 @@ func TestHTTP(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 	})
 
-	_ = s.AddStep(`^the request has method set to (GET|POST|PUT|DELETE|OPTIONS)$`, requestHasMethodSetTo)
-	_ = s.AddStep(`^the url is set to "([^"]*)"$`, urlIsSetTo)
-	_ = s.AddStep(`^the request body is nil$`, requestBodyIsNil)
-	_ = s.AddStep(`^I set the header "([^"]*)" to "([^"]*)"$`, ISetHeaderTo)
-	_ = s.AddStep(`^the request has header "([^"]*)" set to "([^"]*)"$`, requestHasHeaderSetTo)
+	s.AddStep(`^the request has method set to (GET|POST|PUT|DELETE|OPTIONS)$`, requestHasMethodSetTo)
+	s.AddStep(`^the url is set to "([^"]*)"$`, urlIsSetTo)
+	s.AddStep(`^the request body is nil$`, requestBodyIsNil)
+	s.AddStep(`^I set the header "([^"]*)" to "([^"]*)"$`, ISetHeaderTo)
+	s.AddStep(`^the request has header "([^"]*)" set to "([^"]*)"$`, requestHasHeaderSetTo)
 	testhttp.Build(s, router)
 
 	s.Run()
@@ -62,7 +63,7 @@ func ISetHeaderTo(ctx context.Context, headerName, value string) (context.Contex
 	return ctx, nil
 }
 
-func requestHasHeaderSetTo(ctx context.Context, headerName,expected  string) (context.Context, error) {
+func requestHasHeaderSetTo(ctx context.Context, headerName, expected string) (context.Context, error) {
 	r := ctx.Value(testhttp.RequestKey{}).(*http.Request)
 	given := r.Header.Get(headerName)
 	return ctx, assert.Equals(expected, given)
