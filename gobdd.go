@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	messages "github.com/cucumber/cucumber-messages-go/v6"
 	"io/ioutil"
 	"log"
 	"os"
@@ -15,6 +14,8 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+
+	messages "github.com/cucumber/cucumber-messages-go/v6"
 
 	"github.com/cucumber/gherkin-go/v8"
 )
@@ -212,21 +213,32 @@ func (s *Suite) runFeature(feature *messages.GherkinDocument_Feature) error {
 	return nil
 }
 
-func (s *Suite) runOutlineStep(outline *messages.GherkinDocument_Feature_Scenario, placeholders []*messages.GherkinDocument_Feature_TableRow_TableCell, group *messages.GherkinDocument_Feature_TableRow) []*messages.GherkinDocument_Feature_Step {
-	var steps []*messages.GherkinDocument_Feature_Step
-	for _, outlineStep := range outline.Steps {
-		text := outlineStep.Text
+func (s *Suite) getOutlineStep(steps []*messages.GherkinDocument_Feature_Step, examples []*messages.GherkinDocument_Feature_Scenario_Examples) []*messages.GherkinDocument_Feature_Step {
+	var newSteps []*messages.GherkinDocument_Feature_Step
+	for _, outlineStep := range steps {
+		for _, example := range examples {
+			newSteps = append(newSteps, s.stepsFromExample(outlineStep, example)...)
+		}
+	}
+	return newSteps
+}
 
-		for i, placeholder := range placeholders {
-			ph := "<" + placeholder.Value + ">"
-			index := strings.Index(text, ph)
-			originalText := text
-			if index == -1 {
-				continue
-			}
+func (s *Suite) stepsFromExample(sourceStep *messages.GherkinDocument_Feature_Step, example *messages.GherkinDocument_Feature_Scenario_Examples) []*messages.GherkinDocument_Feature_Step {
+	steps := []*messages.GherkinDocument_Feature_Step{}
+	text := sourceStep.GetText()
+	placeholders := example.GetTableHeader().GetCells()
+	for i, placeholder := range placeholders {
+		ph := "<" + placeholder.GetValue() + ">"
+		index := strings.Index(text, ph)
+		originalText := text
+		if index == -1 {
+			continue
+		}
 
-			text = strings.Replace(text, "<"+placeholder.Value+">", group.Cells[i].Value, -1)
-			t := getRegexpForVar(group.Cells[i].Value)
+		for _, row := range example.GetTableBody() {
+			value := row.GetCells()[i].GetValue()
+			text = strings.Replace(text, "<"+placeholder.Value+">", value, -1)
+			t := getRegexpForVar(value)
 
 			def, err := s.findStepDef(originalText)
 			if err != nil {
@@ -240,24 +252,19 @@ func (s *Suite) runOutlineStep(outline *messages.GherkinDocument_Feature_Scenari
 				continue
 			}
 		}
-
-		// clone a step
-		step := &messages.GherkinDocument_Feature_Step{
-			Location: outline.Location,
-			Keyword:  outlineStep.Keyword,
-			Text:     text,
-			//Argument:
-		}
-		steps = append(steps, step)
 	}
+
+	// clone a step
+	step := &messages.GherkinDocument_Feature_Step{
+		Location: sourceStep.Location,
+		Keyword:  sourceStep.Keyword,
+		Text:     text,
+		Argument: sourceStep.Argument,
+	}
+
+	steps = append(steps, step)
+
 	return steps
-}
-
-func (s *Suite) getOutlineArguments(outlineStep *messages.GherkinDocument_Feature_Step, placeholders []*messages.GherkinDocument_Feature_TableRow_TableCell, group *messages.GherkinDocument_Feature_TableRow) interface{} {
-	arg := outlineStep.Argument
-
-	//arg = s.outlineDataTableArguments(outlineStep.GetDataTable(), placeholders, group)
-	return arg
 }
 
 func (s *Suite) callBeforeScenarios() {
@@ -281,7 +288,11 @@ func (s *Suite) runScenario(ctx context.Context, scenario *messages.GherkinDocum
 			steps := s.getBackgroundSteps(bkg)
 			ctx = s.runSteps(ctx, t, steps)
 		}
-		s.runSteps(ctx, t, scenario.Steps)
+		steps := scenario.Steps
+		if examples := scenario.GetExamples(); len(examples) > 0 {
+			steps = s.getOutlineStep(scenario.GetSteps(), examples)
+		}
+		s.runSteps(ctx, t, steps)
 	})
 	return nil
 }
@@ -430,5 +441,5 @@ func getRegexpForVar(v interface{}) string {
 		return "([+-]?([0-9]*[.])?[0-9]+)"
 	}
 
-	return "string"
+	return "(.*)"
 }
