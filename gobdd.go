@@ -2,7 +2,6 @@ package gobdd
 
 import (
 	"bufio"
-	"context"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -17,6 +16,7 @@ import (
 
 	"github.com/cucumber/gherkin-go/v9"
 	"github.com/cucumber/messages-go/v9"
+	"github.com/go-bdd/gobdd/context"
 )
 
 // Holds all the information about the suite (options, steps to execute etc)
@@ -234,7 +234,7 @@ func (s *Suite) runFeature(feature *messages.GherkinDocument_Feature) error {
 				t.Log(fmt.Sprintf("Skipping scenario %s", scenario.Name))
 				continue
 			}
-			ctx := context.Background()
+			ctx := context.New()
 			err := s.runScenario(ctx, scenario, bkgSteps, t)
 			if err != nil {
 				hasErrors = true
