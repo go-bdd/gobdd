@@ -1,12 +1,11 @@
 package gobdd
 
 import (
-	"context"
 	"net/http"
 	"testing"
 
 	"github.com/go-bdd/assert"
-
+	"github.com/go-bdd/gobdd/context"
 	"github.com/go-bdd/gobdd/testhttp"
 )
 
@@ -42,29 +41,29 @@ func TestHTTP(t *testing.T) {
 }
 
 func requestHasMethodSetTo(ctx context.Context, method string) (context.Context, error) {
-	r := ctx.Value(testhttp.RequestKey{}).(*http.Request)
+	r := ctx.Get(testhttp.RequestKey{}).(*http.Request)
 	return ctx, assert.Equals(method, r.Method)
 }
 
 func requestBodyIsNil(ctx context.Context) (context.Context, error) {
-	r := ctx.Value(testhttp.RequestKey{}).(*http.Request)
+	r := ctx.Get(testhttp.RequestKey{}).(*http.Request)
 	return ctx, assert.Nil(r.Body)
 }
 
 func urlIsSetTo(ctx context.Context, url string) (context.Context, error) {
-	r := ctx.Value(testhttp.RequestKey{}).(*http.Request)
+	r := ctx.Get(testhttp.RequestKey{}).(*http.Request)
 	return ctx, assert.Equals(url, r.URL.String())
 }
 
 func ISetHeaderTo(ctx context.Context, headerName, value string) (context.Context, error) {
-	r := ctx.Value(testhttp.RequestKey{}).(*http.Request)
+	r := ctx.Get(testhttp.RequestKey{}).(*http.Request)
 	r.Header.Set(headerName, value)
-	ctx = context.WithValue(ctx, testhttp.RequestKey{}, r)
+	ctx.Set(testhttp.RequestKey{}, r)
 	return ctx, nil
 }
 
 func requestHasHeaderSetTo(ctx context.Context, headerName, expected string) (context.Context, error) {
-	r := ctx.Value(testhttp.RequestKey{}).(*http.Request)
+	r := ctx.Get(testhttp.RequestKey{}).(*http.Request)
 	given := r.Header.Get(headerName)
 	return ctx, assert.Equals(expected, given)
 }

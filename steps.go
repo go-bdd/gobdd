@@ -1,9 +1,10 @@
 package gobdd
 
 import (
-	"context"
 	"errors"
 	"reflect"
+
+	"github.com/go-bdd/gobdd/context"
 )
 
 func validateStepFunc(f interface{}) error {
