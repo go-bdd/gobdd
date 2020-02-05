@@ -1,11 +1,11 @@
 package gobdd
 
 import (
-	"context"
 	"errors"
 	"testing"
 
 	"github.com/go-bdd/assert"
+	"github.com/go-bdd/gobdd/context"
 )
 
 func TestScenarios(t *testing.T) {
@@ -85,18 +85,18 @@ func TestInvalidFunctionSignature(t *testing.T) {
 
 func addf(ctx context.Context, var1, var2 float32) (context.Context, error) {
 	res := var1 + var2
-	ctx = context.WithValue(ctx, "sumRes", res)
+	ctx.Set("sumRes", res)
 	return ctx, nil
 }
 
 func add(ctx context.Context, var1, var2 int) (context.Context, error) {
 	res := var1 + var2
-	ctx = context.WithValue(ctx, "sumRes", res)
+	ctx.Set("sumRes", res)
 	return ctx, nil
 }
 
 func checkf(ctx context.Context, sum float32) (context.Context, error) {
-	received := ctx.Value("sumRes")
+	received := ctx.Get("sumRes")
 
 	if sum != received {
 		return ctx, errors.New("the math does not work for you")
@@ -106,7 +106,7 @@ func checkf(ctx context.Context, sum float32) (context.Context, error) {
 }
 
 func check(ctx context.Context, sum int) (context.Context, error) {
-	received := ctx.Value("sumRes")
+	received := ctx.Get("sumRes")
 
 	if sum != received {
 		return ctx, errors.New("the math does not work for you")

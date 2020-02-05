@@ -27,6 +27,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: go generate
+        run: go generate
+
       - name: Run tests
         run: go test ./...
 
