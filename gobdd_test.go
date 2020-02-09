@@ -2,8 +2,10 @@ package gobdd
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
+	"github.com/cucumber/messages-go/v9"
 	"github.com/go-bdd/assert"
 	"github.com/go-bdd/gobdd/context"
 )
@@ -83,6 +85,32 @@ func TestInvalidFunctionSignature(t *testing.T) {
 	}
 }
 
+func TestFailureOutput(t *testing.T) {
+	testCases := []struct {
+		name     string
+		f        interface{}
+		expected []string
+	}{
+		{name: "passes", f: pass, expected: nil},
+		{name: "returns error", f: failure, expected: []string{"Test text: the step failed"}},
+		{name: "step panics", f: panics, expected: []string{"the step panicked"}},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			def := stepDef{f: testCase.f}
+			step := &messages.GherkinDocument_Feature_Step{Keyword: "Test", Text: "text"}
+
+			tester := &mockTester{}
+			def.run(context.New(), tester, step, nil)
+			err := assert.Equals(testCase.expected, tester.errors)
+			if err != nil {
+				t.Fatal(err)
+			}
+		})
+	}
+}
+
 func addf(ctx context.Context, var1, var2 float32) (context.Context, error) {
 	res := var1 + var2
 	ctx.Set("sumRes", res)
@@ -119,30 +147,43 @@ func fail(ctx context.Context) (context.Context, error) {
 	return ctx, errors.New("the step should never be executed")
 }
 
+func failure(ctx context.Context) (context.Context, error) {
+	return ctx, errors.New("the step failed")
+}
+
+func panics(_ context.Context) (context.Context, error) {
+	panic(errors.New("the step panicked"))
+}
+
 func pass(ctx context.Context) (context.Context, error) {
 	return ctx, nil
 }
 
 type mockTester struct {
 	fatalCalled int
+	errors      []string
 }
 
-func (m mockTester) Log(...interface{}) {
+func (m *mockTester) Log(...interface{}) {
 }
 
 func (m *mockTester) Fatal(...interface{}) {
 	m.fatalCalled++
 }
 
-func (m mockTester) Fatalf(string, ...interface{}) {
+func (m *mockTester) Fatalf(string, ...interface{}) {
 }
 
-func (m mockTester) Parallel() {
+func (m *mockTester) Errorf(format string, a ...interface{}) {
+	m.errors = append(m.errors, fmt.Sprintf(format, a...))
 }
 
-func (m mockTester) Fail() {
+func (m *mockTester) Parallel() {
 }
 
-func (m mockTester) Run(name string, f func(t *testing.T)) bool {
+func (m *mockTester) Fail() {
+}
+
+func (m *mockTester) Run(_ string, _ func(t *testing.T)) bool {
 	return true
 }
