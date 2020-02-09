@@ -87,13 +87,13 @@ func TestInvalidFunctionSignature(t *testing.T) {
 
 func TestFailureOutput(t *testing.T) {
 	testCases := []struct {
-		name     string
-		f        interface{}
-		expected []string
+		name           string
+		f              interface{}
+		expectedErrors []string
 	}{
-		{name: "passes", f: pass, expected: nil},
-		{name: "returns error", f: failure, expected: []string{"Test text: the step failed"}},
-		{name: "step panics", f: panics, expected: []string{"the step panicked"}},
+		{name: "passes", f: pass, expectedErrors: nil},
+		{name: "returns error", f: failure, expectedErrors: []string{"Test text: the step failed"}},
+		{name: "step panics", f: panics, expectedErrors: []string{"the step panicked"}},
 	}
 
 	for _, testCase := range testCases {
@@ -103,7 +103,7 @@ func TestFailureOutput(t *testing.T) {
 
 			tester := &mockTester{}
 			def.run(context.New(), tester, step, nil)
-			err := assert.Equals(testCase.expected, tester.errors)
+			err := assert.Equals(testCase.expectedErrors, tester.errors)
 			if err != nil {
 				t.Fatal(err)
 			}
