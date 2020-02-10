@@ -27,7 +27,7 @@ github_username:  jekyll
 # Build settings
 markdown: kramdown
 remote_theme: yous/whiteglass
-theme: jekyll-whiteglass
+theme: jekyll-theme-hacker
 plugins:
   - jekyll-feed
 
