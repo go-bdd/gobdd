@@ -6,6 +6,6 @@
 //
 // - you can use every Go native feature like build tags, pprof and so on
 //
-// - the context in every test case contains all the required information to run (values passed from previous steps or step parameters).
+// - the context in every test case contains all the required information to run (values passed from previous steps).
 // More information can be found in the readme file https://github.com/go-bdd/gobdd/blob/master/README.md
 package gobdd
