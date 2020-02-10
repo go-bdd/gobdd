@@ -96,6 +96,7 @@ type TestingT interface {
 	Log(...interface{})
 	Fatal(...interface{})
 	Fatalf(string, ...interface{})
+	Errorf(string, ...interface{})
 	Parallel()
 	Fail()
 	Run(name string, f func(t *testing.T)) bool
@@ -352,38 +353,42 @@ func (s *Suite) runStep(ctx context.Context, t *testing.T, step *messages.Gherki
 
 	params := def.expr.FindSubmatch([]byte(step.Text))[1:]
 	t.Run(step.Text, func(t *testing.T) {
-		defer func() {
-			if r := recover(); r != nil {
-				t.Errorf("%+v", r)
-			}
-		}()
-
-		d := reflect.ValueOf(def.f)
-		in := []reflect.Value{reflect.ValueOf(ctx)}
-		if len(params)+1 != d.Type().NumIn() {
-			t.Errorf("the step function %s accepts %d arguments but %d received", d.String(), d.Type().NumIn(), len(params)+1)
-			return
-		}
-		for i, v := range params {
-			inType := d.Type().In(i + 1)
-			paramType := s.paramType(v, inType)
-			in = append(in, paramType)
-		}
-		retValues := d.Call(in)
-		v := retValues[1]
-
-		if !v.IsNil() {
-			err = v.Interface().(error)
-			t.Errorf(step.Keyword, step.Text, err)
-		}
-
-		ctx = retValues[0].Interface().(context.Context)
+		ctx = def.run(ctx, t, step, params)
 	})
 
 	return ctx
 }
 
-func (s *Suite) paramType(param []byte, inType reflect.Type) reflect.Value {
+func (def *stepDef) run(ctx context.Context, t TestingT, step *messages.GherkinDocument_Feature_Step, params [][]byte) context.Context {
+	defer func() {
+		if r := recover(); r != nil {
+			t.Errorf("%+v", r)
+		}
+	}()
+
+	d := reflect.ValueOf(def.f)
+	in := []reflect.Value{reflect.ValueOf(ctx)}
+	if len(params)+1 != d.Type().NumIn() {
+		t.Errorf("the step function %s accepts %d arguments but %d received", d.String(), d.Type().NumIn(), len(params)+1)
+		return ctx
+	}
+	for i, v := range params {
+		inType := d.Type().In(i + 1)
+		paramType := paramType(v, inType)
+		in = append(in, paramType)
+	}
+	retValues := d.Call(in)
+	v := retValues[1]
+
+	if !v.IsNil() {
+		err := v.Interface().(error)
+		t.Errorf("%s %s: %v", step.Keyword, step.Text, err)
+	}
+
+	return retValues[0].Interface().(context.Context)
+}
+
+func paramType(param []byte, inType reflect.Type) reflect.Value {
 	paramType := reflect.ValueOf(param)
 	if inType.Kind() == reflect.String {
 		paramType = reflect.ValueOf(string(paramType.Interface().([]uint8)))
