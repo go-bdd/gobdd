@@ -4,7 +4,7 @@
 
 This is a BDD testing framework. Uses gherkin for the test's syntax. Project is under active development.
 
-More detailed documentation can be found on the docs page: https://go-bdd.github.io/doc/
+More detailed documentation can be found on the docs page: https://go-bdd.github.io/gobdd/
 
 # Contributing
 All contributions are very much welcome. If you'd like to help with GoBDD development, please see open issues and submit your pull request via GitHub.
