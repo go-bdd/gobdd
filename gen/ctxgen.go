@@ -92,6 +92,18 @@ var testTmpl = `// Code generated .* DO NOT EDIT.
 package context
 
 import "testing"
+import "errors"
+
+func TestContext_GetError(t *testing.T) {
+	ctx := New()
+	expected := errors.New("new err")
+	ctx.Set("test", expected)
+	received := ctx.GetError("test")
+	if received != expected {
+		t.Errorf("expected %+v but received %+v", expected, received)
+	}
+}
+
 {{ range .Types }}
 func TestContext_Get{{ .Name | Title }}(t *testing.T) {
 	ctx := New()
@@ -138,6 +150,7 @@ var getTmpl = `// Code generated .* DO NOT EDIT.
 package context
 
 import "fmt"
+
 {{ range .Types }}
 func (ctx Context) Get{{ .Name | Title }}(key interface{}, defaultValue ...{{ .Name }}) {{ .Name }} {
 	if len(defaultValue) > 1 {

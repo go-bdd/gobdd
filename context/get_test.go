@@ -2,6 +2,18 @@
 package context
 
 import "testing"
+import "errors"
+
+func TestContext_GetError(t *testing.T) {
+	ctx := New()
+	expected := errors.New("new err")
+	ctx.Set("test", expected)
+	received := ctx.GetError("test")
+	if received != expected {
+		t.Errorf("expected %+v but received %+v", expected, received)
+	}
+}
+
 
 func TestContext_GetString(t *testing.T) {
 	ctx := New()

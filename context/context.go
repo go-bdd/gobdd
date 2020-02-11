@@ -34,3 +34,19 @@ func (ctx Context) Get(key interface{}, defaultValue ...interface{}) interface{}
 
 	return ctx.values[key]
 }
+
+
+func (ctx Context) GetError(key interface{}, defaultValue ...interface{}) interface{} {
+	if _, ok := ctx.values[key]; !ok {
+		if len(defaultValue) == 1 {
+			return defaultValue[0]
+		}
+		panic(fmt.Sprintf("the key %+v does not exist", key))
+	}
+
+	value, ok := ctx.values[key].(error)
+	if !ok {
+		panic(fmt.Sprintf("the expected value is not error  (%T)", key))
+	}
+	return value
+}
