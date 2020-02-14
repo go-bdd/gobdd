@@ -6,6 +6,6 @@ main:
   - title: "Creating steps"
     url: /creating-steps.html
   - title: "testhttp package"
-    url: /doc/testhttp.html
+    url: /gobdd/testhttp.html
   - title: "GitHub"
     url: https://github.com/go-bdd/gobdd
