@@ -11,7 +11,7 @@ import (
 )
 
 func TestScenarios(t *testing.T) {
-	suite := NewSuite(t, NewSuiteOptions().WithFeaturesPath("features/example.feature"))
+	suite := NewSuite(t, WithFeaturesPath("features/example.feature"))
 	suite.AddStep(`I add (\d+) and (\d+)`, add)
 	suite.AddStep(`the result should equal (\d+)`, check)
 
@@ -19,7 +19,7 @@ func TestScenarios(t *testing.T) {
 }
 
 func TestDifferentFuncTypes(t *testing.T) {
-	suite := NewSuite(t, NewSuiteOptions().WithFeaturesPath("features/func_types.feature"))
+	suite := NewSuite(t, WithFeaturesPath("features/func_types.feature"))
 	suite.AddStep(`I add ([+-]?[0-9]*[.]?[0-9]+) and ([+-]?[0-9]*[.]?[0-9]+)`, addf)
 	suite.AddStep(`the result should equal ([+-]?[0-9]*[.]?[0-9]+)`, checkf)
 
@@ -27,7 +27,7 @@ func TestDifferentFuncTypes(t *testing.T) {
 }
 
 func TestScenarioOutline(t *testing.T) {
-	suite := NewSuite(t, NewSuiteOptions().WithFeaturesPath("features/outline.feature"))
+	suite := NewSuite(t, WithFeaturesPath("features/outline.feature"))
 	suite.AddStep(`I add (\d+) and (\d+)`, add)
 	suite.AddStep(`the result should equal <result>`, check)
 
@@ -35,8 +35,7 @@ func TestScenarioOutline(t *testing.T) {
 }
 
 func TestBackground(t *testing.T) {
-	options := NewSuiteOptions().WithFeaturesPath("features/background.feature")
-	suite := NewSuite(t, options)
+	suite := NewSuite(t, WithFeaturesPath("features/background.feature"))
 	suite.AddStep(`I add (\d+) and (\d+)`, add)
 	suite.AddStep(`the result should equal (\d+)`, check)
 
@@ -44,8 +43,7 @@ func TestBackground(t *testing.T) {
 }
 
 func TestTags(t *testing.T) {
-	options := NewSuiteOptions().WithFeaturesPath("features/tags.feature").WithTags([]string{"@tag"})
-	suite := NewSuite(t, options)
+	suite := NewSuite(t, WithFeaturesPath("features/tags.feature"), WithTags([]string{"@tag"}))
 	suite.AddStep(`fail the test`, fail)
 	suite.AddStep(`the test should pass`, pass)
 
@@ -53,9 +51,7 @@ func TestTags(t *testing.T) {
 }
 
 func TestIgnoredTags(t *testing.T) {
-	options := NewSuiteOptions().WithFeaturesPath("features/ignored_tags.feature")
-	options = options.WithIgnoredTags([]string{"@ignore"})
-	suite := NewSuite(t, options)
+	suite := NewSuite(t, WithFeaturesPath("features/ignored_tags.feature"), WithIgnoredTags([]string{"@ignore"}))
 	suite.AddStep(`fail the test`, fail)
 	suite.Run()
 }
@@ -74,7 +70,7 @@ func TestInvalidFunctionSignature(t *testing.T) {
 	for name, testCase := range testCases {
 		t.Run(name, func(t *testing.T) {
 			tester := &mockTester{}
-			suite := NewSuite(tester, NewSuiteOptions())
+			suite := NewSuite(tester)
 			suite.AddStep("", testCase.f)
 			suite.Run()
 			err := assert.Equals(1, tester.fatalCalled)
