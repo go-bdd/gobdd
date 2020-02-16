@@ -48,43 +48,49 @@ func NewSuiteOptions() SuiteOptions {
 	}
 }
 
-// runs tests in parallel
-func (options SuiteOptions) RunInParallel() SuiteOptions {
-	options.runInParallel = true
-	return options
+// RunInParallel runs tests in parallel
+func RunInParallel() func(*SuiteOptions) {
+	return func(options *SuiteOptions) {
+		options.runInParallel = true
+	}
 }
 
-// Configures a pattern (regexp) where feature can be found.
+// WithFeaturesPath configures a pattern (regexp) where feature can be found.
 // The default value is "features/*.feature"
-func (options SuiteOptions) WithFeaturesPath(path string) SuiteOptions {
-	options.featuresPaths = path
-	return options
+func WithFeaturesPath(path string) func(*SuiteOptions) {
+	return func(options *SuiteOptions) {
+		options.featuresPaths = path
+	}
 }
 
-// Configures which tags should be skipped while executing a suite
+// WithTags configures which tags should be skipped while executing a suite
 // Every tag has to start with @
-func (options SuiteOptions) WithTags(tags []string) SuiteOptions {
-	options.tags = tags
-	return options
+func WithTags(tags []string) func(*SuiteOptions) {
+	return func(options *SuiteOptions) {
+		options.tags = tags
+	}
 }
 
-// Configures functions that should be executed before every scenario
-func (options SuiteOptions) WithBeforeScenario(f func()) SuiteOptions {
-	options.beforeScenario = append(options.beforeScenario, f)
-	return options
+// WithBeforeScenario configures functions that should be executed before every scenario
+func WithBeforeScenario(f func()) func(*SuiteOptions) {
+	return func(options *SuiteOptions) {
+		options.beforeScenario = append(options.beforeScenario, f)
+	}
 }
 
-// Configures functions that should be executed after every scenario
-func (options SuiteOptions) WithAfterScenario(f func()) SuiteOptions {
-	options.afterScenario = append(options.afterScenario, f)
-	return options
+// WithAfterScenario configures functions that should be executed after every scenario
+func WithAfterScenario(f func()) func(*SuiteOptions) {
+	return func(options *SuiteOptions) {
+		options.afterScenario = append(options.afterScenario, f)
+	}
 }
 
-// Configures which tags should be skipped while executing a suite
+// WithIgnoredTags configures which tags should be skipped while executing a suite
 // Every tag has to start with @ otherwise will be ignored
-func (options SuiteOptions) WithIgnoredTags(tags []string) SuiteOptions {
-	options.ignoreTags = tags
-	return options
+func WithIgnoredTags(tags []string) func(*SuiteOptions) {
+	return func(options *SuiteOptions) {
+		options.ignoreTags = tags
+	}
 }
 
 type stepDef struct {
@@ -103,7 +109,12 @@ type TestingT interface {
 }
 
 // Creates a new suites with given configuration and empty steps defined
-func NewSuite(t TestingT, options SuiteOptions) *Suite {
+func NewSuite(t TestingT, optionClosures ...func(*SuiteOptions)) *Suite {
+	options := NewSuiteOptions()
+	for _, oC := range optionClosures {
+		oC(&options)
+	}
+
 	return &Suite{
 		t:       t,
 		steps:   []stepDef{},
@@ -347,7 +358,7 @@ func (s *Suite) runStep(ctx context.Context, t *testing.T, step *messages.Gherki
 
 	def, err := s.findStepDef(step.Text)
 	if err != nil {
-		t.Errorf("cannot find step definition for step: %s %s", step.Keyword, step.Text)
+		t.Errorf("cannot find step definition for step: %s%s", step.Keyword, step.Text)
 		return ctx
 	}
 

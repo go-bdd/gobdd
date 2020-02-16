@@ -10,7 +10,7 @@ import (
 )
 
 func TestValidMethods(t *testing.T) {
-	s := gobdd.NewSuite(t, gobdd.NewSuiteOptions())
+	s := gobdd.NewSuite(t)
 	handler := Build(s, testHandler{})
 	methods := []string{"Get", "Post", "Trace", "Options", "Head", "Connect", "Patch", "Put", "Delete"}
 

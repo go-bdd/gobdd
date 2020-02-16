@@ -10,7 +10,7 @@ import (
 )
 
 func TestHTTP(t *testing.T) {
-	s := NewSuite(t, NewSuiteOptions().WithFeaturesPath("features/http.feature"))
+	s := NewSuite(t, WithFeaturesPath("features/http.feature"))
 	router := http.NewServeMux()
 	router.HandleFunc("/health", func(w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(http.StatusOK)
