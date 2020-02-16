@@ -9,7 +9,7 @@ This package is designed to help you testing your handlers and the domain hidden
 To be able to use it, you have to initialise using `testhttp.Setup()` function.
 
 ```golang
-s := NewSuite(t, NewSuiteOptions().WithFeaturesPath("features/http.feature"))
+s := NewSuite(t, WithFeaturesPath("features/http.feature"))
 router := http.NewServeMux()
 testhttp.Build(s, router)
 
