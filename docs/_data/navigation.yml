@@ -8,6 +8,6 @@ main:
   - title: "testhttp package"
     url: /gobdd/testhttp.html
   - title: "Suite's options"
-    url: /gobdd/suite-options.html
+    url: /suite-options.html
   - title: "GitHub"
     url: https://github.com/go-bdd/gobdd
