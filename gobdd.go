@@ -32,8 +32,8 @@ type SuiteOptions struct {
 	featuresPaths  string
 	ignoreTags     []string
 	tags           []string
-	beforeScenario []func()
-	afterScenario  []func()
+	beforeScenario []func(ctx context.Context)
+	afterScenario  []func(ctx context.Context)
 	runInParallel  bool
 }
 
@@ -43,8 +43,8 @@ func NewSuiteOptions() SuiteOptions {
 		featuresPaths:  "features/*.feature",
 		ignoreTags:     []string{},
 		tags:           []string{},
-		beforeScenario: []func(){},
-		afterScenario:  []func(){},
+		beforeScenario: []func(ctx context.Context){},
+		afterScenario:  []func(ctx context.Context){},
 	}
 }
 
@@ -72,14 +72,14 @@ func WithTags(tags []string) func(*SuiteOptions) {
 }
 
 // WithBeforeScenario configures functions that should be executed before every scenario
-func WithBeforeScenario(f func()) func(*SuiteOptions) {
+func WithBeforeScenario(f func(ctx context.Context)) func(*SuiteOptions) {
 	return func(options *SuiteOptions) {
 		options.beforeScenario = append(options.beforeScenario, f)
 	}
 }
 
 // WithAfterScenario configures functions that should be executed after every scenario
-func WithAfterScenario(f func()) func(*SuiteOptions) {
+func WithAfterScenario(f func(ctx context.Context)) func(*SuiteOptions) {
 	return func(options *SuiteOptions) {
 		options.afterScenario = append(options.afterScenario, f)
 	}
@@ -311,22 +311,22 @@ func (s *Suite) stepsFromExample(sourceStep *messages.GherkinDocument_Feature_St
 	return steps
 }
 
-func (s *Suite) callBeforeScenarios() {
+func (s *Suite) callBeforeScenarios(ctx context.Context) {
 	for _, f := range s.options.beforeScenario {
-		f()
+		f(ctx)
 	}
 }
 
-func (s *Suite) callAfterScenarios() {
+func (s *Suite) callAfterScenarios(ctx context.Context) {
 	for _, f := range s.options.afterScenario {
-		f()
+		f(ctx)
 	}
 }
 
 func (s *Suite) runScenario(ctx context.Context, scenario *messages.GherkinDocument_Feature_Scenario, bkg *messages.GherkinDocument_Feature_Background, t *testing.T) error {
-	s.callBeforeScenarios()
+	s.callBeforeScenarios(ctx)
 
-	defer s.callAfterScenarios()
+	defer s.callAfterScenarios(ctx)
 	t.Run(scenario.Name, func(t *testing.T) {
 		if bkg != nil {
 			steps := s.getBackgroundSteps(bkg)
