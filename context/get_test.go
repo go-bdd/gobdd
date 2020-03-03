@@ -8,7 +8,10 @@ func TestContext_GetError(t *testing.T) {
 	ctx := New()
 	expected := errors.New("new err")
 	ctx.Set("test", expected)
-	received := ctx.GetError("test")
+	received, err := ctx.GetError("test")
+	if err != nil {
+		t.Error(err)
+	}
 	if received != expected {
 		t.Errorf("expected %+v but received %+v", expected, received)
 	}
@@ -19,7 +22,10 @@ func TestContext_GetString(t *testing.T) {
 	ctx := New()
 	expected := string("example text")
 	ctx.Set("test", expected)
-	received := ctx.GetString("test")
+	received, err := ctx.GetString("test")
+	if err != nil {
+		t.Error(err)
+	}
 	if received != expected {
 		t.Errorf("expected %+v but received %+v", expected, received)
 	}
@@ -28,37 +34,39 @@ func TestContext_GetString(t *testing.T) {
 func TestContext_GetString_WithDefaultValue(t *testing.T) {
 	ctx := New()
 	defaultValue := string("example text")
-	received := ctx.GetString("test", defaultValue)
+	received, err := ctx.GetString("test", defaultValue)
+	if err != nil {
+		t.Error(err)
+	}
 	if received != defaultValue {
 		t.Errorf("expected %+v but received %+v", defaultValue, received)
 	}
 }
 
-func TestContext_GetString_PanicOnMoreThanOneDefaultValue(t *testing.T) {
+func TestContext_GetString_ShouldReturnErrorWhenMoreThanOneDefaultValue(t *testing.T) {
 	ctx := New()
-	defer func() {
-        if r := recover(); r == nil {
-            t.Error("the GetString should panic")
-        }
-    }()
-	_ = ctx.GetString("test", "example text", "example text")
+	_, err := ctx.GetString("test", "example text", "example text")
+	if err == nil  {
+		t.Error("the GetString should return an error")
+	}
 }
 
-func TestContext_GetString_PanicOnNotFound(t *testing.T) {
+func TestContext_GetString_ErrorOnNotFound(t *testing.T) {
 	ctx := New()
-	defer func() {
-        if r := recover(); r == nil {
-            t.Error("the GetString should panic")
-        }
-    }()
-	_ = ctx.GetString("test")
+	_, err := ctx.GetString("test")
+	if err == nil  {
+		t.Error("the GetString should return an error")
+	}
 }
 
 func TestContext_GetInt(t *testing.T) {
 	ctx := New()
 	expected := int(123)
 	ctx.Set("test", expected)
-	received := ctx.GetInt("test")
+	received, err := ctx.GetInt("test")
+	if err != nil {
+		t.Error(err)
+	}
 	if received != expected {
 		t.Errorf("expected %+v but received %+v", expected, received)
 	}
@@ -67,37 +75,39 @@ func TestContext_GetInt(t *testing.T) {
 func TestContext_GetInt_WithDefaultValue(t *testing.T) {
 	ctx := New()
 	defaultValue := int(123)
-	received := ctx.GetInt("test", defaultValue)
+	received, err := ctx.GetInt("test", defaultValue)
+	if err != nil {
+		t.Error(err)
+	}
 	if received != defaultValue {
 		t.Errorf("expected %+v but received %+v", defaultValue, received)
 	}
 }
 
-func TestContext_GetInt_PanicOnMoreThanOneDefaultValue(t *testing.T) {
+func TestContext_GetInt_ShouldReturnErrorWhenMoreThanOneDefaultValue(t *testing.T) {
 	ctx := New()
-	defer func() {
-        if r := recover(); r == nil {
-            t.Error("the GetInt should panic")
-        }
-    }()
-	_ = ctx.GetInt("test", 123, 123)
+	_, err := ctx.GetInt("test", 123, 123)
+	if err == nil  {
+		t.Error("the GetInt should return an error")
+	}
 }
 
-func TestContext_GetInt_PanicOnNotFound(t *testing.T) {
+func TestContext_GetInt_ErrorOnNotFound(t *testing.T) {
 	ctx := New()
-	defer func() {
-        if r := recover(); r == nil {
-            t.Error("the GetInt should panic")
-        }
-    }()
-	_ = ctx.GetInt("test")
+	_, err := ctx.GetInt("test")
+	if err == nil  {
+		t.Error("the GetInt should return an error")
+	}
 }
 
 func TestContext_GetInt8(t *testing.T) {
 	ctx := New()
 	expected := int8(123)
 	ctx.Set("test", expected)
-	received := ctx.GetInt8("test")
+	received, err := ctx.GetInt8("test")
+	if err != nil {
+		t.Error(err)
+	}
 	if received != expected {
 		t.Errorf("expected %+v but received %+v", expected, received)
 	}
@@ -106,37 +116,39 @@ func TestContext_GetInt8(t *testing.T) {
 func TestContext_GetInt8_WithDefaultValue(t *testing.T) {
 	ctx := New()
 	defaultValue := int8(123)
-	received := ctx.GetInt8("test", defaultValue)
+	received, err := ctx.GetInt8("test", defaultValue)
+	if err != nil {
+		t.Error(err)
+	}
 	if received != defaultValue {
 		t.Errorf("expected %+v but received %+v", defaultValue, received)
 	}
 }
 
-func TestContext_GetInt8_PanicOnMoreThanOneDefaultValue(t *testing.T) {
+func TestContext_GetInt8_ShouldReturnErrorWhenMoreThanOneDefaultValue(t *testing.T) {
 	ctx := New()
-	defer func() {
-        if r := recover(); r == nil {
-            t.Error("the GetInt8 should panic")
-        }
-    }()
-	_ = ctx.GetInt8("test", 123, 123)
+	_, err := ctx.GetInt8("test", 123, 123)
+	if err == nil  {
+		t.Error("the GetInt8 should return an error")
+	}
 }
 
-func TestContext_GetInt8_PanicOnNotFound(t *testing.T) {
+func TestContext_GetInt8_ErrorOnNotFound(t *testing.T) {
 	ctx := New()
-	defer func() {
-        if r := recover(); r == nil {
-            t.Error("the GetInt8 should panic")
-        }
-    }()
-	_ = ctx.GetInt8("test")
+	_, err := ctx.GetInt8("test")
+	if err == nil  {
+		t.Error("the GetInt8 should return an error")
+	}
 }
 
 func TestContext_GetInt16(t *testing.T) {
 	ctx := New()
 	expected := int16(123)
 	ctx.Set("test", expected)
-	received := ctx.GetInt16("test")
+	received, err := ctx.GetInt16("test")
+	if err != nil {
+		t.Error(err)
+	}
 	if received != expected {
 		t.Errorf("expected %+v but received %+v", expected, received)
 	}
@@ -145,37 +157,39 @@ func TestContext_GetInt16(t *testing.T) {
 func TestContext_GetInt16_WithDefaultValue(t *testing.T) {
 	ctx := New()
 	defaultValue := int16(123)
-	received := ctx.GetInt16("test", defaultValue)
+	received, err := ctx.GetInt16("test", defaultValue)
+	if err != nil {
+		t.Error(err)
+	}
 	if received != defaultValue {
 		t.Errorf("expected %+v but received %+v", defaultValue, received)
 	}
 }
 
-func TestContext_GetInt16_PanicOnMoreThanOneDefaultValue(t *testing.T) {
+func TestContext_GetInt16_ShouldReturnErrorWhenMoreThanOneDefaultValue(t *testing.T) {
 	ctx := New()
-	defer func() {
-        if r := recover(); r == nil {
-            t.Error("the GetInt16 should panic")
-        }
-    }()
-	_ = ctx.GetInt16("test", 123, 123)
+	_, err := ctx.GetInt16("test", 123, 123)
+	if err == nil  {
+		t.Error("the GetInt16 should return an error")
+	}
 }
 
-func TestContext_GetInt16_PanicOnNotFound(t *testing.T) {
+func TestContext_GetInt16_ErrorOnNotFound(t *testing.T) {
 	ctx := New()
-	defer func() {
-        if r := recover(); r == nil {
-            t.Error("the GetInt16 should panic")
-        }
-    }()
-	_ = ctx.GetInt16("test")
+	_, err := ctx.GetInt16("test")
+	if err == nil  {
+		t.Error("the GetInt16 should return an error")
+	}
 }
 
 func TestContext_GetInt32(t *testing.T) {
 	ctx := New()
 	expected := int32(123)
 	ctx.Set("test", expected)
-	received := ctx.GetInt32("test")
+	received, err := ctx.GetInt32("test")
+	if err != nil {
+		t.Error(err)
+	}
 	if received != expected {
 		t.Errorf("expected %+v but received %+v", expected, received)
 	}
@@ -184,37 +198,39 @@ func TestContext_GetInt32(t *testing.T) {
 func TestContext_GetInt32_WithDefaultValue(t *testing.T) {
 	ctx := New()
 	defaultValue := int32(123)
-	received := ctx.GetInt32("test", defaultValue)
+	received, err := ctx.GetInt32("test", defaultValue)
+	if err != nil {
+		t.Error(err)
+	}
 	if received != defaultValue {
 		t.Errorf("expected %+v but received %+v", defaultValue, received)
 	}
 }
 
-func TestContext_GetInt32_PanicOnMoreThanOneDefaultValue(t *testing.T) {
+func TestContext_GetInt32_ShouldReturnErrorWhenMoreThanOneDefaultValue(t *testing.T) {
 	ctx := New()
-	defer func() {
-        if r := recover(); r == nil {
-            t.Error("the GetInt32 should panic")
-        }
-    }()
-	_ = ctx.GetInt32("test", 123, 123)
+	_, err := ctx.GetInt32("test", 123, 123)
+	if err == nil  {
+		t.Error("the GetInt32 should return an error")
+	}
 }
 
-func TestContext_GetInt32_PanicOnNotFound(t *testing.T) {
+func TestContext_GetInt32_ErrorOnNotFound(t *testing.T) {
 	ctx := New()
-	defer func() {
-        if r := recover(); r == nil {
-            t.Error("the GetInt32 should panic")
-        }
-    }()
-	_ = ctx.GetInt32("test")
+	_, err := ctx.GetInt32("test")
+	if err == nil  {
+		t.Error("the GetInt32 should return an error")
+	}
 }
 
 func TestContext_GetInt64(t *testing.T) {
 	ctx := New()
 	expected := int64(123)
 	ctx.Set("test", expected)
-	received := ctx.GetInt64("test")
+	received, err := ctx.GetInt64("test")
+	if err != nil {
+		t.Error(err)
+	}
 	if received != expected {
 		t.Errorf("expected %+v but received %+v", expected, received)
 	}
@@ -223,37 +239,39 @@ func TestContext_GetInt64(t *testing.T) {
 func TestContext_GetInt64_WithDefaultValue(t *testing.T) {
 	ctx := New()
 	defaultValue := int64(123)
-	received := ctx.GetInt64("test", defaultValue)
+	received, err := ctx.GetInt64("test", defaultValue)
+	if err != nil {
+		t.Error(err)
+	}
 	if received != defaultValue {
 		t.Errorf("expected %+v but received %+v", defaultValue, received)
 	}
 }
 
-func TestContext_GetInt64_PanicOnMoreThanOneDefaultValue(t *testing.T) {
+func TestContext_GetInt64_ShouldReturnErrorWhenMoreThanOneDefaultValue(t *testing.T) {
 	ctx := New()
-	defer func() {
-        if r := recover(); r == nil {
-            t.Error("the GetInt64 should panic")
-        }
-    }()
-	_ = ctx.GetInt64("test", 123, 123)
+	_, err := ctx.GetInt64("test", 123, 123)
+	if err == nil  {
+		t.Error("the GetInt64 should return an error")
+	}
 }
 
-func TestContext_GetInt64_PanicOnNotFound(t *testing.T) {
+func TestContext_GetInt64_ErrorOnNotFound(t *testing.T) {
 	ctx := New()
-	defer func() {
-        if r := recover(); r == nil {
-            t.Error("the GetInt64 should panic")
-        }
-    }()
-	_ = ctx.GetInt64("test")
+	_, err := ctx.GetInt64("test")
+	if err == nil  {
+		t.Error("the GetInt64 should return an error")
+	}
 }
 
 func TestContext_GetFloat32(t *testing.T) {
 	ctx := New()
 	expected := float32(123.5)
 	ctx.Set("test", expected)
-	received := ctx.GetFloat32("test")
+	received, err := ctx.GetFloat32("test")
+	if err != nil {
+		t.Error(err)
+	}
 	if received != expected {
 		t.Errorf("expected %+v but received %+v", expected, received)
 	}
@@ -262,37 +280,39 @@ func TestContext_GetFloat32(t *testing.T) {
 func TestContext_GetFloat32_WithDefaultValue(t *testing.T) {
 	ctx := New()
 	defaultValue := float32(123.5)
-	received := ctx.GetFloat32("test", defaultValue)
+	received, err := ctx.GetFloat32("test", defaultValue)
+	if err != nil {
+		t.Error(err)
+	}
 	if received != defaultValue {
 		t.Errorf("expected %+v but received %+v", defaultValue, received)
 	}
 }
 
-func TestContext_GetFloat32_PanicOnMoreThanOneDefaultValue(t *testing.T) {
+func TestContext_GetFloat32_ShouldReturnErrorWhenMoreThanOneDefaultValue(t *testing.T) {
 	ctx := New()
-	defer func() {
-        if r := recover(); r == nil {
-            t.Error("the GetFloat32 should panic")
-        }
-    }()
-	_ = ctx.GetFloat32("test", 123.5, 123.5)
+	_, err := ctx.GetFloat32("test", 123.5, 123.5)
+	if err == nil  {
+		t.Error("the GetFloat32 should return an error")
+	}
 }
 
-func TestContext_GetFloat32_PanicOnNotFound(t *testing.T) {
+func TestContext_GetFloat32_ErrorOnNotFound(t *testing.T) {
 	ctx := New()
-	defer func() {
-        if r := recover(); r == nil {
-            t.Error("the GetFloat32 should panic")
-        }
-    }()
-	_ = ctx.GetFloat32("test")
+	_, err := ctx.GetFloat32("test")
+	if err == nil  {
+		t.Error("the GetFloat32 should return an error")
+	}
 }
 
 func TestContext_GetFloat64(t *testing.T) {
 	ctx := New()
 	expected := float64(123.5)
 	ctx.Set("test", expected)
-	received := ctx.GetFloat64("test")
+	received, err := ctx.GetFloat64("test")
+	if err != nil {
+		t.Error(err)
+	}
 	if received != expected {
 		t.Errorf("expected %+v but received %+v", expected, received)
 	}
@@ -301,37 +321,39 @@ func TestContext_GetFloat64(t *testing.T) {
 func TestContext_GetFloat64_WithDefaultValue(t *testing.T) {
 	ctx := New()
 	defaultValue := float64(123.5)
-	received := ctx.GetFloat64("test", defaultValue)
+	received, err := ctx.GetFloat64("test", defaultValue)
+	if err != nil {
+		t.Error(err)
+	}
 	if received != defaultValue {
 		t.Errorf("expected %+v but received %+v", defaultValue, received)
 	}
 }
 
-func TestContext_GetFloat64_PanicOnMoreThanOneDefaultValue(t *testing.T) {
+func TestContext_GetFloat64_ShouldReturnErrorWhenMoreThanOneDefaultValue(t *testing.T) {
 	ctx := New()
-	defer func() {
-        if r := recover(); r == nil {
-            t.Error("the GetFloat64 should panic")
-        }
-    }()
-	_ = ctx.GetFloat64("test", 123.5, 123.5)
+	_, err := ctx.GetFloat64("test", 123.5, 123.5)
+	if err == nil  {
+		t.Error("the GetFloat64 should return an error")
+	}
 }
 
-func TestContext_GetFloat64_PanicOnNotFound(t *testing.T) {
+func TestContext_GetFloat64_ErrorOnNotFound(t *testing.T) {
 	ctx := New()
-	defer func() {
-        if r := recover(); r == nil {
-            t.Error("the GetFloat64 should panic")
-        }
-    }()
-	_ = ctx.GetFloat64("test")
+	_, err := ctx.GetFloat64("test")
+	if err == nil  {
+		t.Error("the GetFloat64 should return an error")
+	}
 }
 
 func TestContext_GetBool(t *testing.T) {
 	ctx := New()
 	expected := bool(false)
 	ctx.Set("test", expected)
-	received := ctx.GetBool("test")
+	received, err := ctx.GetBool("test")
+	if err != nil {
+		t.Error(err)
+	}
 	if received != expected {
 		t.Errorf("expected %+v but received %+v", expected, received)
 	}
@@ -340,29 +362,28 @@ func TestContext_GetBool(t *testing.T) {
 func TestContext_GetBool_WithDefaultValue(t *testing.T) {
 	ctx := New()
 	defaultValue := bool(false)
-	received := ctx.GetBool("test", defaultValue)
+	received, err := ctx.GetBool("test", defaultValue)
+	if err != nil {
+		t.Error(err)
+	}
 	if received != defaultValue {
 		t.Errorf("expected %+v but received %+v", defaultValue, received)
 	}
 }
 
-func TestContext_GetBool_PanicOnMoreThanOneDefaultValue(t *testing.T) {
+func TestContext_GetBool_ShouldReturnErrorWhenMoreThanOneDefaultValue(t *testing.T) {
 	ctx := New()
-	defer func() {
-        if r := recover(); r == nil {
-            t.Error("the GetBool should panic")
-        }
-    }()
-	_ = ctx.GetBool("test", false, false)
+	_, err := ctx.GetBool("test", false, false)
+	if err == nil  {
+		t.Error("the GetBool should return an error")
+	}
 }
 
-func TestContext_GetBool_PanicOnNotFound(t *testing.T) {
+func TestContext_GetBool_ErrorOnNotFound(t *testing.T) {
 	ctx := New()
-	defer func() {
-        if r := recover(); r == nil {
-            t.Error("the GetBool should panic")
-        }
-    }()
-	_ = ctx.GetBool("test")
+	_, err := ctx.GetBool("test")
+	if err == nil  {
+		t.Error("the GetBool should return an error")
+	}
 }
 	
