@@ -45,14 +45,20 @@ func Build(addStep addStepper, h httpHandler) TestHTTP {
 }
 
 func (t testHTTPMethods) iSetRequestBodyTo(ctx context.Context, body string) (context.Context, error) {
-	r := ctx.Get(RequestKey{}).(*http.Request)
+	r, err := GetRequest(ctx)
+	if err != nil {
+		return ctx, err
+	}
 	r.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(body)))
 	ctx.Set(RequestKey{}, r)
 	return ctx, nil
 }
 
 func (t testHTTPMethods) iSetRequestSetTo(ctx context.Context, headerName, value string) (context.Context, error) {
-	req := ctx.Get(RequestKey{}).(*http.Request)
+	req, err := GetRequest(ctx)
+	if err != nil {
+		return ctx, err
+	}
 	req.Header.Add(headerName, value)
 
 	ctx.Set(RequestKey{}, req)
@@ -60,14 +66,20 @@ func (t testHTTPMethods) iSetRequestSetTo(ctx context.Context, headerName, value
 }
 
 func (t testHTTPMethods) responseHeaderEquals(ctx context.Context, headerName, expected string) (context.Context, error) {
-	resp := ctx.Get(ResponseKey{}).(Response)
+	resp, err := GetResponse(ctx)
+	if err != nil {
+		return ctx, err
+	}
 	given := resp.Header.Get(headerName)
 
 	return ctx, assert.Equals(expected, given)
 }
 
 func (t testHTTPMethods) theRequestHasBody(ctx context.Context, body string) (context.Context, error) {
-	req := ctx.Get(RequestKey{}).(*http.Request)
+	req, err := GetRequest(ctx)
+	if err != nil {
+		return ctx, err
+	}
 	req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(body)))
 	ctx.Set(RequestKey{}, req)
 	return ctx, nil
@@ -84,7 +96,10 @@ func (t testHTTPMethods) iHaveARequest(ctx context.Context, method, url string) 
 }
 
 func (t testHTTPMethods) theResponseIs(ctx context.Context, expectedResponse string) (context.Context, error) {
-	resp := ctx.Get(ResponseKey{}).(Response)
+	resp, err := GetResponse(ctx)
+	if err != nil {
+		return ctx, err
+	}
 	body, err := ioutil.ReadAll(resp.Body)
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 	ctx.Set(ResponseKey{}, resp)
@@ -99,7 +114,10 @@ func (t testHTTPMethods) theResponseIs(ctx context.Context, expectedResponse str
 }
 
 func (t testHTTPMethods) validJSON(ctx context.Context) (context.Context, error) {
-	resp := ctx.Get(ResponseKey{}).(Response)
+	resp, err := GetResponse(ctx)
+	if err != nil {
+		return ctx, err
+	}
 	body, err := ioutil.ReadAll(resp.Body)
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 	ctx.Set(ResponseKey{}, resp)
@@ -114,7 +132,10 @@ func (t testHTTPMethods) validJSON(ctx context.Context) (context.Context, error)
 }
 
 func (t testHTTPMethods) iMakeRequest(ctx context.Context) (context.Context, error) {
-	req := ctx.Get(RequestKey{}).(*http.Request)
+	req, err := GetRequest(ctx)
+	if err != nil {
+		return ctx, err
+	}
 	resp, err := t.tHTTP.MakeRequest(req)
 	if err != nil {
 		return ctx, err
@@ -140,10 +161,31 @@ func (t testHTTPMethods) makeRequest(ctx context.Context, method, url string) (c
 }
 
 func (t testHTTPMethods) statusCodeEquals(ctx context.Context, expectedStatus int) (context.Context, error) {
-	resp := ctx.Get(ResponseKey{}).(Response)
+	resp, err := GetResponse(ctx)
+	if err != nil {
+		return ctx, err
+	}
 
 	if expectedStatus != resp.Code {
 		return ctx, fmt.Errorf("expected status code: %d but %d given", expectedStatus, resp.Code)
 	}
 	return ctx, nil
+}
+
+func GetResponse(ctx context.Context) (Response, error) {
+	v, err := ctx.Get(ResponseKey{})
+	if err != nil {
+		return Response{}, err
+	}
+
+	return v.(Response), nil
+}
+
+func GetRequest(ctx context.Context) (*http.Request, error) {
+	v, err := ctx.Get(RequestKey{})
+	if err != nil {
+		return nil, err
+	}
+
+	return v.(*http.Request), nil
 }

@@ -24,29 +24,28 @@ func (ctx Context) Set(key interface{}, value interface{}) {
 // Returns the data under the key.
 // If couldn't find anything but the default value is provided, returns the default value.
 // Otherwise, it panics.
-func (ctx Context) Get(key interface{}, defaultValue ...interface{}) interface{} {
+func (ctx Context) Get(key interface{}, defaultValue ...interface{}) (interface{}, error) {
 	if _, ok := ctx.values[key]; !ok {
 		if len(defaultValue) == 1 {
-			return defaultValue[0]
+			return defaultValue[0], nil
 		}
-		panic(fmt.Sprintf("the key %+v does not exist", key))
+		return nil, fmt.Errorf("the key %+v does not exist", key)
 	}
 
-	return ctx.values[key]
+	return ctx.values[key], nil
 }
 
-
-func (ctx Context) GetError(key interface{}, defaultValue ...interface{}) interface{} {
+func (ctx Context) GetError(key interface{}, defaultValue ...interface{}) (interface{}, error) {
 	if _, ok := ctx.values[key]; !ok {
 		if len(defaultValue) == 1 {
-			return defaultValue[0]
+			return defaultValue[0], nil
 		}
-		panic(fmt.Sprintf("the key %+v does not exist", key))
+		return nil, fmt.Errorf("the key %+v does not exist", key)
 	}
 
 	value, ok := ctx.values[key].(error)
 	if !ok {
-		panic(fmt.Sprintf("the expected value is not error  (%T)", key))
+		return nil, fmt.Errorf("the expected value is not error  (%T)", key)
 	}
-	return value
+	return value, nil
 }

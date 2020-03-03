@@ -10,6 +10,7 @@ import (
 type typeDef struct {
 	Name  string
 	Value string
+	Zero  string
 }
 
 func noescape(str string) template.HTML {
@@ -26,38 +27,47 @@ func main() {
 		{
 			Name:  "string",
 			Value: `"example text"`,
+			Zero:  `""`,
 		},
 		{
 			Name:  "int",
 			Value: "123",
+			Zero:  "0",
 		},
 		{
 			Name:  "int8",
 			Value: "123",
+			Zero:  "0",
 		},
 		{
 			Name:  "int16",
 			Value: "123",
+			Zero:  "0",
 		},
 		{
 			Name:  "int32",
 			Value: "123",
+			Zero:  "0",
 		},
 		{
 			Name:  "int64",
 			Value: "123",
+			Zero:  "0",
 		},
 		{
 			Name:  "float32",
 			Value: "123.5",
+			Zero:  "0",
 		},
 		{
 			Name:  "float64",
 			Value: "123.5",
+			Zero:  "0",
 		},
 		{
 			Name:  "bool",
 			Value: "false",
+			Zero:  "false",
 		},
 	}
 
@@ -98,7 +108,10 @@ func TestContext_GetError(t *testing.T) {
 	ctx := New()
 	expected := errors.New("new err")
 	ctx.Set("test", expected)
-	received := ctx.GetError("test")
+	received, err := ctx.GetError("test")
+	if err != nil {
+		t.Error(err)
+	}
 	if received != expected {
 		t.Errorf("expected %+v but received %+v", expected, received)
 	}
@@ -109,7 +122,10 @@ func TestContext_Get{{ .Name | Title }}(t *testing.T) {
 	ctx := New()
 	expected := {{ .Name }}({{ .Value | noescape }})
 	ctx.Set("test", expected)
-	received := ctx.Get{{ .Name | Title }}("test")
+	received, err := ctx.Get{{ .Name | Title }}("test")
+	if err != nil {
+		t.Error(err)
+	}
 	if received != expected {
 		t.Errorf("expected %+v but received %+v", expected, received)
 	}
@@ -118,30 +134,29 @@ func TestContext_Get{{ .Name | Title }}(t *testing.T) {
 func TestContext_Get{{ .Name | Title }}_WithDefaultValue(t *testing.T) {
 	ctx := New()
 	defaultValue := {{ .Name }}({{ .Value | noescape }})
-	received := ctx.Get{{ .Name | Title }}("test", defaultValue)
+	received, err := ctx.Get{{ .Name | Title }}("test", defaultValue)
+	if err != nil {
+		t.Error(err)
+	}
 	if received != defaultValue {
 		t.Errorf("expected %+v but received %+v", defaultValue, received)
 	}
 }
 
-func TestContext_Get{{ .Name | Title }}_PanicOnMoreThanOneDefaultValue(t *testing.T) {
+func TestContext_Get{{ .Name | Title }}_ShouldReturnErrorWhenMoreThanOneDefaultValue(t *testing.T) {
 	ctx := New()
-	defer func() {
-        if r := recover(); r == nil {
-            t.Error("the Get{{ .Name | Title }} should panic")
-        }
-    }()
-	_ = ctx.Get{{ .Name | Title }}("test", {{ .Value | noescape }}, {{ .Value | noescape }})
+	_, err := ctx.Get{{ .Name | Title }}("test", {{ .Value | noescape }}, {{ .Value | noescape }})
+	if err == nil  {
+		t.Error("the Get{{ .Name | Title }} should return an error")
+	}
 }
 
-func TestContext_Get{{ .Name | Title }}_PanicOnNotFound(t *testing.T) {
+func TestContext_Get{{ .Name | Title }}_ErrorOnNotFound(t *testing.T) {
 	ctx := New()
-	defer func() {
-        if r := recover(); r == nil {
-            t.Error("the Get{{ .Name | Title }} should panic")
-        }
-    }()
-	_ = ctx.Get{{ .Name | Title }}("test")
+	_, err := ctx.Get{{ .Name | Title }}("test")
+	if err == nil  {
+		t.Error("the Get{{ .Name | Title }} should return an error")
+	}
 }
 {{ end }}	
 `
@@ -152,23 +167,23 @@ package context
 import "fmt"
 
 {{ range .Types }}
-func (ctx Context) Get{{ .Name | Title }}(key interface{}, defaultValue ...{{ .Name }}) {{ .Name }} {
+func (ctx Context) Get{{ .Name | Title }}(key interface{}, defaultValue ...{{ .Name }}) ({{ .Name }}, error) {
 	if len(defaultValue) > 1 {
-        panic(fmt.Sprintf("allowed to pass only 1 default value but %d got", len(defaultValue)))
+        return {{.Zero|noescape}}, fmt.Errorf("allowed to pass only 1 default value but %d got", len(defaultValue))
     }
 
 	if _, ok := ctx.values[key]; !ok {
 		if len(defaultValue) == 1 {
-			return defaultValue[0]
+			return defaultValue[0], nil
 		}
-		panic(fmt.Sprintf("the key %+v does not exist", key))
+		return {{.Zero|noescape}}, fmt.Errorf("the key %+v does not exist", key)
 	}
 
 	value, ok := ctx.values[key].({{ .Name }})
 	if !ok {
-		panic(fmt.Sprintf("the expected value is not {{ .Name }} (%T)", key))
+		return {{.Zero|noescape}}, fmt.Errorf("the expected value is not {{ .Name }} (%T)", key)
 	}
-	return value
+	return value, nil
 }
 {{ end }}
 `

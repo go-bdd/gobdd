@@ -120,7 +120,10 @@ func add(ctx context.Context, var1, var2 int) (context.Context, error) {
 }
 
 func checkf(ctx context.Context, sum float32) (context.Context, error) {
-	received := ctx.Get("sumRes")
+	received, err := ctx.Get("sumRes")
+	if err != nil {
+		return ctx, err
+	}
 
 	if sum != received {
 		return ctx, errors.New("the math does not work for you")
@@ -130,7 +133,10 @@ func checkf(ctx context.Context, sum float32) (context.Context, error) {
 }
 
 func check(ctx context.Context, sum int) (context.Context, error) {
-	received := ctx.Get("sumRes")
+	received, err := ctx.Get("sumRes")
+	if err != nil {
+		return ctx, err
+	}
 
 	if sum != received {
 		return ctx, errors.New("the math does not work for you")
