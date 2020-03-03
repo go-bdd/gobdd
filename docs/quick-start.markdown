@@ -18,14 +18,17 @@ func add(ctx context.Context, var1, var2 int) (context.Context, error) {
 	return ctx, nil
 }
 
-func check(ctx context.Context, sum int) error {
-	received := ctx.GetInt("sumRes")
+func check(ctx context.Context, sum int) (context.Context, error) {
+	received, err := ctx.GetInt("sumRes")
+    if err != nil {
+        return ctx, err
+    }
 
 	if sum != received {
 		return errors.New("the math does not work for you")
 	}
 
-	return nil
+	return ctx, nil
 }
 
 func TestScenarios(t *testing.T) {

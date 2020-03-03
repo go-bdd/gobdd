@@ -11,10 +11,10 @@ The context contains the data (state) from previous steps.
 
 The context holds all the data from previously executed steps. They are accessible by `Context.GetX(key interface{})` functions:
 
-* `Context.GetInt(key interface{}) int`
-* `Context.GetFloat32(key interface{}) float32`
-* `Context.GetFloat64(key interface{}) float64`
-* `Context.GetString(key interface{}) string`
+* `Context.GetInt(key interface{}) (int, error)`
+* `Context.GetFloat32(key interface{}) (float32, error)`
+* `Context.GetFloat64(key interface{}) (float64, error)`
+* `Context.GetString(key interface{}) (string, error)`
 * and so on...
 
 When you want to share some data between steps, use the `Context.Set(key, value interface{})` function
@@ -24,7 +24,8 @@ When you want to share some data between steps, use the `Context.Set(key, value 
 ctx.Set(name{}, "John")
 
 // in the second step
-fmt.Printf("Hi %s\n", ctx.GetString(name{})) // prints "Hi John"
+val, err := ctx.GetString(name{})
+fmt.Printf("Hi %s\n", val) // prints "Hi John"
 ```
 
 When the data is not provided, the whole test will fail.
