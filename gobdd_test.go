@@ -88,7 +88,7 @@ func TestFailureOutput(t *testing.T) {
 		expectedErrors []string
 	}{
 		{name: "passes", f: pass, expectedErrors: nil},
-		{name: "returns error", f: failure, expectedErrors: []string{"Test text: the step failed"}},
+		{name: "returns error", f: failure, expectedErrors: []string{"the step failed"}},
 		{name: "step panics", f: panics, expectedErrors: []string{"the step panicked"}},
 	}
 
@@ -107,58 +107,63 @@ func TestFailureOutput(t *testing.T) {
 	}
 }
 
-func addf(ctx context.Context, var1, var2 float32) (context.Context, error) {
+func addf(t StepTest, ctx context.Context, var1, var2 float32) context.Context {
 	res := var1 + var2
 	ctx.Set("sumRes", res)
-	return ctx, nil
+	return ctx
 }
 
-func add(ctx context.Context, var1, var2 int) (context.Context, error) {
+func add(t StepTest, ctx context.Context, var1, var2 int) context.Context {
 	res := var1 + var2
 	ctx.Set("sumRes", res)
-	return ctx, nil
+	return ctx
 }
 
-func checkf(ctx context.Context, sum float32) (context.Context, error) {
+func checkf(t StepTest, ctx context.Context, sum float32) context.Context {
 	received, err := ctx.Get("sumRes")
 	if err != nil {
-		return ctx, err
+		t.Error(err.Error())
+		return ctx
 	}
 
 	if sum != received {
-		return ctx, errors.New("the math does not work for you")
+		t.Error("the sum doesn't match")
 	}
 
-	return ctx, nil
+	return ctx
 }
 
-func check(ctx context.Context, sum int) (context.Context, error) {
+func check(t StepTest, ctx context.Context, sum int) context.Context {
 	received, err := ctx.Get("sumRes")
 	if err != nil {
-		return ctx, err
+		t.Error(err.Error())
+		return ctx
 	}
 
 	if sum != received {
-		return ctx, errors.New("the math does not work for you")
+		t.Error("the math does not work for you")
+		return ctx
 	}
 
-	return ctx, nil
+	return ctx
 }
 
-func fail(ctx context.Context) (context.Context, error) {
-	return ctx, errors.New("the step should never be executed")
+func fail(t StepTest, ctx context.Context) context.Context {
+	t.Error("the step should never be executed")
+	return ctx
 }
 
-func failure(ctx context.Context) (context.Context, error) {
-	return ctx, errors.New("the step failed")
+func failure(t StepTest, ctx context.Context) context.Context {
+	t.Error("the step failed")
+	return ctx
 }
 
-func panics(_ context.Context) (context.Context, error) {
+func panics(t StepTest, _ context.Context) context.Context {
 	panic(errors.New("the step panicked"))
 }
 
-func pass(ctx context.Context) (context.Context, error) {
-	return ctx, nil
+func pass(t StepTest, ctx context.Context) context.Context {
+	return ctx
 }
 
 type mockTester struct {
@@ -169,11 +174,17 @@ type mockTester struct {
 func (m *mockTester) Log(...interface{}) {
 }
 
+func (m *mockTester) Logf(string, ...interface{}) {
+}
 func (m *mockTester) Fatal(...interface{}) {
 	m.fatalCalled++
 }
 
 func (m *mockTester) Fatalf(string, ...interface{}) {
+}
+
+func (m *mockTester) Error(a ...interface{}) {
+	m.errors = append(m.errors, fmt.Sprintf("%s", a...))
 }
 
 func (m *mockTester) Errorf(format string, a ...interface{}) {

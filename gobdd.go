@@ -21,10 +21,10 @@ import (
 
 // Holds all the information about the suite (options, steps to execute etc)
 type Suite struct {
-	t           TestingT
-	steps       []stepDef
-	options     SuiteOptions
-	stepsErrors []error
+	t             TestingT
+	steps         []stepDef
+	options       SuiteOptions
+	hasStepErrors bool
 }
 
 // Holds all the information about how the suite or features/steps should be configured
@@ -98,11 +98,17 @@ type stepDef struct {
 	f    interface{}
 }
 
-type TestingT interface {
+type StepTest interface {
 	Log(...interface{})
+	Logf(string, ...interface{})
 	Fatal(...interface{})
 	Fatalf(string, ...interface{})
 	Errorf(string, ...interface{})
+	Error(...interface{})
+}
+
+type TestingT interface {
+	StepTest
 	Parallel()
 	Fail()
 	Run(name string, f func(t *testing.T)) bool
@@ -137,13 +143,15 @@ func NewSuite(t TestingT, optionClosures ...func(*SuiteOptions)) *Suite {
 func (s *Suite) AddStep(expr string, step interface{}) {
 	err := validateStepFunc(step)
 	if err != nil {
-		s.stepsErrors = append(s.stepsErrors, err)
+		s.t.Errorf("the step function for step `%s` is incorrect: %w", expr, err)
+		s.hasStepErrors = true
 		return
 	}
 
 	compiled, err := regexp.Compile(expr)
 	if err != nil {
-		s.stepsErrors = append(s.stepsErrors, err)
+		s.t.Errorf("the step function is incorrect: %w", err)
+		s.hasStepErrors = true
 		return
 	}
 
@@ -168,7 +176,8 @@ func (s *Suite) AddStep(expr string, step interface{}) {
 func (s *Suite) AddRegexStep(expr *regexp.Regexp, step interface{}) {
 	err := validateStepFunc(step)
 	if err != nil {
-		s.stepsErrors = append(s.stepsErrors, err)
+		s.t.Errorf("the step function is incorrect: %w", err)
+		s.hasStepErrors = true
 		return
 	}
 
@@ -180,10 +189,7 @@ func (s *Suite) AddRegexStep(expr *regexp.Regexp, step interface{}) {
 
 // Executes the suite with given options and defined steps
 func (s *Suite) Run() {
-	if len(s.stepsErrors) > 0 {
-		for _, err := range s.stepsErrors {
-			s.t.Log(err)
-		}
+	if s.hasStepErrors {
 		s.t.Fatal("the test contains invalid step definitions")
 		return
 	}
@@ -378,24 +384,22 @@ func (def *stepDef) run(ctx context.Context, t TestingT, step *messages.GherkinD
 	}()
 
 	d := reflect.ValueOf(def.f)
-	in := []reflect.Value{reflect.ValueOf(ctx)}
-	if len(params)+1 != d.Type().NumIn() {
-		t.Errorf("the step function %s accepts %d arguments but %d received", d.String(), d.Type().NumIn(), len(params)+1)
+	if len(params)+2 != d.Type().NumIn() {
+		t.Errorf("the step function %s accepts %d arguments but %d received", d.String(), d.Type().NumIn(), len(params)+2)
 		return ctx
 	}
+
+	in := []reflect.Value{reflect.ValueOf(t), reflect.ValueOf(ctx)}
 	for i, v := range params {
-		inType := d.Type().In(i + 1)
+		if len(params) < i+1 {
+			break
+		}
+		inType := d.Type().In(i + 2)
 		paramType := paramType(v, inType)
 		in = append(in, paramType)
 	}
+
 	retValues := d.Call(in)
-	v := retValues[1]
-
-	if !v.IsNil() {
-		err := v.Interface().(error)
-		t.Errorf("%s %s: %v", step.Keyword, step.Text, err)
-	}
-
 	return retValues[0].Interface().(context.Context)
 }
 
