@@ -215,7 +215,7 @@ func (s *Suite) executeFeature(file string) error {
 	doc, err := gherkin.ParseGherkinDocument(fileIO, (&messages.Incrementing{}).NewId)
 	if err != nil {
 		s.t.Fail()
-		printErrorf("error while loading document: %s\n", err)
+		s.t.Errorf("error while loading document: %s\n", err)
 		return fmt.Errorf("error while loading document: %s\n", err)
 	}
 
