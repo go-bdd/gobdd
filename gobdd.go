@@ -134,11 +134,11 @@ func NewSuite(t TestingT, optionClosures ...func(*SuiteOptions)) *Suite {
 // when a step definition matches the provided regular expression.
 //
 // A step function can have any number of parameters (even zero),
-// but it MUST accept a context.Context as the first parameter (if there is any)
-// and MUST return a context and an error:
+// but it MUST accept a gobdd.StepTest and context.Context as the first parameters (if there is any)
+// and MUST return the context.Context back:
 //
-// 	func myStepFunction(ctx context.Context, first int, second int) (context.Context, error) {
-// 		return ctx, nil
+// 	func myStepFunction(t gobdd.StepTest, ctx context.Context, first int, second int) context.Context {
+// 		return ctx
 // 	}
 func (s *Suite) AddStep(expr string, step interface{}) {
 	err := validateStepFunc(step)
@@ -167,11 +167,11 @@ func (s *Suite) AddStep(expr string, step interface{}) {
 // when a step definition matches the provided regular expression.
 //
 // A step function can have any number of parameters (even zero),
-// but it MUST accept a context.Context as the first parameter (if there is any)
-// and MUST return a context and an error:
+// but it MUST accept a gobdd.StepTest and context.Context as the first parameters (if there is any)
+// and MUST return the context.Context back:
 //
-// 	func myStepFunction(ctx context.Context, first int, second int) (context.Context, error) {
-// 		return ctx, nil
+// 	func myStepFunction(t gobdd.StepTest, ctx context.Context, first int, second int) context.Context {
+// 		return ctx
 // 	}
 func (s *Suite) AddRegexStep(expr *regexp.Regexp, step interface{}) {
 	err := validateStepFunc(step)
