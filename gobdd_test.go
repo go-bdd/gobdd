@@ -3,6 +3,7 @@ package gobdd
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/cucumber/messages-go/v9"
@@ -11,6 +12,16 @@ import (
 )
 
 func TestScenarios(t *testing.T) {
+	suite := NewSuite(t, WithFeaturesPath("features/example.feature"))
+	compiled, _ := regexp.Compile(`I add (\d+) and (\d+)`)
+	suite.AddRegexStep(compiled, add)
+	compiled, _ = regexp.Compile(`the result should equal (\d+)`)
+	suite.AddRegexStep(compiled, check)
+
+	suite.Run()
+}
+
+func TestAddStepWithRegexp(t *testing.T) {
 	suite := NewSuite(t, WithFeaturesPath("features/example.feature"))
 	suite.AddStep(`I add (\d+) and (\d+)`, add)
 	suite.AddStep(`the result should equal (\d+)`, check)
