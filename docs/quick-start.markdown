@@ -12,23 +12,24 @@ go get github.com/go-bdd/gobdd
 Add a new test `main_test.go`:
 
 ```go
-func add(ctx context.Context, var1, var2 int) (context.Context, error) {
+func add(t gobdd.StepTest, ctx context.Context, var1, var2 int) context.Context{
 	res := var1 + var2
 	ctx.Set("sumRes", res)
-	return ctx, nil
+	return ctx
 }
 
-func check(ctx context.Context, sum int) (context.Context, error) {
+func check(t gobdd.StepTest, ctx context.Context, sum int) context.Context{
 	received, err := ctx.GetInt("sumRes")
     if err != nil {
-        return ctx, err
+        t.Error(err)
+        return ctx
     }
 
 	if sum != received {
-		return errors.New("the math does not work for you")
+        t.Error(errors.New("the math does not work for you"))
 	}
 
-	return ctx, nil
+	return ctx
 }
 
 func TestScenarios(t *testing.T) {

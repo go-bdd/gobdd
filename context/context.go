@@ -23,7 +23,7 @@ func (ctx Context) Set(key interface{}, value interface{}) {
 
 // Returns the data under the key.
 // If couldn't find anything but the default value is provided, returns the default value.
-// Otherwise, it panics.
+// Otherwise, it returns an error.
 func (ctx Context) Get(key interface{}, defaultValue ...interface{}) (interface{}, error) {
 	if _, ok := ctx.values[key]; !ok {
 		if len(defaultValue) == 1 {
@@ -35,6 +35,7 @@ func (ctx Context) Get(key interface{}, defaultValue ...interface{}) (interface{
 	return ctx.values[key], nil
 }
 
+// It is a shortcut for getting the value already casted as error.
 func (ctx Context) GetError(key interface{}, defaultValue ...interface{}) (interface{}, error) {
 	if _, ok := ctx.values[key]; !ok {
 		if len(defaultValue) == 1 {

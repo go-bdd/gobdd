@@ -5,10 +5,10 @@ title: Creating steps
 
 # Creating steps
 
-Every step function should accept the `Context` as the first parameter and returns the `Context` and `error`. Here's an example:
+Every step function should accept the `StepTest` as the first 2 parameters and returns the `Context`. Here's an example:
 
 ```go
-type StepFunc func(ctx context.Context, var1 int, var2 string) (context.Context, error)
+type StepFunc func(gobdd.StepTest, ctx context.Context, var1 int, var2 string) context.Context
 ```
 
 What's important to stress - the context is a [custom struct](https://github.com/go-bdd/gobdd/tree/master/context), not the built-in interface.

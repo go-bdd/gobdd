@@ -40,45 +40,64 @@ func TestHTTP(t *testing.T) {
 	s.Run()
 }
 
-func requestHasMethodSetTo(ctx context.Context, method string) (context.Context, error) {
+func requestHasMethodSetTo(t StepTest, ctx context.Context, method string) context.Context {
 	r, err := testhttp.GetRequest(ctx)
 	if err != nil {
-		return ctx, err
+		t.Error(err)
+		return ctx
 	}
-	return ctx, assert.Equals(method, r.Method)
+
+	if err = assert.Equals(method, r.Method); err != nil {
+		t.Error(err)
+	}
+	return ctx
 }
 
-func requestBodyIsNil(ctx context.Context) (context.Context, error) {
+func requestBodyIsNil(t StepTest, ctx context.Context) context.Context {
 	r, err := testhttp.GetRequest(ctx)
 	if err != nil {
-		return ctx, err
+		t.Error(err)
+		return ctx
 	}
-	return ctx, assert.Nil(r.Body)
+	if err = assert.Nil(r.Body); err != nil {
+		t.Error(err)
+	}
+	return ctx
 }
 
-func urlIsSetTo(ctx context.Context, url string) (context.Context, error) {
+func urlIsSetTo(t StepTest, ctx context.Context, url string) context.Context {
 	r, err := testhttp.GetRequest(ctx)
 	if err != nil {
-		return ctx, err
+		t.Error(err)
+		return ctx
 	}
-	return ctx, assert.Equals(url, r.URL.String())
+
+	if err := assert.Equals(url, r.URL.String()); err != nil {
+		t.Error(err)
+	}
+	return ctx
 }
 
-func ISetHeaderTo(ctx context.Context, headerName, value string) (context.Context, error) {
+func ISetHeaderTo(t StepTest, ctx context.Context, headerName, value string) context.Context {
 	r, err := testhttp.GetRequest(ctx)
 	if err != nil {
-		return ctx, err
+		t.Error(err)
+		return ctx
 	}
 	r.Header.Set(headerName, value)
 	ctx.Set(testhttp.RequestKey{}, r)
-	return ctx, nil
+	return ctx
 }
 
-func requestHasHeaderSetTo(ctx context.Context, headerName, expected string) (context.Context, error) {
+func requestHasHeaderSetTo(t StepTest, ctx context.Context, headerName, expected string) context.Context {
 	r, err := testhttp.GetRequest(ctx)
 	if err != nil {
-		return ctx, err
+		t.Error(err)
+		return ctx
 	}
 	given := r.Header.Get(headerName)
-	return ctx, assert.Equals(expected, given)
+	if err := assert.Equals(expected, given); err != nil {
+		t.Error(err)
+	}
+	return ctx
 }
