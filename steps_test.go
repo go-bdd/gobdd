@@ -8,12 +8,11 @@ import (
 
 func TestValidateStepFunc(t *testing.T) {
 	testCases := map[string]interface{}{
-		"function without arguments":                  func() (context.Context, error) { return context.Context{}, nil },
-		"function with 1 argument":                    func(StepTest) (context.Context, error) { return context.Context{}, nil },
-		"function with invalid first argument":        func(int, context.Context) (context.Context, error) { return context.Context{}, nil },
-		"function without returned values":            func(StepTest, context.Context) {},
-		"function with invalid first returned value":  func(StepTest, context.Context) (int, error) { return 0, nil },
-		"function with invalid second returned value": func(StepTest, context.Context) (context.Context, int) { return context.Context{}, 0 },
+		"function without arguments":                 func() context.Context { return context.Context{} },
+		"function with 1 argument":                   func(StepTest) context.Context { return context.Context{} },
+		"function with invalid first argument":       func(int, context.Context) context.Context { return context.Context{} },
+		"function without returned values":           func(StepTest, context.Context) {},
+		"function with invalid first returned value": func(StepTest, context.Context) int { return 0 },
 	}
 
 	for name, testCase := range testCases {
