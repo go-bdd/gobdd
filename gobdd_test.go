@@ -21,7 +21,7 @@ func TestScenarios(t *testing.T) {
 	suite.Run()
 }
 
-func ExampleAddStepWithRegexp(t *testing.T) {
+func TestAddStepWithRegexp(t *testing.T) {
 	suite := NewSuite(t, WithFeaturesPath("features/example.feature"))
 	suite.AddStep(`I add (\d+) and (\d+)`, add)
 	suite.AddStep(`the result should equal (\d+)`, check)
@@ -53,7 +53,7 @@ func TestBackground(t *testing.T) {
 	suite.Run()
 }
 
-func ExampleTags(t *testing.T) {
+func TestTags(t *testing.T) {
 	suite := NewSuite(t, WithFeaturesPath("features/tags.feature"), WithTags([]string{"@tag"}))
 	suite.AddStep(`fail the test`, fail)
 	suite.AddStep(`the test should pass`, pass)
@@ -61,7 +61,7 @@ func ExampleTags(t *testing.T) {
 	suite.Run()
 }
 
-func ExampleIgnoredTags(t *testing.T) {
+func TestIgnoredTags(t *testing.T) {
 	suite := NewSuite(t, WithFeaturesPath("features/ignored_tags.feature"), WithIgnoredTags([]string{"@ignore"}))
 	suite.AddStep(`fail the test`, fail)
 	suite.Run()
