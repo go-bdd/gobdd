@@ -5,8 +5,6 @@ main:
     url: /context.html
   - title: "Creating steps"
     url: /creating-steps.html
-  - title: "testhttp package"
-    url: /gobdd/testhttp.html
   - title: "Suite's options"
     url: /suite-options.html
   - title: "GitHub"
