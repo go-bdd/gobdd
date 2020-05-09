@@ -7,4 +7,5 @@ require (
 	github.com/cucumber/messages-go/v9 v9.0.3
 	github.com/go-bdd/assert v0.0.0-20190820124234-20d47a68475d
 	github.com/logrusorgru/aurora v0.0.0-20200102142835-e9ef32dff381
+	github.com/stretchr/testify v1.4.0
 )

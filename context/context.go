@@ -44,6 +44,10 @@ func (ctx Context) GetError(key interface{}, defaultValue ...interface{}) (inter
 		return nil, fmt.Errorf("the key %+v does not exist", key)
 	}
 
+	if ctx.values[key] == nil {
+		return nil, nil
+	}
+
 	value, ok := ctx.values[key].(error)
 	if !ok {
 		return nil, fmt.Errorf("the expected value is not error  (%T)", key)
