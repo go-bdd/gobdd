@@ -36,7 +36,7 @@ func (ctx Context) Get(key interface{}, defaultValue ...interface{}) (interface{
 }
 
 // It is a shortcut for getting the value already casted as error.
-func (ctx Context) GetError(key interface{}, defaultValue ...interface{}) (interface{}, error) {
+func (ctx Context) GetError(key interface{}, defaultValue ...error) (error, error) {
 	if _, ok := ctx.values[key]; !ok {
 		if len(defaultValue) == 1 {
 			return defaultValue[0], nil
