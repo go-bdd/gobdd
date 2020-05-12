@@ -1,0 +1,22 @@
+name: Cyclop
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    env:
+      VERBOSE: 1
+      GOFLAGS: -mod=readonly
+      GOPROXY: https://proxy.golang.org
+
+    steps:
+      - name: Download and cyclop
+        run: |
+          go get github.com/bkielbasa/cyclop
+          cyclop .
