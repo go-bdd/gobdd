@@ -49,6 +49,6 @@ jobs:
             path-to-lcov: coverage.lcov
 
       - name: Download cyclop
-          run: go get github.com/bkielbasa/cyclop
-      - name: Run cyclop
-          run: cyclop .
+        run: |
+          go get github.com/bkielbasa/cyclop
+          cyclop .
