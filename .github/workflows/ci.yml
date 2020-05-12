@@ -47,3 +47,8 @@ jobs:
         with:
             github-token: ${{ secrets.github_token }}
             path-to-lcov: coverage.lcov
+
+      - name: Download cyclop
+          run: go get github.com/bkielbasa/cyclop
+      - name: Run cyclop
+          run: cyclop .
