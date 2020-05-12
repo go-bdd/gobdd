@@ -16,6 +16,8 @@ jobs:
       GOPROXY: https://proxy.golang.org
 
     steps:
+      - name: Set up Go
+        uses: actions/setup-go@v2
       - name: Download and cyclop
         run: |
           go get github.com/bkielbasa/cyclop
