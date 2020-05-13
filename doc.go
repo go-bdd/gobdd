@@ -1,4 +1,5 @@
-// This project is created as the alternative to https://github.com/DATA-DOG/godog and is inspirited by it. There are a few differences between both solutions:
+// This project is created as the alternative to https://github.com/DATA-DOG/godog and is inspirited by it.
+// There are a few differences between both solutions:
 //
 // - GoBDD uses the built-in testing framework
 //
