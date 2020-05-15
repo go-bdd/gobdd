@@ -14,8 +14,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cucumber/gherkin-go/v9"
-	"github.com/cucumber/messages-go/v9"
+	"github.com/cucumber/gherkin-go/v13"
+	"github.com/cucumber/messages-go/v12"
 	"github.com/go-bdd/gobdd/context"
 )
 

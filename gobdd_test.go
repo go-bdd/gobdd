@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/cucumber/messages-go/v9"
+	"github.com/cucumber/messages-go/v12"
 	"github.com/go-bdd/assert"
 	"github.com/go-bdd/gobdd/context"
 )
@@ -22,15 +22,11 @@ func TestScenarios(t *testing.T) {
 }
 
 func TestAddStepWithRegexp(t *testing.T) {
-	mockT := &mockT{}
-	suite := NewSuite(mockT, WithFeaturesPath("features/example.feature"))
+	suite := NewSuite(t, WithFeaturesPath("features/example.feature"))
 	suite.AddStep(`I add (\d+) and (\d+)`, add)
 	suite.AddStep(`the result should equal (\d+)`, check)
 
 	suite.Run()
-	if err := assert.Equals(mockT.errored, 1); err != nil {
-		t.Error(err)
-	}
 }
 
 func TestDifferentFuncTypes(t *testing.T) {
@@ -42,7 +38,8 @@ func TestDifferentFuncTypes(t *testing.T) {
 }
 
 func TestScenarioOutline(t *testing.T) {
-	suite := NewSuite(t, WithFeaturesPath("features/outline.feature"))
+	mockT := &mockT{}
+	suite := NewSuite(mockT, WithFeaturesPath("features/outline.feature"))
 	suite.AddStep(`I add (\d+) and (\d+)`, add)
 	suite.AddStep(`the result should equal <result>`, check)
 
