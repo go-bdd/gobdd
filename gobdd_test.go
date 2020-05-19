@@ -48,7 +48,7 @@ func TestScenarioOutline(t *testing.T) {
 func TestScenarioOutlineExecutesAllTests(t *testing.T) {
 	suite := NewSuite(t, WithFeaturesPath("features/outline-failed.feature"))
 	suite.AddStep(`I add (\d+) and (\d+)`, add)
-	suite.AddStep(`the result should equal (\d+)`, check)
+	suite.AddStep(`the result should equal (\d+)`, checkNot)
 
 	suite.Run()
 }
@@ -135,10 +135,9 @@ func TestFailureOutput(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 			def := stepDef{f: testCase.f}
-			step := &messages.GherkinDocument_Feature_Step{Keyword: "Test", Text: "text"}
 
 			tester := &mockTester{}
-			def.run(context.New(), tester, step, nil)
+			def.run(context.New(), tester, nil)
 			err := assert.Equals(testCase.expectedErrors, tester.errors)
 			if err != nil {
 				t.Fatal(err)
@@ -182,6 +181,21 @@ func check(t StepTest, ctx context.Context, sum int) context.Context {
 
 	if sum != received {
 		t.Errorf("expected %d but %d received", sum, received)
+		return ctx
+	}
+
+	return ctx
+}
+
+func checkNot(t StepTest, ctx context.Context, sum int) context.Context {
+	received, err := ctx.Get("sumRes")
+	if err != nil {
+		t.Error(err)
+		return ctx
+	}
+
+	if sum == received {
+		t.Errorf("expected NOT receive %d", received)
 		return ctx
 	}
 

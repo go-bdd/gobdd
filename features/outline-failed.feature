@@ -4,5 +4,5 @@ Feature: Scenario Outline
     Then the result should equal <result>
     Examples:
      | digit1 | digit2 | result |
-     | 1 | 2 | 3                |
+     | 1 | 2 | 4                |
      | 5 | 5 | 11               |

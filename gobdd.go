@@ -268,12 +268,28 @@ func (s *Suite) runFeature(feature *messages.GherkinDocument_Feature) error {
 }
 
 func (s *Suite) getOutlineStep(steps []*messages.GherkinDocument_Feature_Step, examples []*messages.GherkinDocument_Feature_Scenario_Examples) []*messages.GherkinDocument_Feature_Step {
-	var newSteps []*messages.GherkinDocument_Feature_Step
-	for _, outlineStep := range steps {
+	stepsList := make([][]*messages.GherkinDocument_Feature_Step, len(steps))
+
+	for i, outlineStep := range steps {
 		for _, example := range examples {
-			newSteps = append(newSteps, s.stepsFromExamples(outlineStep, example)...)
+			stepsList[i] = append(stepsList[i], s.stepsFromExamples(outlineStep, example)...)
 		}
 	}
+
+	var newSteps []*messages.GherkinDocument_Feature_Step
+
+	if len(stepsList) == 0 {
+		return newSteps
+	}
+
+	for ei := range examples {
+		for ci := range examples[ei].TableBody {
+			for si := range steps {
+				newSteps = append(newSteps, stepsList[si][ci])
+			}
+		}
+	}
+
 	return newSteps
 }
 
@@ -351,9 +367,13 @@ func (s *Suite) runScenario(ctx context.Context, scenario *messages.GherkinDocum
 		}
 		steps := scenario.Steps
 		if examples := scenario.GetExamples(); len(examples) > 0 {
+			c := ctx.Clone()
 			steps = s.getOutlineStep(scenario.GetSteps(), examples)
+			s.runSteps(c, t, steps)
+		} else {
+			c := ctx.Clone()
+			s.runSteps(c, t, steps)
 		}
-		s.runSteps(ctx, t, steps)
 	})
 	return nil
 }
@@ -381,13 +401,13 @@ func (s *Suite) runStep(ctx context.Context, t *testing.T, step *messages.Gherki
 
 	params := def.expr.FindSubmatch([]byte(step.Text))[1:]
 	t.Run(step.Text, func(t *testing.T) {
-		ctx = def.run(ctx, t, step, params)
+		ctx = def.run(ctx, t, params)
 	})
 
 	return ctx
 }
 
-func (def *stepDef) run(ctx context.Context, t TestingT, step *messages.GherkinDocument_Feature_Step, params [][]byte) context.Context {
+func (def *stepDef) run(ctx context.Context, t TestingT, params [][]byte) context.Context {
 	defer func() {
 		if r := recover(); r != nil {
 			t.Errorf("%+v", r)
