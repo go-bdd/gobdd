@@ -60,6 +60,30 @@ func TestTags(t *testing.T) {
 	suite.Run()
 }
 
+func TestWithAfterScenario(t *testing.T) {
+	c := false
+	suite := NewSuite(t, WithFeaturesPath("features/empty.feature"), WithAfterScenario(func(ctx context.Context) {
+		c = true
+	}))
+	suite.Run()
+
+	if err := assert.Equals(true, c); err != nil {
+		t.Error(err)
+	}
+}
+
+func TestWithBeforeScenario(t *testing.T) {
+	c := false
+	suite := NewSuite(t, WithFeaturesPath("features/empty.feature"), WithBeforeScenario(func(ctx context.Context) {
+		c = true
+	}))
+	suite.Run()
+
+	if err := assert.Equals(true, c); err != nil {
+		t.Error(err)
+	}
+}
+
 func TestIgnoredTags(t *testing.T) {
 	suite := NewSuite(t, WithFeaturesPath("features/ignored_tags.feature"), WithIgnoredTags([]string{"@ignore"}))
 	suite.AddStep(`fail the test`, fail)
