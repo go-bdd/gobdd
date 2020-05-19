@@ -16,7 +16,7 @@ func New() Context {
 	}
 }
 
-// Creates a new (empty) context struct
+// Clone creates a copy of the context
 func (ctx Context) Clone() Context {
 	c := Context{
 		values: map[interface{}]interface{}{},
