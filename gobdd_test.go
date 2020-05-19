@@ -38,10 +38,9 @@ func TestDifferentFuncTypes(t *testing.T) {
 }
 
 func TestScenarioOutline(t *testing.T) {
-	mockT := &mockT{}
-	suite := NewSuite(mockT, WithFeaturesPath("features/outline.feature"))
+	suite := NewSuite(t, WithFeaturesPath("features/outline.feature"))
 	suite.AddStep(`I add (\d+) and (\d+)`, add)
-	suite.AddStep(`the result should equal <result>`, check)
+	suite.AddStep(`the result should equal (\d+)`, check)
 
 	suite.Run()
 }
@@ -49,9 +48,30 @@ func TestScenarioOutline(t *testing.T) {
 func TestScenarioOutlineExecutesAllTests(t *testing.T) {
 	suite := NewSuite(t, WithFeaturesPath("features/outline-failed.feature"))
 	suite.AddStep(`I add (\d+) and (\d+)`, add)
-	suite.AddStep(`the result should equal <result>`, check)
+	suite.AddStep(`the result should equal (\d+)`, check)
 
 	suite.Run()
+}
+
+func TestStepFromExample(t *testing.T) {
+	s := NewSuite(t)
+	st, expr := s.stepFromExample("I add <d1> and <d2>", &messages.GherkinDocument_Feature_TableRow{
+		Cells: []*messages.GherkinDocument_Feature_TableRow_TableCell{
+			{Value: "1"},
+			{Value: "2"},
+		},
+	}, []string{"<d1>", "<d2>"})
+	if err := assert.NotNil(st); err != nil {
+		t.Error(err)
+	}
+
+	if err := assert.Equals("I add 1 and 2", st); err != nil {
+		t.Error(err)
+	}
+
+	if err := assert.Equals(`I add (\d+) and (\d+)`, expr); err != nil {
+		t.Error(err)
+	}
 }
 
 func TestBackground(t *testing.T) {
@@ -156,12 +176,12 @@ func checkf(t StepTest, ctx context.Context, sum float32) context.Context {
 func check(t StepTest, ctx context.Context, sum int) context.Context {
 	received, err := ctx.Get("sumRes")
 	if err != nil {
-		t.Error(err.Error())
+		t.Error(err)
 		return ctx
 	}
 
 	if sum != received {
-		t.Error("the math does not work for you")
+		t.Errorf("expected %d but %d received", sum, received)
 		return ctx
 	}
 

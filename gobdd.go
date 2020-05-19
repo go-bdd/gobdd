@@ -271,50 +271,61 @@ func (s *Suite) getOutlineStep(steps []*messages.GherkinDocument_Feature_Step, e
 	var newSteps []*messages.GherkinDocument_Feature_Step
 	for _, outlineStep := range steps {
 		for _, example := range examples {
-			newSteps = append(newSteps, s.stepsFromExample(outlineStep, example)...)
+			newSteps = append(newSteps, s.stepsFromExamples(outlineStep, example)...)
 		}
 	}
 	return newSteps
 }
 
-func (s *Suite) stepsFromExample(sourceStep *messages.GherkinDocument_Feature_Step, example *messages.GherkinDocument_Feature_Scenario_Examples) []*messages.GherkinDocument_Feature_Step {
+func (s *Suite) stepsFromExamples(sourceStep *messages.GherkinDocument_Feature_Step, example *messages.GherkinDocument_Feature_Scenario_Examples) []*messages.GherkinDocument_Feature_Step {
 	steps := []*messages.GherkinDocument_Feature_Step{}
-	text := sourceStep.GetText()
+
 	placeholders := example.GetTableHeader().GetCells()
-	for i, placeholder := range placeholders {
+	placeholdersValues := []string{}
+
+	for _, placeholder := range placeholders {
 		ph := "<" + placeholder.GetValue() + ">"
-		index := strings.Index(text, ph)
-		originalText := text
-		if index == -1 {
+		placeholdersValues = append(placeholdersValues, ph)
+	}
+	text := sourceStep.GetText()
+
+	for _, row := range example.GetTableBody() {
+		// iterate over the cells and update the text
+		stepText, expr := s.stepFromExample(text, row, placeholdersValues)
+
+		// find step definition for the new step
+		def, err := s.findStepDef(stepText)
+		if err != nil {
 			continue
 		}
 
-		for _, row := range example.GetTableBody() {
-			value := row.GetCells()[i].GetValue()
-			text = strings.Replace(text, "<"+placeholder.Value+">", value, -1)
-			t := getRegexpForVar(value)
+		// add the step to the list
+		s.AddStep(expr, def.f)
 
-			def, err := s.findStepDef(originalText)
-			if err != nil {
-				continue
-			}
-
-			expr := strings.Replace(def.expr.String(), ph, t, -1)
-			s.AddStep(expr, def.f)
+		// clone a step
+		step := &messages.GherkinDocument_Feature_Step{
+			Location: sourceStep.Location,
+			Keyword:  sourceStep.Keyword,
+			Text:     stepText,
+			Argument: sourceStep.Argument,
 		}
-	}
 
-	// clone a step
-	step := &messages.GherkinDocument_Feature_Step{
-		Location: sourceStep.Location,
-		Keyword:  sourceStep.Keyword,
-		Text:     text,
-		Argument: sourceStep.Argument,
+		steps = append(steps, step)
 	}
-
-	steps = append(steps, step)
 
 	return steps
+}
+
+func (s *Suite) stepFromExample(stepName string, row *messages.GherkinDocument_Feature_TableRow, placeholders []string) (string, string) {
+	expr := stepName
+
+	for i, ph := range placeholders {
+		t := getRegexpForVar(row.Cells[i].Value)
+		expr = strings.Replace(expr, ph, t, -1)
+		stepName = strings.Replace(stepName, ph, row.Cells[i].Value, -1)
+	}
+
+	return stepName, expr
 }
 
 func (s *Suite) callBeforeScenarios(ctx context.Context) {
