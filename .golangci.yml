@@ -1,0 +1,12 @@
+linters-settings:
+  golint:
+    min-confidence: 0.1
+
+linters:
+  enable-all: true
+  disable:
+    - funlen
+    - gomnd
+    - golint
+    - scopelint
+    - gosec

@@ -42,6 +42,7 @@ func (ctx Context) Get(key interface{}, defaultValue ...interface{}) (interface{
 		if len(defaultValue) == 1 {
 			return defaultValue[0], nil
 		}
+
 		return nil, fmt.Errorf("the key %+v does not exist", key)
 	}
 
@@ -54,6 +55,7 @@ func (ctx Context) GetError(key interface{}, defaultValue ...error) (error, erro
 		if len(defaultValue) == 1 {
 			return defaultValue[0], nil
 		}
+
 		return nil, fmt.Errorf("the key %+v does not exist", key)
 	}
 
@@ -65,5 +67,6 @@ func (ctx Context) GetError(key interface{}, defaultValue ...error) (error, erro
 	if !ok {
 		return nil, fmt.Errorf("the expected value is not error  (%T)", key)
 	}
+
 	return value, nil
 }
