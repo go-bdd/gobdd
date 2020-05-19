@@ -46,11 +46,18 @@ func TestScenarioOutline(t *testing.T) {
 }
 
 func TestScenarioOutlineExecutesAllTests(t *testing.T) {
-	suite := NewSuite(t, WithFeaturesPath("features/outline-failed.feature"))
+	c := 0
+	suite := NewSuite(t, WithFeaturesPath("features/outline.feature"))
 	suite.AddStep(`I add (\d+) and (\d+)`, add)
-	suite.AddStep(`the result should equal (\d+)`, checkNot)
+	suite.AddStep(`the result should equal (\d+)`, func(t StepTest, ctx context.Context, sum int) context.Context {
+		c++
+		return check(t, ctx, sum)
+	})
 
 	suite.Run()
+	if err := assert.Equals(2, c); err != nil {
+		t.Errorf("expected to run %d times but %d got", 2, c)
+	}
 }
 
 func TestStepFromExample(t *testing.T) {
@@ -181,21 +188,6 @@ func check(t StepTest, ctx context.Context, sum int) context.Context {
 
 	if sum != received {
 		t.Errorf("expected %d but %d received", sum, received)
-		return ctx
-	}
-
-	return ctx
-}
-
-func checkNot(t StepTest, ctx context.Context, sum int) context.Context {
-	received, err := ctx.Get("sumRes")
-	if err != nil {
-		t.Error(err)
-		return ctx
-	}
-
-	if sum == received {
-		t.Errorf("expected NOT receive %d", received)
 		return ctx
 	}
 
