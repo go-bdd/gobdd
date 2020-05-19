@@ -84,7 +84,9 @@ func main() {
 
 	f, err = os.Create("context/get_test.go")
 	die(err)
+
 	tmpl = template.Must(template.New("").Funcs(funcMap).Parse(testTmpl))
+
 	err = tmpl.Execute(f, struct {
 		Types []typeDef
 	}{Types: types})
@@ -98,7 +100,7 @@ func die(err error) {
 	}
 }
 
-var testTmpl = `// Code generated .* DO NOT EDIT.	
+const testTmpl = `// Code generated .* DO NOT EDIT.	
 package context
 
 import "testing"
@@ -161,7 +163,7 @@ func TestContext_Get{{ .Name | Title }}_ErrorOnNotFound(t *testing.T) {
 {{ end }}	
 `
 
-var getTmpl = `// Code generated .* DO NOT EDIT.	
+const getTmpl = `// Code generated .* DO NOT EDIT.	
 package context
 
 import "fmt"

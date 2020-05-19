@@ -6,16 +6,15 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/cucumber/messages-go/v9"
 	"github.com/go-bdd/assert"
 	"github.com/go-bdd/gobdd/context"
 )
 
 func TestScenarios(t *testing.T) {
 	suite := NewSuite(t, WithFeaturesPath("features/example.feature"))
-	compiled, _ := regexp.Compile(`I add (\d+) and (\d+)`)
+	compiled := regexp.MustCompile(`I add (\d+) and (\d+)`)
 	suite.AddRegexStep(compiled, add)
-	compiled, _ = regexp.Compile(`the result should equal (\d+)`)
+	compiled = regexp.MustCompile(`the result should equal (\d+)`)
 	suite.AddRegexStep(compiled, check)
 
 	suite.Run()
@@ -106,10 +105,9 @@ func TestFailureOutput(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 			def := stepDef{f: testCase.f}
-			step := &messages.GherkinDocument_Feature_Step{Keyword: "Test", Text: "text"}
 
 			tester := &mockTester{}
-			def.run(context.New(), tester, step, nil)
+			def.run(context.New(), tester, nil)
 			err := assert.Equals(testCase.expectedErrors, tester.errors)
 			if err != nil {
 				t.Fatal(err)
@@ -121,12 +119,14 @@ func TestFailureOutput(t *testing.T) {
 func addf(t StepTest, ctx context.Context, var1, var2 float32) context.Context {
 	res := var1 + var2
 	ctx.Set("sumRes", res)
+
 	return ctx
 }
 
 func add(t StepTest, ctx context.Context, var1, var2 int) context.Context {
 	res := var1 + var2
 	ctx.Set("sumRes", res)
+
 	return ctx
 }
 

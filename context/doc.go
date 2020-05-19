@@ -6,6 +6,7 @@
 //
 // Good practices
 //
-// It’s a good practice to use custom structs as keys instead of strings or any built-in types to avoid collisions between steps using context.
+// It’s a good practice to use custom structs as keys instead of strings or any built-in types
+// to avoid collisions between steps using context.
 
 package context
