@@ -55,6 +55,7 @@ func TestScenarioOutlineExecutesAllTests(t *testing.T) {
 	})
 
 	suite.Run()
+
 	if err := assert.Equals(2, c); err != nil {
 		t.Errorf("expected to run %d times but %d got", 2, c)
 	}
@@ -68,6 +69,7 @@ func TestStepFromExample(t *testing.T) {
 			{Value: "2"},
 		},
 	}, []string{"<d1>", "<d2>"})
+
 	if err := assert.NotNil(st); err != nil {
 		t.Error(err)
 	}

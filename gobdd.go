@@ -273,7 +273,9 @@ func (s *Suite) runFeature(feature *msgs.GherkinDocument_Feature) error {
 	return nil
 }
 
-func (s *Suite) getOutlineStep(steps []*msgs.GherkinDocument_Feature_Step, examples []*msgs.GherkinDocument_Feature_Scenario_Examples) []*msgs.GherkinDocument_Feature_Step {
+func (s *Suite) getOutlineStep(
+	steps []*msgs.GherkinDocument_Feature_Step,
+	examples []*msgs.GherkinDocument_Feature_Scenario_Examples) []*msgs.GherkinDocument_Feature_Step {
 	stepsList := make([][]*msgs.GherkinDocument_Feature_Step, len(steps))
 
 	for i, outlineStep := range steps {
@@ -299,7 +301,9 @@ func (s *Suite) getOutlineStep(steps []*msgs.GherkinDocument_Feature_Step, examp
 	return newSteps
 }
 
-func (s *Suite) stepsFromExamples(sourceStep *msgs.GherkinDocument_Feature_Step, example *msgs.GherkinDocument_Feature_Scenario_Examples) []*msgs.GherkinDocument_Feature_Step {
+func (s *Suite) stepsFromExamples(
+	sourceStep *msgs.GherkinDocument_Feature_Step,
+	example *msgs.GherkinDocument_Feature_Scenario_Examples) []*msgs.GherkinDocument_Feature_Step {
 	steps := []*msgs.GherkinDocument_Feature_Step{}
 
 	placeholders := example.GetTableHeader().GetCells()
@@ -309,6 +313,7 @@ func (s *Suite) stepsFromExamples(sourceStep *msgs.GherkinDocument_Feature_Step,
 		ph := "<" + placeholder.GetValue() + ">"
 		placeholdersValues = append(placeholdersValues, ph)
 	}
+
 	text := sourceStep.GetText()
 
 	for _, row := range example.GetTableBody() {
@@ -338,7 +343,9 @@ func (s *Suite) stepsFromExamples(sourceStep *msgs.GherkinDocument_Feature_Step,
 	return steps
 }
 
-func (s *Suite) stepFromExample(stepName string, row *msgs.GherkinDocument_Feature_TableRow, placeholders []string) (string, string) {
+func (s *Suite) stepFromExample(
+	stepName string,
+	row *msgs.GherkinDocument_Feature_TableRow, placeholders []string) (string, string) {
 	expr := stepName
 
 	for i, ph := range placeholders {
