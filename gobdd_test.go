@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/go-bdd/assert"
+
 	"github.com/go-bdd/gobdd/context"
 )
 
@@ -140,66 +141,57 @@ func TestFailureOutput(t *testing.T) {
 	}
 }
 
-func addf(t StepTest, ctx context.Context, var1, var2 float32) context.Context {
+func addf(_ StepTest, ctx context.Context, var1, var2 float32) {
 	res := var1 + var2
 	ctx.Set("sumRes", res)
-
-	return ctx
 }
 
-func add(t StepTest, ctx context.Context, var1, var2 int) context.Context {
+func add(_ StepTest, ctx context.Context, var1, var2 int) {
 	res := var1 + var2
 	ctx.Set("sumRes", res)
-
-	return ctx
 }
 
-func checkf(t StepTest, ctx context.Context, sum float32) context.Context {
+func checkf(t StepTest, ctx context.Context, sum float32) {
 	received, err := ctx.Get("sumRes")
 	if err != nil {
 		t.Error(err.Error())
-		return ctx
+
+		return
 	}
 
 	if sum != received {
 		t.Error("the sum doesn't match")
 	}
-
-	return ctx
 }
 
-func check(t StepTest, ctx context.Context, sum int) context.Context {
+func check(t StepTest, ctx context.Context, sum int) {
 	received, err := ctx.Get("sumRes")
 	if err != nil {
 		t.Error(err.Error())
-		return ctx
+
+		return
 	}
 
 	if sum != received {
 		t.Error("the math does not work for you")
-		return ctx
+
+		return
 	}
-
-	return ctx
 }
 
-func fail(t StepTest, ctx context.Context) context.Context {
+func fail(t StepTest, _ context.Context) {
 	t.Error("the step should never be executed")
-	return ctx
 }
 
-func failure(t StepTest, ctx context.Context) context.Context {
+func failure(t StepTest, _ context.Context) {
 	t.Error("the step failed")
-	return ctx
 }
 
-func panics(t StepTest, _ context.Context) context.Context {
+func panics(_ StepTest, _ context.Context) {
 	panic(errors.New("the step panicked"))
 }
 
-func pass(t StepTest, ctx context.Context) context.Context {
-	return ctx
-}
+func pass(_ StepTest, _ context.Context) {}
 
 type mockTester struct {
 	fatalCalled int

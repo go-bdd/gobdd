@@ -16,6 +16,7 @@ import (
 
 	"github.com/cucumber/gherkin-go/v9"
 	msgs "github.com/cucumber/messages-go/v9"
+
 	"github.com/go-bdd/gobdd/context"
 )
 
@@ -135,11 +136,9 @@ func NewSuite(t TestingT, optionClosures ...func(*SuiteOptions)) *Suite {
 // when a step definition matches the provided regular expression.
 //
 // A step function can have any number of parameters (even zero),
-// but it MUST accept a gobdd.StepTest and context.Context as the first parameters (if there is any)
-// and MUST return the context.Context back:
+// but it MUST accept a gobdd.StepTest and context.Context as the first parameters (if there is any):
 //
-// 	func myStepFunction(t gobdd.StepTest, ctx context.Context, first int, second int) context.Context {
-// 		return ctx
+// 	func myStepFunction(t gobdd.StepTest, ctx context.Context, first int, second int) {
 // 	}
 func (s *Suite) AddStep(expr string, step interface{}) {
 	err := validateStepFunc(step)
@@ -170,11 +169,9 @@ func (s *Suite) AddStep(expr string, step interface{}) {
 // when a step definition matches the provided regular expression.
 //
 // A step function can have any number of parameters (even zero),
-// but it MUST accept a gobdd.StepTest and context.Context as the first parameters (if there is any)
-// and MUST return the context.Context back:
+// but it MUST accept a gobdd.StepTest and context.Context as the first parameters (if there is any):
 //
-// 	func myStepFunction(t gobdd.StepTest, ctx context.Context, first int, second int) context.Context {
-// 		return ctx
+// 	func myStepFunction(t gobdd.StepTest, ctx context.Context, first int, second int) {
 // 	}
 func (s *Suite) AddRegexStep(expr *regexp.Regexp, step interface{}) {
 	err := validateStepFunc(step)
@@ -349,7 +346,7 @@ func (s *Suite) runScenario(ctx context.Context, scenario *msgs.GherkinDocument_
 	t.Run(scenario.Name, func(t *testing.T) {
 		if bkg != nil {
 			steps := s.getBackgroundSteps(bkg)
-			ctx = s.runSteps(ctx, t, steps)
+			s.runSteps(ctx, t, steps)
 		}
 		steps := scenario.Steps
 		if examples := scenario.GetExamples(); len(examples) > 0 {
@@ -359,16 +356,13 @@ func (s *Suite) runScenario(ctx context.Context, scenario *msgs.GherkinDocument_
 	})
 }
 
-func (s *Suite) runSteps(ctx context.Context, t *testing.T,
-	steps []*msgs.GherkinDocument_Feature_Step) context.Context {
+func (s *Suite) runSteps(ctx context.Context, t *testing.T, steps []*msgs.GherkinDocument_Feature_Step) {
 	for _, step := range steps {
-		ctx = s.runStep(ctx, t, step)
+		s.runStep(ctx, t, step)
 	}
-
-	return ctx
 }
 
-func (s *Suite) runStep(ctx context.Context, t *testing.T, step *msgs.GherkinDocument_Feature_Step) context.Context {
+func (s *Suite) runStep(ctx context.Context, t *testing.T, step *msgs.GherkinDocument_Feature_Step) {
 	defer func() {
 		if r := recover(); r != nil {
 			t.Error(r)
@@ -378,18 +372,17 @@ func (s *Suite) runStep(ctx context.Context, t *testing.T, step *msgs.GherkinDoc
 	def, err := s.findStepDef(step.Text)
 	if err != nil {
 		t.Errorf("cannot find step definition for step: %s%s", step.Keyword, step.Text)
-		return ctx
+
+		return
 	}
 
 	params := def.expr.FindSubmatch([]byte(step.Text))[1:]
 	t.Run(step.Text, func(t *testing.T) {
-		ctx = def.run(ctx, t, params)
+		def.run(ctx, t, params)
 	})
-
-	return ctx
 }
 
-func (def *stepDef) run(ctx context.Context, t TestingT, params [][]byte) context.Context {
+func (def *stepDef) run(ctx context.Context, t TestingT, params [][]byte) {
 	defer func() {
 		if r := recover(); r != nil {
 			t.Errorf("%+v", r)
@@ -399,7 +392,8 @@ func (def *stepDef) run(ctx context.Context, t TestingT, params [][]byte) contex
 	d := reflect.ValueOf(def.f)
 	if len(params)+2 != d.Type().NumIn() {
 		t.Errorf("the step function %s accepts %d arguments but %d received", d.String(), d.Type().NumIn(), len(params)+2)
-		return ctx
+
+		return
 	}
 
 	in := []reflect.Value{reflect.ValueOf(t), reflect.ValueOf(ctx)}
@@ -414,9 +408,7 @@ func (def *stepDef) run(ctx context.Context, t TestingT, params [][]byte) contex
 		in = append(in, paramType)
 	}
 
-	retValues := d.Call(in)
-
-	return retValues[0].Interface().(context.Context)
+	d.Call(in)
 }
 
 func paramType(param []byte, inType reflect.Type) reflect.Value {
