@@ -8,6 +8,7 @@ import (
 
 	"github.com/cucumber/messages-go/v12"
 	"github.com/go-bdd/assert"
+
 	"github.com/go-bdd/gobdd/context"
 )
 
@@ -99,6 +100,30 @@ func TestTags(t *testing.T) {
 	suite.Run()
 }
 
+func TestWithAfterScenario(t *testing.T) {
+	c := false
+	suite := NewSuite(t, WithFeaturesPath("features/empty.feature"), WithAfterScenario(func(ctx context.Context) {
+		c = true
+	}))
+	suite.Run()
+
+	if err := assert.Equals(true, c); err != nil {
+		t.Error(err)
+	}
+}
+
+func TestWithBeforeScenario(t *testing.T) {
+	c := false
+	suite := NewSuite(t, WithFeaturesPath("features/empty.feature"), WithBeforeScenario(func(ctx context.Context) {
+		c = true
+	}))
+	suite.Run()
+
+	if err := assert.Equals(true, c); err != nil {
+		t.Error(err)
+	}
+}
+
 func TestIgnoredTags(t *testing.T) {
 	suite := NewSuite(t, WithFeaturesPath("features/ignored_tags.feature"), WithIgnoredTags([]string{"@ignore"}))
 	suite.AddStep(`fail the test`, fail)
@@ -155,66 +180,54 @@ func TestFailureOutput(t *testing.T) {
 	}
 }
 
-func addf(t StepTest, ctx context.Context, var1, var2 float32) context.Context {
+func addf(_ StepTest, ctx context.Context, var1, var2 float32) {
 	res := var1 + var2
 	ctx.Set("sumRes", res)
-
-	return ctx
 }
 
-func add(t StepTest, ctx context.Context, var1, var2 int) context.Context {
+func add(_ StepTest, ctx context.Context, var1, var2 int) {
 	res := var1 + var2
 	ctx.Set("sumRes", res)
-
-	return ctx
 }
 
-func checkf(t StepTest, ctx context.Context, sum float32) context.Context {
+func checkf(t StepTest, ctx context.Context, sum float32) {
 	received, err := ctx.Get("sumRes")
 	if err != nil {
 		t.Error(err.Error())
-		return ctx
+
+		return
 	}
 
 	if sum != received {
 		t.Error("the sum doesn't match")
 	}
-
-	return ctx
 }
 
-func check(t StepTest, ctx context.Context, sum int) context.Context {
+func check(t StepTest, ctx context.Context, sum int) {
 	received, err := ctx.Get("sumRes")
 	if err != nil {
 		t.Error(err)
-		return ctx
+		return
 	}
 
 	if sum != received {
 		t.Errorf("expected %d but %d received", sum, received)
-		return ctx
 	}
-
-	return ctx
 }
 
-func fail(t StepTest, ctx context.Context) context.Context {
+func fail(t StepTest, _ context.Context) {
 	t.Error("the step should never be executed")
-	return ctx
 }
 
-func failure(t StepTest, ctx context.Context) context.Context {
+func failure(t StepTest, _ context.Context) {
 	t.Error("the step failed")
-	return ctx
 }
 
-func panics(t StepTest, _ context.Context) context.Context {
+func panics(_ StepTest, _ context.Context) {
 	panic(errors.New("the step panicked"))
 }
 
-func pass(t StepTest, ctx context.Context) context.Context {
-	return ctx
-}
+func pass(_ StepTest, _ context.Context) {}
 
 type mockTester struct {
 	fatalCalled int
