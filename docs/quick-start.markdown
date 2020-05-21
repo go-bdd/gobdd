@@ -12,12 +12,12 @@ go get github.com/go-bdd/gobdd
 Add a new test `main_test.go`:
 
 ```go
-func add(t gobdd.StepTest, ctx context.Context, var1, var2 int) {
+func add(t gobdd.StepTest, ctx gobdd.Context, var1, var2 int) {
 	res := var1 + var2
 	ctx.Set("sumRes", res)
 }
 
-func check(t gobdd.StepTest, ctx context.Context, sum int) {
+func check(t gobdd.StepTest, ctx gobdd.Context, sum int) {
 	received, err := ctx.GetInt("sumRes")
     if err != nil {
         t.Error(err)
