@@ -6,9 +6,8 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/cucumber/messages-go/v12"
+	msgs "github.com/cucumber/messages-go/v12"
 	"github.com/go-bdd/assert"
-
 	"github.com/go-bdd/gobdd/context"
 )
 
@@ -50,9 +49,9 @@ func TestScenarioOutlineExecutesAllTests(t *testing.T) {
 	c := 0
 	suite := NewSuite(t, WithFeaturesPath("features/outline.feature"))
 	suite.AddStep(`I add (\d+) and (\d+)`, add)
-	suite.AddStep(`the result should equal (\d+)`, func(t StepTest, ctx context.Context, sum int) context.Context {
+	suite.AddStep(`the result should equal (\d+)`, func(t StepTest, ctx context.Context, sum int) {
 		c++
-		return check(t, ctx, sum)
+		check(t, ctx, sum)
 	})
 
 	suite.Run()
@@ -64,8 +63,8 @@ func TestScenarioOutlineExecutesAllTests(t *testing.T) {
 
 func TestStepFromExample(t *testing.T) {
 	s := NewSuite(t)
-	st, expr := s.stepFromExample("I add <d1> and <d2>", &messages.GherkinDocument_Feature_TableRow{
-		Cells: []*messages.GherkinDocument_Feature_TableRow_TableCell{
+	st, expr := s.stepFromExample("I add <d1> and <d2>", &msgs.GherkinDocument_Feature_TableRow{
+		Cells: []*msgs.GherkinDocument_Feature_TableRow_TableCell{
 			{Value: "1"},
 			{Value: "2"},
 		},
