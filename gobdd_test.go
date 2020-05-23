@@ -8,7 +8,6 @@ import (
 
 	msgs "github.com/cucumber/messages-go/v12"
 	"github.com/go-bdd/assert"
-	"github.com/go-bdd/gobdd/context"
 )
 
 func TestScenarios(t *testing.T) {
@@ -49,7 +48,7 @@ func TestScenarioOutlineExecutesAllTests(t *testing.T) {
 	c := 0
 	suite := NewSuite(t, WithFeaturesPath("features/outline.feature"))
 	suite.AddStep(`I add (\d+) and (\d+)`, add)
-	suite.AddStep(`the result should equal (\d+)`, func(t StepTest, ctx context.Context, sum int) {
+	suite.AddStep(`the result should equal (\d+)`, func(t StepTest, ctx Context, sum int) {
 		c++
 		check(t, ctx, sum)
 	})
@@ -101,7 +100,7 @@ func TestTags(t *testing.T) {
 
 func TestWithAfterScenario(t *testing.T) {
 	c := false
-	suite := NewSuite(t, WithFeaturesPath("features/empty.feature"), WithAfterScenario(func(ctx context.Context) {
+	suite := NewSuite(t, WithFeaturesPath("features/empty.feature"), WithAfterScenario(func(ctx Context) {
 		c = true
 	}))
 	suite.Run()
@@ -113,7 +112,7 @@ func TestWithAfterScenario(t *testing.T) {
 
 func TestWithBeforeScenario(t *testing.T) {
 	c := false
-	suite := NewSuite(t, WithFeaturesPath("features/empty.feature"), WithBeforeScenario(func(ctx context.Context) {
+	suite := NewSuite(t, WithFeaturesPath("features/empty.feature"), WithBeforeScenario(func(ctx Context) {
 		c = true
 	}))
 	suite.Run()
@@ -134,8 +133,8 @@ func TestInvalidFunctionSignature(t *testing.T) {
 		f interface{}
 	}{
 		"nil":                              {},
-		"func without return value":        {f: func(ctx context.Context) {}},
-		"func with invalid return value":   {f: func(ctx context.Context) int { return 0 }},
+		"func without return value":        {f: func(ctx Context) {}},
+		"func with invalid return value":   {f: func(ctx Context) int { return 0 }},
 		"func without arguments":           {f: func() error { return errors.New("") }},
 		"func with invalid first argument": {f: func(i int) error { return errors.New("") }},
 	}
@@ -170,7 +169,7 @@ func TestFailureOutput(t *testing.T) {
 			def := stepDef{f: testCase.f}
 
 			tester := &mockTester{}
-			def.run(context.New(), tester, nil)
+			def.run(NewContext(), tester, nil)
 			err := assert.Equals(testCase.expectedErrors, tester.errors)
 			if err != nil {
 				t.Fatal(err)
@@ -179,17 +178,17 @@ func TestFailureOutput(t *testing.T) {
 	}
 }
 
-func addf(_ StepTest, ctx context.Context, var1, var2 float32) {
+func addf(_ StepTest, ctx Context, var1, var2 float32) {
 	res := var1 + var2
 	ctx.Set("sumRes", res)
 }
 
-func add(_ StepTest, ctx context.Context, var1, var2 int) {
+func add(_ StepTest, ctx Context, var1, var2 int) {
 	res := var1 + var2
 	ctx.Set("sumRes", res)
 }
 
-func checkf(t StepTest, ctx context.Context, sum float32) {
+func checkf(t StepTest, ctx Context, sum float32) {
 	received, err := ctx.Get("sumRes")
 	if err != nil {
 		t.Error(err.Error())
@@ -202,7 +201,7 @@ func checkf(t StepTest, ctx context.Context, sum float32) {
 	}
 }
 
-func check(t StepTest, ctx context.Context, sum int) {
+func check(t StepTest, ctx Context, sum int) {
 	received, err := ctx.Get("sumRes")
 	if err != nil {
 		t.Error(err)
@@ -214,19 +213,19 @@ func check(t StepTest, ctx context.Context, sum int) {
 	}
 }
 
-func fail(t StepTest, _ context.Context) {
+func fail(t StepTest, _ Context) {
 	t.Error("the step should never be executed")
 }
 
-func failure(t StepTest, _ context.Context) {
+func failure(t StepTest, _ Context) {
 	t.Error("the step failed")
 }
 
-func panics(_ StepTest, _ context.Context) {
+func panics(_ StepTest, _ Context) {
 	panic(errors.New("the step panicked"))
 }
 
-func pass(_ StepTest, _ context.Context) {}
+func pass(_ StepTest, _ Context) {}
 
 type mockTester struct {
 	fatalCalled int

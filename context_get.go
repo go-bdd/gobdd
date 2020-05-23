@@ -1,5 +1,5 @@
 // Code generated .* DO NOT EDIT.	
-package context
+package gobdd
 
 import "fmt"
 

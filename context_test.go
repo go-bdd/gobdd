@@ -1,4 +1,4 @@
-package context
+package gobdd
 
 import (
 	"testing"
@@ -6,8 +6,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNilInGetError(t *testing.T) {
-	ctx := New()
+func TestContextNilInGetError(t *testing.T) {
+	ctx := NewContext()
 	ctx.Set("err", nil)
 
 	res, err := ctx.GetError("err")

@@ -3,8 +3,6 @@ package gobdd
 import (
 	"errors"
 	"reflect"
-
-	"github.com/go-bdd/gobdd/context"
 )
 
 func validateStepFunc(f interface{}) error {
@@ -26,7 +24,7 @@ func validateStepFunc(f interface{}) error {
 
 	val = value.Type().In(1)
 
-	n := val.ConvertibleTo(reflect.TypeOf((*context.Context)(nil)).Elem())
+	n := val.ConvertibleTo(reflect.TypeOf((*Context)(nil)).Elem())
 	if !n {
 		return errors.New("the function should have Context as the second argument")
 	}

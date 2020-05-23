@@ -71,7 +71,7 @@ func main() {
 		},
 	}
 
-	f, err := os.Create("context/get.go")
+	f, err := os.Create("context_get.go")
 	die(err)
 
 	var tmpl = template.Must(template.New("").Funcs(funcMap).Parse(getTmpl))
@@ -82,7 +82,7 @@ func main() {
 	die(err)
 	f.Close()
 
-	f, err = os.Create("context/get_test.go")
+	f, err = os.Create("context_get_test.go")
 	die(err)
 
 	tmpl = template.Must(template.New("").Funcs(funcMap).Parse(testTmpl))
@@ -101,13 +101,13 @@ func die(err error) {
 }
 
 const testTmpl = `// Code generated .* DO NOT EDIT.	
-package context
+package gobdd
 
 import "testing"
 import "errors"
 
 func TestContext_GetError(t *testing.T) {
-	ctx := New()
+	ctx := NewContext()
 	expected := errors.New("new err")
 	ctx.Set("test", expected)
 	received, err := ctx.GetError("test")
@@ -121,7 +121,7 @@ func TestContext_GetError(t *testing.T) {
 
 {{ range .Types }}
 func TestContext_Get{{ .Name | Title }}(t *testing.T) {
-	ctx := New()
+	ctx := NewContext()
 	expected := {{ .Name }}({{ .Value | noescape }})
 	ctx.Set("test", expected)
 	received, err := ctx.Get{{ .Name | Title }}("test")
@@ -134,7 +134,7 @@ func TestContext_Get{{ .Name | Title }}(t *testing.T) {
 }
 
 func TestContext_Get{{ .Name | Title }}_WithDefaultValue(t *testing.T) {
-	ctx := New()
+	ctx := NewContext()
 	defaultValue := {{ .Name }}({{ .Value | noescape }})
 	received, err := ctx.Get{{ .Name | Title }}("test", defaultValue)
 	if err != nil {
@@ -146,7 +146,7 @@ func TestContext_Get{{ .Name | Title }}_WithDefaultValue(t *testing.T) {
 }
 
 func TestContext_Get{{ .Name | Title }}_ShouldReturnErrorWhenMoreThanOneDefaultValue(t *testing.T) {
-	ctx := New()
+	ctx := NewContext()
 	_, err := ctx.Get{{ .Name | Title }}("test", {{ .Value | noescape }}, {{ .Value | noescape }})
 	if err == nil  {
 		t.Error("the Get{{ .Name | Title }} should return an error")
@@ -154,7 +154,7 @@ func TestContext_Get{{ .Name | Title }}_ShouldReturnErrorWhenMoreThanOneDefaultV
 }
 
 func TestContext_Get{{ .Name | Title }}_ErrorOnNotFound(t *testing.T) {
-	ctx := New()
+	ctx := NewContext()
 	_, err := ctx.Get{{ .Name | Title }}("test")
 	if err == nil  {
 		t.Error("the Get{{ .Name | Title }} should return an error")
@@ -164,7 +164,7 @@ func TestContext_Get{{ .Name | Title }}_ErrorOnNotFound(t *testing.T) {
 `
 
 const getTmpl = `// Code generated .* DO NOT EDIT.	
-package context
+package gobdd
 
 import "fmt"
 

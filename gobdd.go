@@ -16,7 +16,6 @@ import (
 
 	"github.com/cucumber/gherkin-go/v13"
 	msgs "github.com/cucumber/messages-go/v12"
-	"github.com/go-bdd/gobdd/context"
 )
 
 // Holds all the information about the suite (options, steps to execute etc)
@@ -32,8 +31,8 @@ type SuiteOptions struct {
 	featuresPaths  string
 	ignoreTags     []string
 	tags           []string
-	beforeScenario []func(ctx context.Context)
-	afterScenario  []func(ctx context.Context)
+	beforeScenario []func(ctx Context)
+	afterScenario  []func(ctx Context)
 	runInParallel  bool
 }
 
@@ -43,8 +42,8 @@ func NewSuiteOptions() SuiteOptions {
 		featuresPaths:  "features/*.feature",
 		ignoreTags:     []string{},
 		tags:           []string{},
-		beforeScenario: []func(ctx context.Context){},
-		afterScenario:  []func(ctx context.Context){},
+		beforeScenario: []func(ctx Context){},
+		afterScenario:  []func(ctx Context){},
 	}
 }
 
@@ -72,14 +71,14 @@ func WithTags(tags []string) func(*SuiteOptions) {
 }
 
 // WithBeforeScenario configures functions that should be executed before every scenario
-func WithBeforeScenario(f func(ctx context.Context)) func(*SuiteOptions) {
+func WithBeforeScenario(f func(ctx Context)) func(*SuiteOptions) {
 	return func(options *SuiteOptions) {
 		options.beforeScenario = append(options.beforeScenario, f)
 	}
 }
 
 // WithAfterScenario configures functions that should be executed after every scenario
-func WithAfterScenario(f func(ctx context.Context)) func(*SuiteOptions) {
+func WithAfterScenario(f func(ctx Context)) func(*SuiteOptions) {
 	return func(options *SuiteOptions) {
 		options.afterScenario = append(options.afterScenario, f)
 	}
@@ -135,9 +134,9 @@ func NewSuite(t TestingT, optionClosures ...func(*SuiteOptions)) *Suite {
 // when a step definition matches the provided regular expression.
 //
 // A step function can have any number of parameters (even zero),
-// but it MUST accept a gobdd.StepTest and context.Context as the first parameters (if there is any):
+// but it MUST accept a gobdd.StepTest and gobdd.Context as the first parameters (if there is any):
 //
-// 	func myStepFunction(t gobdd.StepTest, ctx context.Context, first int, second int) {
+// 	func myStepFunction(t gobdd.StepTest, ctx gobdd.Context, first int, second int) {
 // 	}
 func (s *Suite) AddStep(expr string, step interface{}) {
 	err := validateStepFunc(step)
@@ -168,9 +167,9 @@ func (s *Suite) AddStep(expr string, step interface{}) {
 // when a step definition matches the provided regular expression.
 //
 // A step function can have any number of parameters (even zero),
-// but it MUST accept a gobdd.StepTest and context.Context as the first parameters (if there is any):
+// but it MUST accept a gobdd.StepTest and gobdd.Context as the first parameters (if there is any):
 //
-// 	func myStepFunction(t gobdd.StepTest, ctx context.Context, first int, second int) {
+// 	func myStepFunction(t gobdd.StepTest, ctx gobdd.Context, first int, second int) {
 // 	}
 func (s *Suite) AddRegexStep(expr *regexp.Regexp, step interface{}) {
 	err := validateStepFunc(step)
@@ -257,7 +256,7 @@ func (s *Suite) runFeature(feature *msgs.GherkinDocument_Feature) error {
 				t.Log(fmt.Sprintf("Skipping scenario %s", scenario.Name))
 				continue
 			}
-			ctx := context.New()
+			ctx := NewContext()
 			s.runScenario(ctx, scenario, bkgSteps, t)
 		}
 	})
@@ -353,19 +352,19 @@ func (s *Suite) stepFromExample(
 	return stepName, expr
 }
 
-func (s *Suite) callBeforeScenarios(ctx context.Context) {
+func (s *Suite) callBeforeScenarios(ctx Context) {
 	for _, f := range s.options.beforeScenario {
 		f(ctx)
 	}
 }
 
-func (s *Suite) callAfterScenarios(ctx context.Context) {
+func (s *Suite) callAfterScenarios(ctx Context) {
 	for _, f := range s.options.afterScenario {
 		f(ctx)
 	}
 }
 
-func (s *Suite) runScenario(ctx context.Context, scenario *msgs.GherkinDocument_Feature_Scenario,
+func (s *Suite) runScenario(ctx Context, scenario *msgs.GherkinDocument_Feature_Scenario,
 	bkg *msgs.GherkinDocument_Feature_Background, t *testing.T) {
 	s.callBeforeScenarios(ctx)
 
@@ -387,13 +386,13 @@ func (s *Suite) runScenario(ctx context.Context, scenario *msgs.GherkinDocument_
 	})
 }
 
-func (s *Suite) runSteps(ctx context.Context, t *testing.T, steps []*msgs.GherkinDocument_Feature_Step) {
+func (s *Suite) runSteps(ctx Context, t *testing.T, steps []*msgs.GherkinDocument_Feature_Step) {
 	for _, step := range steps {
 		s.runStep(ctx, t, step)
 	}
 }
 
-func (s *Suite) runStep(ctx context.Context, t *testing.T, step *msgs.GherkinDocument_Feature_Step) {
+func (s *Suite) runStep(ctx Context, t *testing.T, step *msgs.GherkinDocument_Feature_Step) {
 	defer func() {
 		if r := recover(); r != nil {
 			t.Error(r)
@@ -413,7 +412,7 @@ func (s *Suite) runStep(ctx context.Context, t *testing.T, step *msgs.GherkinDoc
 	})
 }
 
-func (def *stepDef) run(ctx context.Context, t TestingT, params [][]byte) {
+func (def *stepDef) run(ctx Context, t TestingT, params [][]byte) { // nolint:interfacer
 	defer func() {
 		if r := recover(); r != nil {
 			t.Errorf("%+v", r)
