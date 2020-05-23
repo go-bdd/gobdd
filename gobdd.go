@@ -412,7 +412,7 @@ func (s *Suite) runStep(ctx Context, t *testing.T, step *msgs.GherkinDocument_Fe
 	})
 }
 
-func (def *stepDef) run(ctx Context, t TestingT, params [][]byte) {
+func (def *stepDef) run(ctx Context, t TestingT, params [][]byte) { // nolint:interfacer
 	defer func() {
 		if r := recover(); r != nil {
 			t.Errorf("%+v", r)
