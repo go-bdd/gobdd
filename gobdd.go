@@ -14,9 +14,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cucumber/gherkin-go/v9"
-	msgs "github.com/cucumber/messages-go/v9"
-
+	"github.com/cucumber/gherkin-go/v13"
+	msgs "github.com/cucumber/messages-go/v12"
 	"github.com/go-bdd/gobdd/context"
 )
 
@@ -270,60 +269,88 @@ func (s *Suite) runFeature(feature *msgs.GherkinDocument_Feature) error {
 	return nil
 }
 
-func (s *Suite) getOutlineStep(steps []*msgs.GherkinDocument_Feature_Step,
+func (s *Suite) getOutlineStep(
+	steps []*msgs.GherkinDocument_Feature_Step,
 	examples []*msgs.GherkinDocument_Feature_Scenario_Examples) []*msgs.GherkinDocument_Feature_Step {
+	stepsList := make([][]*msgs.GherkinDocument_Feature_Step, len(steps))
+
+	for i, outlineStep := range steps {
+		for _, example := range examples {
+			stepsList[i] = append(stepsList[i], s.stepsFromExamples(outlineStep, example)...)
+		}
+	}
+
 	var newSteps []*msgs.GherkinDocument_Feature_Step
 
-	for _, outlineStep := range steps {
-		for _, example := range examples {
-			newSteps = append(newSteps, s.stepsFromExample(outlineStep, example)...)
+	if len(stepsList) == 0 {
+		return newSteps
+	}
+
+	for ei := range examples {
+		for ci := range examples[ei].TableBody {
+			for si := range steps {
+				newSteps = append(newSteps, stepsList[si][ci])
+			}
 		}
 	}
 
 	return newSteps
 }
 
-func (s *Suite) stepsFromExample(sourceStep *msgs.GherkinDocument_Feature_Step,
+func (s *Suite) stepsFromExamples(
+	sourceStep *msgs.GherkinDocument_Feature_Step,
 	example *msgs.GherkinDocument_Feature_Scenario_Examples) []*msgs.GherkinDocument_Feature_Step {
 	steps := []*msgs.GherkinDocument_Feature_Step{}
-	text := sourceStep.GetText()
+
 	placeholders := example.GetTableHeader().GetCells()
+	placeholdersValues := []string{}
 
-	for i, placeholder := range placeholders {
+	for _, placeholder := range placeholders {
 		ph := "<" + placeholder.GetValue() + ">"
-		index := strings.Index(text, ph)
-		originalText := text
+		placeholdersValues = append(placeholdersValues, ph)
+	}
 
-		if index == -1 {
+	text := sourceStep.GetText()
+
+	for _, row := range example.GetTableBody() {
+		// iterate over the cells and update the text
+		stepText, expr := s.stepFromExample(text, row, placeholdersValues)
+
+		// find step definition for the new step
+		def, err := s.findStepDef(stepText)
+		if err != nil {
 			continue
 		}
 
-		for _, row := range example.GetTableBody() {
-			value := row.GetCells()[i].GetValue()
-			text = strings.Replace(text, "<"+placeholder.Value+">", value, -1)
-			t := getRegexpForVar(value)
+		// add the step to the list
+		s.AddStep(expr, def.f)
 
-			def, err := s.findStepDef(originalText)
-			if err != nil {
-				continue
-			}
-
-			expr := strings.Replace(def.expr.String(), ph, t, -1)
-			s.AddStep(expr, def.f)
+		// clone a step
+		step := &msgs.GherkinDocument_Feature_Step{
+			Location: sourceStep.Location,
+			Keyword:  sourceStep.Keyword,
+			Text:     stepText,
+			Argument: sourceStep.Argument,
 		}
-	}
 
-	// clone a step
-	step := &msgs.GherkinDocument_Feature_Step{
-		Location: sourceStep.Location,
-		Keyword:  sourceStep.Keyword,
-		Text:     text,
-		Argument: sourceStep.Argument,
+		steps = append(steps, step)
 	}
-
-	steps = append(steps, step)
 
 	return steps
+}
+
+func (s *Suite) stepFromExample(
+	stepName string,
+	row *msgs.GherkinDocument_Feature_TableRow, placeholders []string) (string, string) {
+	expr := stepName
+
+	for i, ph := range placeholders {
+		t := getRegexpForVar(row.Cells[i].Value)
+		expr = strings.Replace(expr, ph, t, -1)
+		stepName = strings.Replace(stepName, ph, row.Cells[i].Value, -1)
+	}
+
+	return stepName, expr
 }
 
 func (s *Suite) callBeforeScenarios(ctx context.Context) {
@@ -350,9 +377,13 @@ func (s *Suite) runScenario(ctx context.Context, scenario *msgs.GherkinDocument_
 		}
 		steps := scenario.Steps
 		if examples := scenario.GetExamples(); len(examples) > 0 {
+			c := ctx.Clone()
 			steps = s.getOutlineStep(scenario.GetSteps(), examples)
+			s.runSteps(c, t, steps)
+		} else {
+			c := ctx.Clone()
+			s.runSteps(c, t, steps)
 		}
-		s.runSteps(ctx, t, steps)
 	})
 }
 

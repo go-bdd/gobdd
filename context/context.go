@@ -16,6 +16,19 @@ func New() Context {
 	}
 }
 
+// Clone creates a copy of the context
+func (ctx Context) Clone() Context {
+	c := Context{
+		values: map[interface{}]interface{}{},
+	}
+
+	for k, v := range ctx.values {
+		c.Set(k, v)
+	}
+
+	return c
+}
+
 // Sets the value under the key
 func (ctx Context) Set(key interface{}, value interface{}) {
 	ctx.values[key] = value

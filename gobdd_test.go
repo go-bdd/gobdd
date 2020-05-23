@@ -6,8 +6,8 @@ import (
 	"regexp"
 	"testing"
 
+	msgs "github.com/cucumber/messages-go/v12"
 	"github.com/go-bdd/assert"
-
 	"github.com/go-bdd/gobdd/context"
 )
 
@@ -40,9 +40,47 @@ func TestDifferentFuncTypes(t *testing.T) {
 func TestScenarioOutline(t *testing.T) {
 	suite := NewSuite(t, WithFeaturesPath("features/outline.feature"))
 	suite.AddStep(`I add (\d+) and (\d+)`, add)
-	suite.AddStep(`the result should equal <result>`, check)
+	suite.AddStep(`the result should equal (\d+)`, check)
 
 	suite.Run()
+}
+
+func TestScenarioOutlineExecutesAllTests(t *testing.T) {
+	c := 0
+	suite := NewSuite(t, WithFeaturesPath("features/outline.feature"))
+	suite.AddStep(`I add (\d+) and (\d+)`, add)
+	suite.AddStep(`the result should equal (\d+)`, func(t StepTest, ctx context.Context, sum int) {
+		c++
+		check(t, ctx, sum)
+	})
+
+	suite.Run()
+
+	if err := assert.Equals(2, c); err != nil {
+		t.Errorf("expected to run %d times but %d got", 2, c)
+	}
+}
+
+func TestStepFromExample(t *testing.T) {
+	s := NewSuite(t)
+	st, expr := s.stepFromExample("I add <d1> and <d2>", &msgs.GherkinDocument_Feature_TableRow{
+		Cells: []*msgs.GherkinDocument_Feature_TableRow_TableCell{
+			{Value: "1"},
+			{Value: "2"},
+		},
+	}, []string{"<d1>", "<d2>"})
+
+	if err := assert.NotNil(st); err != nil {
+		t.Error(err)
+	}
+
+	if err := assert.Equals("I add 1 and 2", st); err != nil {
+		t.Error(err)
+	}
+
+	if err := assert.Equals(`I add (\d+) and (\d+)`, expr); err != nil {
+		t.Error(err)
+	}
 }
 
 func TestBackground(t *testing.T) {
@@ -167,15 +205,12 @@ func checkf(t StepTest, ctx context.Context, sum float32) {
 func check(t StepTest, ctx context.Context, sum int) {
 	received, err := ctx.Get("sumRes")
 	if err != nil {
-		t.Error(err.Error())
-
+		t.Error(err)
 		return
 	}
 
 	if sum != received {
-		t.Error("the math does not work for you")
-
-		return
+		t.Errorf("expected %d but %d received", sum, received)
 	}
 }
 
