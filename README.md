@@ -37,21 +37,18 @@ Add a new test `main_test.go`:
 func add(t gobdd.StepTest, ctx gobdd.Context, var1, var2 int) {
 	res := var1 + var2
 	ctx.Set("sumRes", res)
-	return ctx
 }
 
 func check(t gobdd.StepTest, ctx gobdd.Context, sum int) {
 	received, err := ctx.GetInt("sumRes")
 	if err != nil {
 		t.Error(err)
-		return ctx
+		return
 	}
 
 	if sum != received {
 		t.Error(errors.New("the math does not work for you"))
 	}
-
-	return ctx
 }
 
 func TestScenarios(t *testing.T) {
