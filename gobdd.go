@@ -104,12 +104,14 @@ type StepTest interface {
 	Fatalf(string, ...interface{})
 	Errorf(string, ...interface{})
 	Error(...interface{})
+
+	Fail()
+	FailNow()
 }
 
 type TestingT interface {
 	StepTest
 	Parallel()
-	Fail()
 	Run(name string, f func(t *testing.T)) bool
 }
 

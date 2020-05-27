@@ -258,6 +258,9 @@ func (m *mockTester) Parallel() {
 func (m *mockTester) Fail() {
 }
 
+func (m *mockTester) FailNow() {
+}
+
 func (m *mockTester) Run(_ string, _ func(t *testing.T)) bool {
 	return true
 }
