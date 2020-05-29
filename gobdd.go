@@ -141,7 +141,8 @@ func NewSuite(t TestingT, optionClosures ...func(*SuiteOptions)) *Suite {
 
 // AddParameterTypes adds a list of parameter types that will be used to simplify step definitions.
 //
-// The first argument says what parameter should be translated to regular expression.
+// The first argument is the parameter type and the second parameter is a list of regular expressions
+// that should replace the parameter type.
 //
 //    s.AddParameterTypes(map[string]string{
 //       `{int}`:    []string{`(\d)`},
