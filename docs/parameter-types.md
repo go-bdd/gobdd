@@ -22,5 +22,5 @@ You can add your own parameter types using `AddParameterTypes()` function. Here 
 	s.AddParameterTypes(`{text}`, []string{`"([\d\w\-\s]+)"`, `'([\d\w\-\s]+)'`})
 ```
 
-The first argument accepts the parameter types. As the second parameter provide list of regular expresion that should replace the parameter.
+The first argument accepts the parameter types. As the second parameter provides list of regular expressions that should replace the parameter.
 
