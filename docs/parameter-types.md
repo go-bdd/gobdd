@@ -24,3 +24,4 @@ You can add your own parameter types using `AddParameterTypes()` function. Here 
 
 The first argument accepts the parameter types. As the second parameter provides list of regular expressions that should replace the parameter.
 
+Parameter types should be added Before adding any step.
