@@ -155,6 +155,7 @@ func (s *Suite) AddParameterTypes(from string, to []string) {
 		if err != nil {
 			s.t.Fatalf(`the regular expresion for key %s doesn't compile: %s`, from, to)
 		}
+
 		s.parameterTypes[from] = append(s.parameterTypes[from], to)
 	}
 }
@@ -198,6 +199,7 @@ func (s *Suite) AddStep(expr string, step interface{}) {
 
 func (s *Suite) applyParameterTypes(expr string) []string {
 	exprs := []string{expr}
+
 	for from, to := range s.parameterTypes {
 		for _, t := range to {
 			if strings.Contains(expr, from) {
