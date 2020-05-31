@@ -241,7 +241,7 @@ func (s *Suite) runFeature(feature *msgs.GherkinDocument_Feature) error {
 
 	hasErrors := false
 
-	s.t.Run(feature.Name, func(t *testing.T) {
+	s.t.Run(fmt.Sprintf("%s %s", strings.TrimSpace(feature.Keyword), feature.Name), func(t *testing.T) {
 		var bkgSteps *msgs.GherkinDocument_Feature_Background
 
 		for _, child := range feature.Children {
@@ -371,7 +371,7 @@ func (s *Suite) runScenario(ctx Context, scenario *msgs.GherkinDocument_Feature_
 	s.callBeforeScenarios(ctx)
 
 	defer s.callAfterScenarios(ctx)
-	t.Run(scenario.Name, func(t *testing.T) {
+	t.Run(fmt.Sprintf("%s %s", strings.TrimSpace(scenario.Keyword), scenario.Name), func(t *testing.T) {
 		if bkg != nil {
 			steps := s.getBackgroundSteps(bkg)
 			s.runSteps(ctx, t, steps)
@@ -409,7 +409,7 @@ func (s *Suite) runStep(ctx Context, t *testing.T, step *msgs.GherkinDocument_Fe
 	}
 
 	params := def.expr.FindSubmatch([]byte(step.Text))[1:]
-	t.Run(step.Text, func(t *testing.T) {
+	t.Run(fmt.Sprintf("%s %s", strings.TrimSpace(step.Keyword), step.Text), func(t *testing.T) {
 		def.run(ctx, t, params)
 	})
 }
