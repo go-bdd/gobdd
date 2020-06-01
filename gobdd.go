@@ -144,9 +144,7 @@ func NewSuite(t TestingT, optionClosures ...func(*SuiteOptions)) *Suite {
 // The first argument is the parameter type and the second parameter is a list of regular expressions
 // that should replace the parameter type.
 //
-//    s.AddParameterTypes(map[string]string{
-//       `{int}`:    []string{`(\d)`},
-//    })
+//    s.AddParameterTypes(`{int}`, []string{`(\d)`})
 //
 // The regular expression should compile, otherwise will produce an error and stop executing.
 func (s *Suite) AddParameterTypes(from string, to []string) {
