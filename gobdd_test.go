@@ -43,6 +43,25 @@ func TestScenarioOutline(t *testing.T) {
 
 	suite.Run()
 }
+func TestParameterTypes(t *testing.T) {
+	suite := NewSuite(t, WithFeaturesPath("features/parameter-types.feature"))
+	suite.AddStep(`I add {int} and {int}`, add)
+	suite.AddStep(`the result should equal {int}`, check)
+	suite.AddStep(`I add floats {float} and {float}`, addf)
+	suite.AddStep(`the result should equal float {float}`, checkf)
+	suite.AddStep(`I use word {word}`, func(t StepTest, ctx Context, word string) {
+		if word != "pizza" {
+			t.Fatal("it should be pizza")
+		}
+	})
+	suite.AddStep(`I use text {text}`, func(t StepTest, ctx Context, text string) {
+		if text != "I like pizza" {
+			t.Fatal("it should say that I like pizza")
+		}
+	})
+
+	suite.Run()
+}
 
 func TestScenarioOutlineExecutesAllTests(t *testing.T) {
 	c := 0

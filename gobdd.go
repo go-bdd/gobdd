@@ -20,10 +20,11 @@ import (
 
 // Holds all the information about the suite (options, steps to execute etc)
 type Suite struct {
-	t             TestingT
-	steps         []stepDef
-	options       SuiteOptions
-	hasStepErrors bool
+	t              TestingT
+	steps          []stepDef
+	options        SuiteOptions
+	hasStepErrors  bool
+	parameterTypes map[string][]string
 }
 
 // Holds all the information about how the suite or features/steps should be configured
@@ -123,10 +124,37 @@ func NewSuite(t TestingT, optionClosures ...func(*SuiteOptions)) *Suite {
 		optionClosures[i](&options)
 	}
 
-	return &Suite{
-		t:       t,
-		steps:   []stepDef{},
-		options: options,
+	s := &Suite{
+		t:              t,
+		steps:          []stepDef{},
+		options:        options,
+		parameterTypes: map[string][]string{},
+	}
+
+	s.AddParameterTypes(`{int}`, []string{`(\d)`})
+	s.AddParameterTypes(`{float}`, []string{`([-+]?\d*\.?\d*)`})
+	s.AddParameterTypes(`{word}`, []string{`([\d\w]+)`})
+	s.AddParameterTypes(`{text}`, []string{`"([\d\w\-\s]+)"`, `'([\d\w\-\s]+)'`})
+
+	return s
+}
+
+// AddParameterTypes adds a list of parameter types that will be used to simplify step definitions.
+//
+// The first argument is the parameter type and the second parameter is a list of regular expressions
+// that should replace the parameter type.
+//
+//    s.AddParameterTypes(`{int}`, []string{`(\d)`})
+//
+// The regular expression should compile, otherwise will produce an error and stop executing.
+func (s *Suite) AddParameterTypes(from string, to []string) {
+	for _, to := range to {
+		_, err := regexp.Compile(to)
+		if err != nil {
+			s.t.Fatalf(`the regular expresion for key %s doesn't compile: %s`, from, to)
+		}
+
+		s.parameterTypes[from] = append(s.parameterTypes[from], to)
 	}
 }
 
@@ -149,18 +177,36 @@ func (s *Suite) AddStep(expr string, step interface{}) {
 		return
 	}
 
-	compiled, err := regexp.Compile(expr)
-	if err != nil {
-		s.t.Errorf("the step function is incorrect: %w", err)
-		s.hasStepErrors = true
+	exprs := s.applyParameterTypes(expr)
 
-		return
+	for _, expr := range exprs {
+		compiled, err := regexp.Compile(expr)
+		if err != nil {
+			s.t.Errorf("the step function is incorrect: %w", err)
+			s.hasStepErrors = true
+
+			return
+		}
+
+		s.steps = append(s.steps, stepDef{
+			expr: compiled,
+			f:    step,
+		})
+	}
+}
+
+func (s *Suite) applyParameterTypes(expr string) []string {
+	exprs := []string{expr}
+
+	for from, to := range s.parameterTypes {
+		for _, t := range to {
+			if strings.Contains(expr, from) {
+				exprs = append(exprs, strings.Replace(expr, from, t, -1))
+			}
+		}
 	}
 
-	s.steps = append(s.steps, stepDef{
-		expr: compiled,
-		f:    step,
-	})
+	return exprs
 }
 
 // AddRegexStep registers a step in the suite.
