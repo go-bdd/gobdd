@@ -14,7 +14,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cucumber/gherkin-go/v13"
+	gherkin "github.com/cucumber/gherkin-go/v13"
 	msgs "github.com/cucumber/messages-go/v12"
 )
 
@@ -283,6 +283,12 @@ func (s *Suite) executeFeature(file string) error {
 }
 
 func (s *Suite) runFeature(feature *msgs.GherkinDocument_Feature) error {
+	for _, tag := range feature.GetTags() {
+		if contains(s.options.ignoreTags, tag.Name) {
+			s.t.Logf("the feature (%s) is ignored ", feature.GetName())
+			return nil
+		}
+	}
 	log.SetOutput(ioutil.Discard)
 
 	hasErrors := false
