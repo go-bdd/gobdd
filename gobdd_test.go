@@ -147,6 +147,11 @@ func TestIgnoredTags(t *testing.T) {
 	suite.Run()
 }
 
+func TestIgnorFeatureWithTags(t *testing.T) {
+	suite := NewSuite(t, WithFeaturesPath("features/ignored_feature_tags.feature"), WithIgnoredTags([]string{"@ignore"}))
+	suite.AddStep(`fail the test`, fail)
+	suite.Run()
+}
 func TestInvalidFunctionSignature(t *testing.T) {
 	testCases := map[string]struct {
 		f interface{}
