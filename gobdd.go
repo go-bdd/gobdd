@@ -289,6 +289,7 @@ func (s *Suite) runFeature(feature *msgs.GherkinDocument_Feature) error {
 			return nil
 		}
 	}
+
 	log.SetOutput(ioutil.Discard)
 
 	hasErrors := false
