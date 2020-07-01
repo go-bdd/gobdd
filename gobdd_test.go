@@ -144,7 +144,7 @@ func TestWithBeforeScenario(t *testing.T) {
 func TestWithAfterStep(t *testing.T) {
 	c := 0
 	suite := NewSuite(t, WithFeaturesPath("features/background.feature"), WithAfterStep(func(ctx Context) {
-		c = c + 1
+		c++
 	}))
 	suite.AddStep(`I add (\d+) and (\d+)`, add)
 	suite.AddStep(`the result should equal (\d+)`, check)
@@ -159,7 +159,7 @@ func TestWithAfterStep(t *testing.T) {
 func TestWithBeforeStep(t *testing.T) {
 	c := 0
 	suite := NewSuite(t, WithFeaturesPath("features/background.feature"), WithBeforeStep(func(ctx Context) {
-		c = c + 1
+		c++
 	}))
 	suite.AddStep(`I add (\d+) and (\d+)`, add)
 	suite.AddStep(`the result should equal (\d+)`, check)
