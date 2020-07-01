@@ -141,6 +141,36 @@ func TestWithBeforeScenario(t *testing.T) {
 	}
 }
 
+func TestWithAfterStep(t *testing.T) {
+	c := 0
+	suite := NewSuite(t, WithFeaturesPath("features/background.feature"), WithAfterStep(func(ctx Context) {
+		c = c + 1
+	}))
+	suite.AddStep(`I add (\d+) and (\d+)`, add)
+	suite.AddStep(`the result should equal (\d+)`, check)
+
+	suite.Run()
+
+	if err := assert.Equals(2, c); err != nil {
+		t.Error(err)
+	}
+}
+
+func TestWithBeforeStep(t *testing.T) {
+	c := 0
+	suite := NewSuite(t, WithFeaturesPath("features/background.feature"), WithBeforeStep(func(ctx Context) {
+		c = c + 1
+	}))
+	suite.AddStep(`I add (\d+) and (\d+)`, add)
+	suite.AddStep(`the result should equal (\d+)`, check)
+
+	suite.Run()
+
+	if err := assert.Equals(2, c); err != nil {
+		t.Error(err)
+	}
+}
+
 func TestIgnoredTags(t *testing.T) {
 	suite := NewSuite(t, WithFeaturesPath("features/ignored_tags.feature"), WithIgnoredTags([]string{"@ignore"}))
 	suite.AddStep(`fail the test`, fail)
