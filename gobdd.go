@@ -454,14 +454,14 @@ func (s *Suite) callAfterSteps(ctx Context) {
 
 func (s *Suite) runScenario(ctx Context, scenario *msgs.GherkinDocument_Feature_Scenario,
 	bkg *msgs.GherkinDocument_Feature_Background, t *testing.T) {
-	// NOTE consider passing t as argument to scenario hooks
-	ctx.Set(TestingTKey{}, t)
-	defer ctx.Set(TestingTKey{}, nil)
-
-	s.callBeforeScenarios(ctx)
-	defer s.callAfterScenarios(ctx)
-
 	t.Run(fmt.Sprintf("%s %s", strings.TrimSpace(scenario.Keyword), scenario.Name), func(t *testing.T) {
+		// NOTE consider passing t as argument to scenario hooks
+		ctx.Set(TestingTKey{}, t)
+		defer ctx.Set(TestingTKey{}, nil)
+
+		s.callBeforeScenarios(ctx)
+		defer s.callAfterScenarios(ctx)
+
 		if bkg != nil {
 			steps := s.getBackgroundSteps(bkg)
 			s.runSteps(ctx, t, steps)
