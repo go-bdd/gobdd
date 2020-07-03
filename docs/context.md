@@ -30,6 +30,10 @@ fmt.Printf("Hi %s\n", val) // prints "Hi John"
 
 When the data is not provided, the whole test will fail.
 
+#### Predefined keys
+
+The context holds current test state `testing.T`. It is accessible by calling `Context.Get(TestingTKey{})`. This is useful if you need access to the test state from scenario or step hooks.
+
 ## Good practices
 
 It's a good practice to use custom structs as keys instead of strings or any built-in types to avoid collisions between steps using context.

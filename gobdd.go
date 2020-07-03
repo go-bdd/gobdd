@@ -18,7 +18,7 @@ import (
 	msgs "github.com/cucumber/messages-go/v12"
 )
 
-// Holds all the information about the suite (options, steps to execute etc)
+// Suite holds all the information about the suite (options, steps to execute etc)
 type Suite struct {
 	t              TestingT
 	steps          []stepDef
@@ -27,17 +27,19 @@ type Suite struct {
 	parameterTypes map[string][]string
 }
 
-// Holds all the information about how the suite or features/steps should be configured
+// SuiteOptions holds all the information about how the suite or features/steps should be configured
 type SuiteOptions struct {
 	featuresPaths  string
 	ignoreTags     []string
 	tags           []string
 	beforeScenario []func(ctx Context)
 	afterScenario  []func(ctx Context)
+	beforeStep     []func(ctx Context)
+	afterStep      []func(ctx Context)
 	runInParallel  bool
 }
 
-// creates a new suite configuration with default values
+// NewSuiteOptions creates a new suite configuration with default values
 func NewSuiteOptions() SuiteOptions {
 	return SuiteOptions{
 		featuresPaths:  "features/*.feature",
@@ -45,6 +47,8 @@ func NewSuiteOptions() SuiteOptions {
 		tags:           []string{},
 		beforeScenario: []func(ctx Context){},
 		afterScenario:  []func(ctx Context){},
+		beforeStep:     []func(ctx Context){},
+		afterStep:      []func(ctx Context){},
 	}
 }
 
@@ -85,6 +89,20 @@ func WithAfterScenario(f func(ctx Context)) func(*SuiteOptions) {
 	}
 }
 
+// WithBeforeStep configures functions that should be executed before every step
+func WithBeforeStep(f func(ctx Context)) func(*SuiteOptions) {
+	return func(options *SuiteOptions) {
+		options.beforeStep = append(options.beforeStep, f)
+	}
+}
+
+// WithAfterStep configures functions that should be executed after every step
+func WithAfterStep(f func(ctx Context)) func(*SuiteOptions) {
+	return func(options *SuiteOptions) {
+		options.afterStep = append(options.afterStep, f)
+	}
+}
+
 // WithIgnoredTags configures which tags should be skipped while executing a suite
 // Every tag has to start with @ otherwise will be ignored
 func WithIgnoredTags(tags []string) func(*SuiteOptions) {
@@ -115,6 +133,9 @@ type TestingT interface {
 	Parallel()
 	Run(name string, f func(t *testing.T)) bool
 }
+
+// TestingTKey is used to store reference to current *testing.T instance
+type TestingTKey struct{}
 
 // Creates a new suites with given configuration and empty steps defined
 func NewSuite(t TestingT, optionClosures ...func(*SuiteOptions)) *Suite {
@@ -419,12 +440,28 @@ func (s *Suite) callAfterScenarios(ctx Context) {
 	}
 }
 
+func (s *Suite) callBeforeSteps(ctx Context) {
+	for _, f := range s.options.beforeStep {
+		f(ctx)
+	}
+}
+
+func (s *Suite) callAfterSteps(ctx Context) {
+	for _, f := range s.options.afterStep {
+		f(ctx)
+	}
+}
+
 func (s *Suite) runScenario(ctx Context, scenario *msgs.GherkinDocument_Feature_Scenario,
 	bkg *msgs.GherkinDocument_Feature_Background, t *testing.T) {
-	s.callBeforeScenarios(ctx)
-
-	defer s.callAfterScenarios(ctx)
 	t.Run(fmt.Sprintf("%s %s", strings.TrimSpace(scenario.Keyword), scenario.Name), func(t *testing.T) {
+		// NOTE consider passing t as argument to scenario hooks
+		ctx.Set(TestingTKey{}, t)
+		defer ctx.Set(TestingTKey{}, nil)
+
+		s.callBeforeScenarios(ctx)
+		defer s.callAfterScenarios(ctx)
+
 		if bkg != nil {
 			steps := s.getBackgroundSteps(bkg)
 			s.runSteps(ctx, t, steps)
@@ -463,6 +500,13 @@ func (s *Suite) runStep(ctx Context, t *testing.T, step *msgs.GherkinDocument_Fe
 
 	params := def.expr.FindSubmatch([]byte(step.Text))[1:]
 	t.Run(fmt.Sprintf("%s %s", strings.TrimSpace(step.Keyword), step.Text), func(t *testing.T) {
+		// NOTE consider passing t as argument to step hooks
+		ctx.Set(TestingTKey{}, t)
+		defer ctx.Set(TestingTKey{}, nil)
+
+		s.callBeforeSteps(ctx)
+		defer s.callAfterSteps(ctx)
+
 		def.run(ctx, t, params)
 	})
 }

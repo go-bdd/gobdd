@@ -28,6 +28,26 @@ ctx.GetFloat32(myFloatValue{}, 123)
 
 If the `myFloatValue{}` value doesn't exists the `123` will be returned.
 
+## Hooks
+
+There's a possibility to define hooks which might be helpful building useful reporting, visualization, etc.
+
+* `WithBeforeStep(f func(ctx Context))` configures functions that should be executed before every step
+* `WithAfterStep(f func(ctx Context))` configures functions that should be executed after every step
+
+```go
+suite := NewSuite(
+    t,
+    WithBeforeStep(func(ctx Context) {
+        ctx.Set(time.Time{}, time.Now())
+    }),
+    WithAfterStep(func(ctx Context) {
+        start, _ := ctx.Get(time.Time{})
+        log.Printf("step took %s", time.Since(start.(time.Time)))
+    }),
+)
+```
+
 ## Good practices
 
 Steps should be immutable and only communicate through [the context]({{ site.baseurl }}/context.html).
