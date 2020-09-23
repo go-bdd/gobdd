@@ -1,6 +1,7 @@
 package gobdd
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
@@ -47,6 +48,21 @@ func (ctx Context) Get(key interface{}, defaultValue ...interface{}) (interface{
 	}
 
 	return ctx.values[key], nil
+}
+
+// GetAs copies data from tke key to the dest.
+// Supports maps, slices and structs.
+func (ctx Context) GetAs(key interface{}, dest interface{}) error {
+	if _, ok := ctx.values[key]; !ok {
+		return fmt.Errorf("the key %+v does not exist", key)
+	}
+
+	d, err := json.Marshal(ctx.values[key])
+	if err != nil {
+	  	return err
+	}
+
+	return json.Unmarshal(d, dest)
 }
 
 // It is a shortcut for getting the value already casted as error.
