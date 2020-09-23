@@ -283,7 +283,7 @@ func (s *Suite) Run() {
 func (s *Suite) executeFeature(file string) error {
 	f, err := os.Open(file)
 	if err != nil {
-		return fmt.Fatalf("cannot open file %s", file)
+		return fmt.Errorf("cannot open file %s", file)
 	}
 	defer f.Close()
 	fileIO := bufio.NewReader(f)
