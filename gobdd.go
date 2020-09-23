@@ -283,17 +283,14 @@ func (s *Suite) Run() {
 func (s *Suite) executeFeature(file string) error {
 	f, err := os.Open(file)
 	if err != nil {
-		return fmt.Errorf("cannot open file %s", file)
+		return fmt.Fatalf("cannot open file %s", file)
 	}
 	defer f.Close()
 	fileIO := bufio.NewReader(f)
 
 	doc, err := gherkin.ParseGherkinDocument(fileIO, (&msgs.Incrementing{}).NewId)
 	if err != nil {
-		s.t.Fail()
-		s.t.Errorf("error while loading document: %s\n", err)
-
-		return fmt.Errorf("error while loading document: %s", err)
+		s.t.Fatalf("error while loading document: %s\n", err)
 	}
 
 	if doc.Feature == nil {
@@ -493,9 +490,7 @@ func (s *Suite) runStep(ctx Context, t *testing.T, step *msgs.GherkinDocument_Fe
 
 	def, err := s.findStepDef(step.Text)
 	if err != nil {
-		t.Errorf("cannot find step definition for step: %s%s", step.Keyword, step.Text)
-
-		return
+		t.Fatalf("cannot find step definition for step: %s%s", step.Keyword, step.Text)
 	}
 
 	params := def.expr.FindSubmatch([]byte(step.Text))[1:]
@@ -514,13 +509,13 @@ func (s *Suite) runStep(ctx Context, t *testing.T, step *msgs.GherkinDocument_Fe
 func (def *stepDef) run(ctx Context, t TestingT, params [][]byte) { // nolint:interfacer
 	defer func() {
 		if r := recover(); r != nil {
-			t.Errorf("%+v", r)
+			t.Fatalf("%+v", r)
 		}
 	}()
 
 	d := reflect.ValueOf(def.f)
 	if len(params)+2 != d.Type().NumIn() {
-		t.Errorf("the step function %s accepts %d arguments but %d received", d.String(), d.Type().NumIn(), len(params)+2)
+		t.Fatalf("the step function %s accepts %d arguments but %d received", d.String(), d.Type().NumIn(), len(params)+2)
 
 		return
 	}
