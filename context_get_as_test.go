@@ -18,7 +18,7 @@ func TestContext_GetAs_NoPointerType(t *testing.T) {
 
 func TestContext_GetAs_WithSlice(t *testing.T) {
 	s := []string{"one", "two"}
-	res := map[string]string{}
+	res := []string{}
 
 	ctx := NewContext()
 	ctx.Set("s", s)
