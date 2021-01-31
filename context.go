@@ -59,7 +59,7 @@ func (ctx Context) GetAs(key interface{}, dest interface{}) error {
 
 	d, err := json.Marshal(ctx.values[key])
 	if err != nil {
-	  	return err
+		return err
 	}
 
 	return json.Unmarshal(d, dest)
