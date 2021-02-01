@@ -43,6 +43,7 @@ func TestScenarioOutline(t *testing.T) {
 
 	suite.Run()
 }
+
 func TestParameterTypes(t *testing.T) {
 	suite := NewSuite(t, WithFeaturesPath("features/parameter-types.feature"))
 	suite.AddStep(`I add {int} and {int}`, add)
