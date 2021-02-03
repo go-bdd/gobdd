@@ -308,8 +308,6 @@ func (s *Suite) runFeature(feature *msgs.GherkinDocument_Feature) error {
 		}
 	}
 
-	log.SetOutput(ioutil.Discard)
-
 	hasErrors := false
 
 	s.t.Run(fmt.Sprintf("%s %s", strings.TrimSpace(feature.Keyword), feature.Name), func(t *testing.T) {
