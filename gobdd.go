@@ -4,8 +4,6 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -307,8 +305,6 @@ func (s *Suite) runFeature(feature *msgs.GherkinDocument_Feature) error {
 			return nil
 		}
 	}
-
-	log.SetOutput(ioutil.Discard)
 
 	hasErrors := false
 
