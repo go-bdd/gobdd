@@ -630,12 +630,12 @@ func getRegexpForVar(v interface{}) string {
 	return "(.*)"
 }
 
-var reTestName = regexp.MustCompile("[^a-zA-Z0-9 ]+")
-
 func scenarioTestName(scenario *msgs.GherkinDocument_Feature_Scenario) string {
+	var reTestName = regexp.MustCompile("[^a-zA-Z0-9 ]+")
 	return reTestName.ReplaceAllString(fmt.Sprintf("%s %s", strings.TrimSpace(scenario.Keyword), scenario.Name), "")
 }
 
 func stepTestName(step *msgs.GherkinDocument_Feature_Step) string {
+	var reTestName = regexp.MustCompile("[^a-zA-Z0-9 ]+")
 	return reTestName.ReplaceAllString(fmt.Sprintf("%s %s", strings.TrimSpace(step.Keyword), step.Text), "")
 }
