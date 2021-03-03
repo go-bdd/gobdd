@@ -447,7 +447,7 @@ func (s *Suite) callAfterSteps(ctx Context) {
 
 func (s *Suite) runScenario(ctx Context, scenario *msgs.GherkinDocument_Feature_Scenario,
 	bkg *msgs.GherkinDocument_Feature_Background, t *testing.T) {
-	t.Run(fmt.Sprintf("%s %s", strings.TrimSpace(scenario.Keyword), scenario.Name), func(t *testing.T) {
+	t.Run(scenarioTestName(scenario), func(t *testing.T) {
 		// NOTE consider passing t as argument to scenario hooks
 		ctx.Set(TestingTKey{}, t)
 		defer ctx.Set(TestingTKey{}, nil)
@@ -490,7 +490,7 @@ func (s *Suite) runStep(ctx Context, t *testing.T, step *msgs.GherkinDocument_Fe
 	}
 
 	params := def.expr.FindSubmatch([]byte(step.Text))[1:]
-	t.Run(fmt.Sprintf("%s %s", strings.TrimSpace(step.Keyword), step.Text), func(t *testing.T) {
+	t.Run(stepTestName(step), func(t *testing.T) {
 		// NOTE consider passing t as argument to step hooks
 		ctx.Set(TestingTKey{}, t)
 		defer ctx.Set(TestingTKey{}, nil)
@@ -628,4 +628,14 @@ func getRegexpForVar(v interface{}) string {
 	}
 
 	return "(.*)"
+}
+
+var reTestName = regexp.MustCompile("[^a-zA-Z0-9 ]+")
+
+func scenarioTestName(scenario *msgs.GherkinDocument_Feature_Scenario) string {
+	return reTestName.ReplaceAllString(fmt.Sprintf("%s %s", strings.TrimSpace(scenario.Keyword), scenario.Name), "")
+}
+
+func stepTestName(step *msgs.GherkinDocument_Feature_Step) string {
+	return reTestName.ReplaceAllString(fmt.Sprintf("%s %s", strings.TrimSpace(step.Keyword), step.Text), "")
 }
