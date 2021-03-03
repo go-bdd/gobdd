@@ -7,12 +7,28 @@ on:
   pull_request:
 
 jobs:
-  build:
+
+  golangci:
+    strategy:
+      matrix:
+        go-version: [1.15.x]
+        os: [macos-latest, windows-latest]
+    name: lint
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2.5.1
+        with:
+          # Required: the version of golangci-lint is required and must be specified without patch version: we always use the latest patch version.
+          version: v1.29
+
+  coverage:
     name: Build
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: ['1.12', '1.13', '1.14']
+        go: ['1.12', '1.13', '1.14', '1.15', '1.16']
     env:
       VERBOSE: 1
       GOFLAGS: -mod=readonly

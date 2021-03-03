@@ -6,7 +6,12 @@ linters:
   enable-all: true
   disable:
     - funlen
+    - goerr113
+    - gofumpt
     - gomnd
+    - godot
+    - testpackage
+    - nolintlint
     - golint
     - scopelint
     - gosec
