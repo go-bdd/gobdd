@@ -220,7 +220,7 @@ func (s *Suite) applyParameterTypes(expr string) []string {
 	for from, to := range s.parameterTypes {
 		for _, t := range to {
 			if strings.Contains(expr, from) {
-				exprs = append(exprs, strings.Replace(expr, from, t, -1))
+				exprs = append(exprs, strings.ReplaceAll(expr, from, t))
 			}
 		}
 	}
@@ -414,8 +414,8 @@ func (s *Suite) stepFromExample(
 
 	for i, ph := range placeholders {
 		t := getRegexpForVar(row.Cells[i].Value)
-		expr = strings.Replace(expr, ph, t, -1)
-		stepName = strings.Replace(stepName, ph, row.Cells[i].Value, -1)
+		expr = strings.ReplaceAll(expr, ph, t)
+		stepName = strings.ReplaceAll(stepName, ph, row.Cells[i].Value)
 	}
 
 	return stepName, expr
