@@ -5,6 +5,9 @@ go 1.12
 require (
 	github.com/cucumber/gherkin-go/v13 v13.0.0
 	github.com/cucumber/messages-go/v12 v12.0.0
+	github.com/cucumber/messages-go/v15 v15.0.0
 	github.com/go-bdd/assert v0.0.0-20190820124234-20d47a68475d
-	github.com/stretchr/testify v1.5.1
+	github.com/gogo/protobuf v1.3.1 // indirect
+	github.com/golang/protobuf v1.5.2
+	github.com/stretchr/testify v1.7.0
 )

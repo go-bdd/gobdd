@@ -4,6 +4,11 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"github.com/cucumber/gherkin-go/v13"
+	msgs "github.com/cucumber/messages-go/v12"
+	"github.com/gogo/protobuf/proto"
+	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -11,9 +16,6 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-
-	gherkin "github.com/cucumber/gherkin-go/v13"
-	msgs "github.com/cucumber/messages-go/v12"
 )
 
 // Suite holds all the information about the suite (options, steps to execute etc)
@@ -23,6 +25,7 @@ type Suite struct {
 	options        SuiteOptions
 	hasStepErrors  bool
 	parameterTypes map[string][]string
+	reporter       reporter
 }
 
 // SuiteOptions holds all the information about how the suite or features/steps should be configured
@@ -135,7 +138,7 @@ type TestingT interface {
 // TestingTKey is used to store reference to current *testing.T instance
 type TestingTKey struct{}
 
-// Creates a new suites with given configuration and empty steps defined
+// NewSuite Creates a new suites with given configuration and empty steps defined
 func NewSuite(t TestingT, optionClosures ...func(*SuiteOptions)) *Suite {
 	options := NewSuiteOptions()
 
@@ -253,7 +256,7 @@ func (s *Suite) AddRegexStep(expr *regexp.Regexp, step interface{}) {
 	})
 }
 
-// Executes the suite with given options and defined steps
+// Run Executes the suite with given options and defined steps
 func (s *Suite) Run() {
 	if s.hasStepErrors {
 		s.t.Fatal("the test contains invalid step definitions")
@@ -263,7 +266,7 @@ func (s *Suite) Run() {
 
 	files, err := filepath.Glob(s.options.featuresPaths)
 	if err != nil {
-		s.t.Fatalf("cannot find features/ directory")
+		s.t.Fatalf("cannot find %s directory", s.options.featuresPaths)
 	}
 
 	if s.options.runInParallel {
@@ -455,25 +458,40 @@ func (s *Suite) runScenario(ctx Context, scenario *msgs.GherkinDocument_Feature_
 		s.callBeforeScenarios(ctx)
 		defer s.callAfterScenarios(ctx)
 
+		pickle := s.reporter.Pickle(scenario)
 		if bkg != nil {
 			steps := s.getBackgroundSteps(bkg)
-			s.runSteps(ctx, t, steps)
+			s.runSteps(ctx, t, pickle, steps)
 		}
+
 		steps := scenario.Steps
+		c := ctx.Clone()
 		if examples := scenario.GetExamples(); len(examples) > 0 {
-			c := ctx.Clone()
 			steps = s.getOutlineStep(scenario.GetSteps(), examples)
-			s.runSteps(c, t, steps)
-		} else {
-			c := ctx.Clone()
-			s.runSteps(c, t, steps)
+		}
+
+		s.runSteps(c, t, pickle, steps)
+
+		out, err := proto.Marshal(pickle)
+		if err != nil {
+			log.Fatalln("Failed to encode address book:", err)
+		}
+		if err := ioutil.WriteFile("report.proto", out, 0644); err != nil {
+			log.Fatalln("Failed to write address book:", err)
 		}
 	})
 }
 
-func (s *Suite) runSteps(ctx Context, t *testing.T, steps []*msgs.GherkinDocument_Feature_Step) {
+func (s *Suite) runSteps(ctx Context, t *testing.T, pickle *msgs.Pickle, steps []*msgs.GherkinDocument_Feature_Step) {
 	for _, step := range steps {
+		pStep := &msgs.Pickle_PickleStep{
+			Text:       step.Text,
+			Id:         step.Id,
+			AstNodeIds: []string{pickle.Id},
+		}
+
 		s.runStep(ctx, t, step)
+		pickle.Steps = append(pickle.Steps, pStep)
 	}
 }
 
