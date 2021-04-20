@@ -118,6 +118,22 @@ func TestTags(t *testing.T) {
 	suite.Run()
 }
 
+func TestFilterFeatureWithTags(t *testing.T) {
+	suite := NewSuite(t, WithFeaturesPath("features/filter_tags_*.feature"), WithTags([]string{"@run-this"}))
+	c := false
+
+	suite.AddStep(`the test should pass`, func(_ StepTest, _ Context) {
+		c = true
+	})
+	suite.AddStep(`fail the test`, fail)
+
+	suite.Run()
+	
+	if err := assert.Equals(true, c); err != nil {
+		t.Error(err)
+	}
+}
+
 func TestWithAfterScenario(t *testing.T) {
 	c := false
 	suite := NewSuite(t, WithFeaturesPath("features/empty.feature"), WithAfterScenario(func(ctx Context) {
@@ -183,6 +199,7 @@ func TestIgnorFeatureWithTags(t *testing.T) {
 	suite.AddStep(`fail the test`, fail)
 	suite.Run()
 }
+
 func TestInvalidFunctionSignature(t *testing.T) {
 	testCases := map[string]struct {
 		f interface{}
