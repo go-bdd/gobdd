@@ -321,7 +321,7 @@ func (s *Suite) runFeature(feature *msgs.GherkinDocument_Feature) error {
 				continue
 			}
 
-			if s.skipScenario(scenario.GetTags()) {
+			if s.skipScenario(append(feature.GetTags(), scenario.GetTags()...)) {
 				t.Log(fmt.Sprintf("Skipping scenario %s", scenario.Name))
 				continue
 			}
