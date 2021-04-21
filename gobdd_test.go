@@ -128,7 +128,7 @@ func TestFilterFeatureWithTags(t *testing.T) {
 	suite.AddStep(`fail the test`, fail)
 
 	suite.Run()
-	
+
 	if err := assert.Equals(true, c); err != nil {
 		t.Error(err)
 	}
