@@ -52,7 +52,7 @@ func check(t gobdd.StepTest, ctx gobdd.Context, sum int) {
 }
 
 func TestScenarios(t *testing.T) {
-	suite := NewSuite(t)
+	suite := gobdd.NewSuite(t)
 	suite.AddStep(`I add (\d+) and (\d+)`, add)
 	suite.AddStep(`I the result should equal (\d+)`, check)
 	suite.Run()
