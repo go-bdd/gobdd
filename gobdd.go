@@ -67,7 +67,7 @@ func WithFeaturesPath(path string) func(*SuiteOptions) {
 
 // WithTags configures which tags should be skipped while executing a suite
 // Every tag has to start with @
-func WithTags(tags []string) func(*SuiteOptions) {
+func WithTags(tags ...string) func(*SuiteOptions) {
 	return func(options *SuiteOptions) {
 		options.tags = tags
 	}
@@ -103,7 +103,7 @@ func WithAfterStep(f func(ctx Context)) func(*SuiteOptions) {
 
 // WithIgnoredTags configures which tags should be skipped while executing a suite
 // Every tag has to start with @ otherwise will be ignored
-func WithIgnoredTags(tags []string) func(*SuiteOptions) {
+func WithIgnoredTags(tags ...string) func(*SuiteOptions) {
 	return func(options *SuiteOptions) {
 		options.ignoreTags = tags
 	}

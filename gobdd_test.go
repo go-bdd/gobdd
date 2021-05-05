@@ -111,7 +111,7 @@ func TestBackground(t *testing.T) {
 }
 
 func TestTags(t *testing.T) {
-	suite := NewSuite(t, WithFeaturesPath("features/tags.feature"), WithTags([]string{"@tag"}))
+	suite := NewSuite(t, WithFeaturesPath("features/tags.feature"), WithTags("@tag"))
 	suite.AddStep(`fail the test`, fail)
 	suite.AddStep(`the test should pass`, pass)
 
@@ -119,7 +119,7 @@ func TestTags(t *testing.T) {
 }
 
 func TestFilterFeatureWithTags(t *testing.T) {
-	suite := NewSuite(t, WithFeaturesPath("features/filter_tags_*.feature"), WithTags([]string{"@run-this"}))
+	suite := NewSuite(t, WithFeaturesPath("features/filter_tags_*.feature"), WithTags("@run-this"))
 	c := false
 
 	suite.AddStep(`the test should pass`, func(_ StepTest, _ Context) {
@@ -189,13 +189,13 @@ func TestWithBeforeStep(t *testing.T) {
 }
 
 func TestIgnoredTags(t *testing.T) {
-	suite := NewSuite(t, WithFeaturesPath("features/ignored_tags.feature"), WithIgnoredTags([]string{"@ignore"}))
+	suite := NewSuite(t, WithFeaturesPath("features/ignored_tags.feature"), WithIgnoredTags("@ignore"))
 	suite.AddStep(`fail the test`, fail)
 	suite.Run()
 }
 
 func TestIgnorFeatureWithTags(t *testing.T) {
-	suite := NewSuite(t, WithFeaturesPath("features/ignored_feature_tags.feature"), WithIgnoredTags([]string{"@ignore"}))
+	suite := NewSuite(t, WithFeaturesPath("features/ignored_feature_tags.feature"), WithIgnoredTags("@ignore"))
 	suite.AddStep(`fail the test`, fail)
 	suite.Run()
 }
