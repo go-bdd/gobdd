@@ -28,7 +28,7 @@ Inside `features` folder create your scenarios. Here is an example:
 Feature: math operations
   Scenario: add two digits
     When I add 1 and 2
-    Then I the result should equal 3
+    Then the result should equal 3
 ```
 
 Add a new test `main_test.go`:
@@ -54,7 +54,7 @@ func check(t gobdd.StepTest, ctx gobdd.Context, sum int) {
 func TestScenarios(t *testing.T) {
 	suite := gobdd.NewSuite(t)
 	suite.AddStep(`I add (\d+) and (\d+)`, add)
-	suite.AddStep(`I the result should equal (\d+)`, check)
+	suite.AddStep(`the result should equal (\d+)`, check)
 	suite.Run()
 }
 ```
