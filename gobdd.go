@@ -135,6 +135,13 @@ type TestingT interface {
 // TestingTKey is used to store reference to current *testing.T instance
 type TestingTKey struct{}
 
+// FeatureKey is used to store reference to current *msgs.GherkinDocument_Feature instance
+type FeatureKey struct{}
+
+// ScenarioKey is used to store reference to current *msgs.GherkinDocument_Feature_Scenario instance
+type ScenarioKey struct{}
+
+
 // Creates a new suites with given configuration and empty steps defined
 func NewSuite(t TestingT, optionClosures ...func(*SuiteOptions)) *Suite {
 	options := NewSuiteOptions()
@@ -326,6 +333,9 @@ func (s *Suite) runFeature(feature *msgs.GherkinDocument_Feature) error {
 				continue
 			}
 			ctx := NewContext()
+			ctx.Set(FeatureKey{}, feature)
+			ctx.Set(ScenarioKey{}, scenario)
+
 			s.runScenario(ctx, scenario, bkgSteps, t)
 		}
 	})

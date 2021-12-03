@@ -8,6 +8,7 @@ import (
 
 	msgs "github.com/cucumber/messages-go/v12"
 	"github.com/go-bdd/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestScenarios(t *testing.T) {
@@ -162,6 +163,20 @@ func TestWithAfterStep(t *testing.T) {
 	c := 0
 	suite := NewSuite(t, WithFeaturesPath("features/background.feature"), WithAfterStep(func(ctx Context) {
 		c++
+
+		// feature should be *msgs.GherkinDocument_Feature
+		feature, err := ctx.Get(FeatureKey{})
+		require.NoError(t, err)
+		if _, ok := feature.(*msgs.GherkinDocument_Feature); !ok {
+			t.Errorf("expected feature but got %T", feature)
+		}
+
+		// scenario should be *msgs.GherkinDocument_Feature_Scenario
+		scenario, err := ctx.Get(ScenarioKey{})
+		require.NoError(t, err)
+		if _, ok := scenario.(*msgs.GherkinDocument_Feature_Scenario); !ok {
+			t.Errorf("expected scenario but got %T", scenario)
+		}
 	}))
 	suite.AddStep(`I add (\d+) and (\d+)`, add)
 	suite.AddStep(`the result should equal (\d+)`, check)
