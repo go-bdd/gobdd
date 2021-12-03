@@ -34,6 +34,18 @@ When the data is not provided, the whole test will fail.
 
 The context holds current test state `testing.T`. It is accessible by calling `Context.Get(TestingTKey{})`. This is useful if you need access to the test state from scenario or step hooks.
 
+It is also possible to access references to current feature and scenario by calling `Context.Get(FeatureNameKey{})` and `Context.Get(ScenarioNameKey{})` respectively.
+
+```go
+value, err := ctx.Get(FeatureKey{})
+feature, ok := value.(*msgs.GherkinDocument_Feature)
+```
+
+```go
+value, err := ctx.Get(ScenarioKey{})
+scenario, ok := value.(*msgs.GherkinDocument_Feature_Scenario)
+```
+
 ## Good practices
 
 It's a good practice to use custom structs as keys instead of strings or any built-in types to avoid collisions between steps using context.
