@@ -12,7 +12,7 @@ import (
 	"strings"
 	"testing"
 
-	gherkin "github.com/cucumber/gherkin-go/v13"
+	"github.com/cucumber/gherkin-go/v13"
 	msgs "github.com/cucumber/messages-go/v12"
 )
 
@@ -140,7 +140,6 @@ type FeatureKey struct{}
 
 // ScenarioKey is used to store reference to current *msgs.GherkinDocument_Feature_Scenario instance
 type ScenarioKey struct{}
-
 
 // Creates a new suites with given configuration and empty steps defined
 func NewSuite(t TestingT, optionClosures ...func(*SuiteOptions)) *Suite {

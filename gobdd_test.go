@@ -265,6 +265,14 @@ func TestFailureOutput(t *testing.T) {
 	}
 }
 
+func issue141(t StepTest, ctx Context) {}
+
+func Test_Issue141(t *testing.T) {
+	suite := NewSuite(t, WithFeaturesPath("features/issue141.feature"))
+	suite.AddStep(`The setup with <param1> and <param2> :`, issue141)
+	suite.Run()
+}
+
 func addf(_ StepTest, ctx Context, var1, var2 float32) {
 	res := var1 + var2
 	ctx.Set("sumRes", res)
