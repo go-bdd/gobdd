@@ -54,7 +54,7 @@ type fsFeature struct {
 }
 
 func (f fsFeature) Open() (io.Reader, error) {
-	file, err := f.fs.Open(string(f.file))
+	file, err := f.fs.Open(f.file)
 	if err != nil {
 		return nil, fmt.Errorf("opening feature: %w", err)
 	}
