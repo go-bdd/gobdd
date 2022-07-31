@@ -24,20 +24,19 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: ['1.12', '1.13', '1.14', '1.15', '1.16']
+        go: ['1.12', '1.13', '1.14', '1.15', '1.16', '1.17', '1.18']
     env:
-      VERBOSE: 1
       GOFLAGS: -mod=readonly
       GOPROXY: https://proxy.golang.org
 
     steps:
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go }}
 
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: go generate
         run: go generate
@@ -49,11 +48,13 @@ jobs:
         run: |
           export PATH=$PATH:$(go env GOPATH)/bin   
           go test -v -covermode=count -coverprofile=coverage.out
+
       - name: Convert coverage to lcov
         uses: jandelgado/gcov2lcov-action@v1.0.0
         with:
             infile: coverage.out
             outfile: coverage.lcov
+
       - name: Coveralls
         uses: coverallsapp/github-action@v1.0.1
         with:
