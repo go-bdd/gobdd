@@ -6,12 +6,10 @@ package gobdd
 import (
 	"regexp"
 	"testing"
-
-	"github.com/go-bdd/gobdd/features"
 )
 
 func TestWithFeaturesFS(t *testing.T) {
-	suite := NewSuite(t, WithFeaturesFS(features.Features(), "example.feature"))
+	suite := NewSuite(t, WithFeaturesFS(featuresFS, "example.feature"))
 	compiled := regexp.MustCompile(`I add (\d+) and (\d+)`)
 	suite.AddRegexStep(compiled, add)
 	compiled = regexp.MustCompile(`the result should equal (\d+)`)
