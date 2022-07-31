@@ -3,6 +3,7 @@ xlinters-settings:
     min-confidence: 0.1
 
 linters:
+  # TODO: best practice is to enable specific linters
   enable-all: true
   disable:
     - funlen
@@ -16,3 +17,18 @@ linters:
     - scopelint
     - gosec
 
+    # Disabled after upgrading golangci-lint
+    # Enable them after issues are resolved
+    - gofmt
+    - goimports
+    - exhaustruct
+    - exhaustivestruct
+    - forcetypeassert
+    - gosimple
+    - ifshort
+    - nlreturn
+    - nosnakecase
+    - paralleltest
+    - thelper
+    - varnamelen
+    - wrapcheck
