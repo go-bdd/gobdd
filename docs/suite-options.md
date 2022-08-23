@@ -27,6 +27,8 @@ suite := NewSuite(t, WithFeaturesPath("features/func_types.feature"))
 suite := NewSuite(t, WithFeaturesPath("features/tags.feature"), WithTags([]string{"@tag"}))
 ```
 
+As of Go 1.16 you can embed feature files into the test binary and use `fs.FS` as a feature source:
+
 ```go
 import (
 	"embed"
@@ -39,3 +41,5 @@ var featuresFS embed.FS
 
 suite := NewSuite(t, WithFeaturesFS(featuresFS, "*.feature"))
 ```
+
+While in most cases it doesn't make any difference, embedding feature files makes your tests more portable.
