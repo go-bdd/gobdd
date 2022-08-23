@@ -1,6 +1,6 @@
 module github.com/go-bdd/gobdd
 
-go 1.12
+go 1.16
 
 require (
 	github.com/cucumber/gherkin-go/v13 v13.0.0

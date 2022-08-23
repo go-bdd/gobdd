@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -27,7 +28,7 @@ type Suite struct {
 
 // SuiteOptions holds all the information about how the suite or features/steps should be configured
 type SuiteOptions struct {
-	featuresPaths  string
+	featureSource  featureSource
 	ignoreTags     []string
 	tags           []string
 	beforeScenario []func(ctx Context)
@@ -37,10 +38,46 @@ type SuiteOptions struct {
 	runInParallel  bool
 }
 
+type featureSource interface {
+	loadFeatures() ([]feature, error)
+}
+
+type feature interface {
+	Open() (io.Reader, error)
+}
+
+type pathFeatureSource string
+
+func (s pathFeatureSource) loadFeatures() ([]feature, error) {
+	files, err := filepath.Glob(string(s))
+	if err != nil {
+		return nil, errors.New("cannot find features/ directory")
+	}
+
+	features := make([]feature, 0, len(files))
+
+	for _, f := range files {
+		features = append(features, fileFeature(f))
+	}
+
+	return features, nil
+}
+
+type fileFeature string
+
+func (f fileFeature) Open() (io.Reader, error) {
+	file, err := os.Open(string(f))
+	if err != nil {
+		return nil, fmt.Errorf("cannot open file %s", f)
+	}
+
+	return file, nil
+}
+
 // NewSuiteOptions creates a new suite configuration with default values
 func NewSuiteOptions() SuiteOptions {
 	return SuiteOptions{
-		featuresPaths:  "features/*.feature",
+		featureSource:  pathFeatureSource("features/*.feature"),
 		ignoreTags:     []string{},
 		tags:           []string{},
 		beforeScenario: []func(ctx Context){},
@@ -61,7 +98,7 @@ func RunInParallel() func(*SuiteOptions) {
 // The default value is "features/*.feature"
 func WithFeaturesPath(path string) func(*SuiteOptions) {
 	return func(options *SuiteOptions) {
-		options.featuresPaths = path
+		options.featureSource = pathFeatureSource(path)
 	}
 }
 
@@ -140,7 +177,6 @@ type FeatureKey struct{}
 
 // ScenarioKey is used to store reference to current *msgs.GherkinDocument_Feature_Scenario instance
 type ScenarioKey struct{}
-
 
 // Creates a new suites with given configuration and empty steps defined
 func NewSuite(t TestingT, optionClosures ...func(*SuiteOptions)) *Suite {
@@ -268,32 +304,36 @@ func (s *Suite) Run() {
 		return
 	}
 
-	files, err := filepath.Glob(s.options.featuresPaths)
+	features, err := s.options.featureSource.loadFeatures()
 	if err != nil {
-		s.t.Fatalf("cannot find features/ directory")
+		s.t.Fatalf(err.Error())
 	}
 
 	if s.options.runInParallel {
 		s.t.Parallel()
 	}
 
-	for _, file := range files {
-		err = s.executeFeature(file)
+	for _, feature := range features {
+		err = s.executeFeature(feature)
 		if err != nil {
 			s.t.Fail()
 		}
 	}
 }
 
-func (s *Suite) executeFeature(file string) error {
-	f, err := os.Open(file)
+func (s *Suite) executeFeature(feature feature) error {
+  f, err := feature.Open()
 	if err != nil {
-		return fmt.Errorf("cannot open file %s", file)
+		return err
 	}
-	defer f.Close()
-	fileIO := bufio.NewReader(f)
 
-	doc, err := gherkin.ParseGherkinDocument(fileIO, (&msgs.Incrementing{}).NewId)
+  if closer, ok := f.(io.Closer); ok {
+    defer closer.Close()
+  }
+
+	featureIO := bufio.NewReader(f)
+
+	doc, err := gherkin.ParseGherkinDocument(featureIO, (&msgs.Incrementing{}).NewId)
 	if err != nil {
 		s.t.Fatalf("error while loading document: %s\n", err)
 	}
