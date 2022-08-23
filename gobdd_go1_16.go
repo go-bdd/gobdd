@@ -9,29 +9,23 @@ import (
 	"io/fs"
 )
 
-// WithFeaturesFS configures a filesystem and a pattern (regexp) where features can be found.
-// An empty path defaults to "*.feature"
-func WithFeaturesFS(fs fs.FS, pattern string) func(*SuiteOptions) {
+// WithFeaturesFS configures a filesystem and a path (glob pattern) where features can be found.
+func WithFeaturesFS(fs fs.FS, path string) func(*SuiteOptions) {
 	return func(options *SuiteOptions) {
 		options.featureSource = fsFeatureSource{
 			fs:      fs,
-			pattern: pattern,
+			path: path,
 		}
 	}
 }
 
 type fsFeatureSource struct {
-	fs      fs.FS
-	pattern string
+	fs   fs.FS
+	path string
 }
 
 func (s fsFeatureSource) loadFeatures() ([]feature, error) {
-	pattern := s.pattern
-	if pattern == "" {
-		pattern = "*.feature"
-	}
-
-	files, err := fs.Glob(s.fs, pattern)
+	files, err := fs.Glob(s.fs, s.path)
 	if err != nil {
 		return nil, fmt.Errorf("loading features: %w", err)
 	}
