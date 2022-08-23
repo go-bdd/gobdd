@@ -9,7 +9,7 @@ import (
 )
 
 func TestWithFeaturesFS(t *testing.T) {
-	suite := NewSuite(t, WithFeaturesFS(featuresFS, "example.feature"))
+	suite := NewSuite(t, WithFeaturesFSPattern(featuresFS, "example.feature"))
 	compiled := regexp.MustCompile(`I add (\d+) and (\d+)`)
 	suite.AddRegexStep(compiled, add)
 	compiled = regexp.MustCompile(`the result should equal (\d+)`)
