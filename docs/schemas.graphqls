@@ -1,0 +1,271 @@
+type Article {
+  adTags: [String!]
+  homeSection: HomeSection!
+  id: String!
+  publishDate: String!
+  seoDescription: String!
+  seoTitle: String!
+  storyline: [StorylineElement!]!
+  title: String!
+  type: String!
+  updateDate: String!
+}
+
+enum BoolWithDefault {
+  TRUE
+  FALSE
+  DEFAULT
+}
+
+interface ContentBase {
+  id: String!
+}
+
+type Crop {
+  links(formats: [CropLinkType], widths: [Int]): [CropLink!]!
+  type: CropType!
+}
+
+type CropLink {
+  type: CropLinkType!
+  uri: String!
+  width: Int!
+}
+
+enum CropLinkType {
+  JPG
+  WEBP
+}
+
+enum CropType {
+  _free
+  _1x1
+  _4x3
+  _9x16
+  _16x9
+}
+
+type HomeSection {
+  id: String!
+  name: String!
+}
+
+type Link implements ParagraphExtra {
+  attributions: LinkAttributions!
+  index: Int!
+  length: Int!
+  linkType: LinkType!
+}
+
+type LinkAttributions {
+  newWindow: BoolWithDefault!
+  noFollow: BoolWithDefault!
+  sponsored: BoolWithDefault!
+  uri: String!
+}
+
+enum LinkType {
+  INTERNAL
+  EXTERNAL
+}
+
+scalar Map
+
+type Menus {
+  key: String!
+  settings: [SettingsMenuItem!]!
+}
+
+interface ParagraphExtra {
+  index: Int!
+  length: Int!
+}
+
+type ParagraphExtraBase implements ParagraphExtra {
+  extraType: ParagraphExtraBaseType!
+  index: Int!
+  length: Int!
+}
+
+enum ParagraphExtraBaseType {
+  UNDERLINE
+  ITALIC
+  BOLD
+  STRIKE
+  SUBSCRIPT
+  SUPERSCRIPT
+}
+
+type Picture implements ContentBase {
+  baseMediaUrl: String!
+  id: String!
+  pictureType: PictureType!
+  title: String!
+}
+
+enum PictureType {
+  PICTURE
+  KEYFRAME
+  INFOGRAPHIC
+}
+
+type Query {
+  article(path: String!, publication: String!): Article!
+  settings(path: String!, publication: String!): Settings!
+  videoByID(id: String!, publication: String!): Video!
+}
+
+type Settings {
+  menus: [Menus!]!
+  parameters: SettingsParameters
+  publication: SettingsPublication!
+  section: SettingsSection!
+}
+
+type SettingsMenuItem {
+  href: String!
+  label: String!
+}
+
+type SettingsParameters {
+  analytics: SettingsParametersAnalytics!
+  seo: SettingsParametersSeo!
+}
+
+type SettingsParametersAnalytics {
+  gemius: SettingsParametersAnalyticsGemius!
+  sitename: String!
+  subterminal: String!
+  terminal: String!
+}
+
+type SettingsParametersAnalyticsGemius {
+  id: String!
+  viewId: String!
+}
+
+type SettingsParametersSeo {
+  titlePrefix: String!
+  titleSuffix: String!
+}
+
+type SettingsPublication {
+  id: String!
+  name: String!
+}
+
+type SettingsSection {
+  href: String!
+  name: String!
+  uniqueName: String!
+}
+
+type StorylineCustomSource implements StorylineElement {
+  id: String!
+  source: String!
+}
+
+interface StorylineElement {
+  id: String!
+}
+
+type StorylineHeadline implements StorylineElement {
+  headline: String!
+  id: String!
+}
+
+type StorylineInlineAuthor implements StorylineElement {
+  author: String!
+  id: String!
+}
+
+type StorylineInlineReporter implements StorylineElement {
+  id: String!
+  reporter: String!
+}
+
+type StorylineLeadText implements StorylineElement {
+  id: String!
+  leadText: String!
+}
+
+type StorylineParagraph implements StorylineElement {
+  extra: [ParagraphExtra!]
+  id: String!
+  paragraph: String!
+}
+
+type StorylinePicture implements StorylineElement {
+  crop: Crop!
+  description: String!
+  id: String!
+  source: String!
+  title: String!
+}
+
+type StorylinePullQuote implements StorylineElement {
+  attributions: Map
+  id: String!
+  quote: String!
+}
+
+type StorylineSocialEmbedFacebook implements StorylineElement {
+  html: String!
+  id: String!
+}
+
+type StorylineSocialEmbedGeneric implements StorylineElement {
+  html: String!
+  id: String!
+  provider: String!
+}
+
+type StorylineSocialEmbedInstagram implements StorylineElement {
+  html: String!
+  id: String!
+}
+
+type StorylineSocialEmbedTikTok implements StorylineElement {
+  html: String!
+  id: String!
+}
+
+type StorylineSocialEmbedTwitter implements StorylineElement {
+  html: String!
+  id: String!
+}
+
+type StorylineSubhead implements StorylineElement {
+  id: String!
+  subhead: String!
+}
+
+type StorylineVideo implements StorylineElement {
+  description: String!
+  id: String!
+  source: String!
+  title: String!
+  type: String!
+  video: Video!
+}
+
+type Video implements ContentBase {
+  assets: [VideoAsset!]!
+  description: String!
+  duration: Int!
+  id: String!
+  keyframe: Picture!
+  source: String!
+  title: String!
+}
+
+type VideoAsset {
+  asset: String!
+  format: VideoFormat!
+}
+
+enum VideoFormat {
+  HLS
+  MP4
+}
+

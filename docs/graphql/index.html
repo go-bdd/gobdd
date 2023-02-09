@@ -1,0 +1,3136 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GraphQL API Reference</title>
+    <style>#spectaql{padding:0;margin:0}#spectaql pre{overflow:auto;margin-top:0;margin-bottom:20px}#spectaql pre code{display:block;background:#ccc}#spectaql table{width:100%;table-layout:fixed;text-align:left;border-collapse:collapse}#spectaql table td,#spectaql table th{margin:0;padding:0}#spectaql #introduction .example-section>*,#spectaql .definition-heading,#spectaql .doc-heading,#spectaql .introduction-item-title,#spectaql .operation-heading{overflow:hidden;text-overflow:ellipsis}#spectaql #page{display:flex}#spectaql #page *{box-sizing:border-box}#spectaql #page.drawer-open #sidebar{z-index:1000;transform:translateX(0)}#spectaql #page.drawer-open .drawer-overlay{display:block;background:rgba(0,0,0,.5);z-index:10}#spectaql #sidebar{position:fixed;min-width:250px;max-width:250px;flex-shrink:0;transition:transform .2s ease-out;transform:translateX(-100%);z-index:10;padding-top:20px;background:#fff}@media (min-width:48em){#spectaql #sidebar{position:relative;transform:none}}@media (min-width:64em){#spectaql #sidebar{min-width:300px;max-width:300px}}#spectaql .sidebar-top-container{display:flex;align-items:center;padding:0 20px}#spectaql #mobile-navbar{display:flex;align-items:center;position:sticky;top:0}@media (min-width:48em){#spectaql #mobile-navbar{display:none}}#spectaql .sidebar-open-button{display:flex;align-items:flex-start;margin:0;padding:0;border:none;background:0 0}#spectaql .sidebar-open-button .hamburger{width:16px;height:14px;cursor:pointer}#spectaql .sidebar-open-button .hamburger::after{display:block;content:"";height:2px;background:#222;box-shadow:0 5px 0 #222,0 10px 0 #222}#spectaql .sidebar-open-button .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}#spectaql .close-button{display:block}#spectaql .close-button .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}@media (min-width:48em){#spectaql .close-button{display:none}}#spectaql .drawer-overlay{display:none;position:absolute;top:0;left:0;bottom:0;right:0;background:rgba(0,0,0,0)}@media (min-width:48em){#spectaql .drawer-overlay{display:none!important}}#spectaql #nav{display:flex;flex-direction:column;max-height:calc(100vh - 0px);padding:0 20px;padding-bottom:20px;position:sticky;top:0;overflow:auto}#spectaql #logo{margin-right:auto}#spectaql #logo img{display:block;width:100%;max-width:100%}#spectaql .nav-group-items,#spectaql .nav-group-section-items{padding:0;margin:0}#spectaql .nav-group-items>li,#spectaql .nav-group-section-items>li{list-style:none}#spectaql .nav-group-items .nav-group-section-title,#spectaql .nav-group-items>li,#spectaql .nav-group-section-items .nav-group-section-title,#spectaql .nav-group-section-items>li{overflow:hidden;text-overflow:ellipsis}#spectaql .nav-group-section-items{display:none}#spectaql .nav-scroll-expand .nav-group-section-items{display:block}#spectaql #docs{position:relative;margin:0 auto;min-width:100px;max-width:88em;flex-grow:1;flex-shrink:1;padding:20px}@media (min-width:48em){#spectaql .doc-row{display:flex;flex-wrap:wrap}}#spectaql .doc-row .doc-copy,#spectaql .doc-row .doc-examples{width:100%}@media (min-width:48em){#spectaql .doc-row .doc-copy,#spectaql .doc-row .doc-examples{width:50%}}@media (min-width:48em){#spectaql .doc-row .doc-copy{padding-right:20px}}@media (min-width:48em){#spectaql .doc-row .doc-examples{padding-left:20px}}.hljs{display:block;overflow-x:auto;padding:.5em;background:#23241f}.hljs,.hljs-subst,.hljs-tag{color:#f8f8f2}.hljs-emphasis,.hljs-strong{color:#a8a8a2}.hljs-bullet,.hljs-link,.hljs-literal,.hljs-number,.hljs-quote,.hljs-regexp{color:#ae81ff}.hljs-code,.hljs-section,.hljs-selector-class,.hljs-title{color:#a6e22e}.hljs-strong{font-weight:700}.hljs-emphasis{font-style:italic}.hljs-attr,.hljs-keyword,.hljs-name,.hljs-selector-tag{color:#f92672}.hljs-attribute,.hljs-symbol{color:#66d9ef}.hljs-class .hljs-title,.hljs-params{color:#f8f8f2}.hljs-addition,.hljs-built_in,.hljs-builtin-name,.hljs-selector-attr,.hljs-selector-id,.hljs-selector-pseudo,.hljs-string,.hljs-template-variable,.hljs-type,.hljs-variable{color:#e6db74}.hljs-comment,.hljs-deletion,.hljs-meta{color:#75715e}#spectaql{font-family:-apple-system,BlinkMacSystemFont,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";font-size:14px;line-height:1.6;background:#fff;color:#222}@media (min-width:32em){#spectaql{font-size:16px}}#spectaql a{color:#0298bf;text-decoration:none}#spectaql a:hover{color:#0182a2}#spectaql a:active,#spectaql a:focus{color:#0298bf}#spectaql code{font-size:.875em;font-family:Consolas,Monaco,Andale Mono,Ubuntu Mono,monospace}#spectaql pre{color:#fff}#spectaql pre code{background:#222}#spectaql pre code,#spectaql pre code.hljs{font-size:.82em;line-height:1.4;padding:15px 20px}#spectaql .doc-heading{line-height:1.2;font-size:2.25em;margin-top:10px}@media (min-width:48em){#spectaql .doc-heading{margin-top:-10px}}#spectaql .close-button{background:0 0;border:none;padding:5px;font-size:16px;font-weight:700;color:#222}#spectaql #introduction{margin-bottom:60px}#spectaql #introduction .example-section:not(.example-section-is-code){margin-bottom:20px}#spectaql #introduction .example-section:not(.example-section-is-code) h5,#spectaql #introduction .example-section:not(.example-section-is-code) p{margin:0;font-size:1em}#spectaql #docs,#spectaql #mobile-navbar,#spectaql #sidebar{padding-top:20px;padding-bottom:20px}@media (min-width:32em){#spectaql #docs,#spectaql #mobile-navbar,#spectaql #sidebar{padding-top:30px;padding-bottom:30px}}@media (min-width:48em){#spectaql #docs,#spectaql #mobile-navbar,#spectaql #sidebar{padding-top:40px;padding-bottom:40px}}#spectaql #docs,#spectaql #mobile-navbar,#spectaql #nav,#spectaql .sidebar-top-container{padding-left:20px;padding-right:20px}@media (min-width:32em){#spectaql #docs,#spectaql #mobile-navbar,#spectaql #nav,#spectaql .sidebar-top-container{padding-left:30px;padding-right:30px}}@media (min-width:48em){#spectaql #docs,#spectaql #mobile-navbar,#spectaql #nav,#spectaql .sidebar-top-container{padding-left:50px;padding-right:50px}}#spectaql #sidebar{padding-bottom:0;background:#fff}#spectaql #sidebar a{color:#222}#spectaql #sidebar a.nav-scroll-active,#spectaql #sidebar a:hover{font-weight:700}#spectaql #sidebar a.nav-scroll-active{color:#222}#spectaql #sidebar a:hover{color:#0182a2}@media (min-width:48em){#spectaql #sidebar{border-right:2px solid #d8d8d8}}#spectaql #mobile-navbar{background:#fff;margin-top:-20px;margin-left:-20px;margin-right:-20px}@media (min-width:32em){#spectaql #mobile-navbar{margin-top:-30px;margin-left:-30px;margin-right:-30px}}#spectaql #mobile-navbar .sidebar-open-button::after{display:block;content:"All Topics";margin-left:10px;color:#222}#spectaql #nav .nav-group{margin-top:20px}#spectaql #nav .nav-group li{margin-bottom:5px}#spectaql #nav .nav-group-title{font-size:.875em;font-weight:400;margin:0 0 6px 0;color:#999}#spectaql #nav .nav-group-section-title{font-size:inherit;margin:0;margin-bottom:5px;font-weight:400}#spectaql #nav .nav-group-section-items{margin-left:.75em}#spectaql .definition,#spectaql .operation{margin-bottom:60px}#spectaql .definition .definition-heading,#spectaql .definition .operation-heading,#spectaql .operation .definition-heading,#spectaql .operation .operation-heading{font-size:1.72em}#spectaql .definition .definition-heading code,#spectaql .definition .operation-heading code,#spectaql .operation .definition-heading code,#spectaql .operation .operation-heading code{font-family:inherit;font-size:inherit;font-weight:inherit}@media (min-width:32em){#spectaql .definition .definition-heading,#spectaql .definition .operation-heading,#spectaql .operation .definition-heading,#spectaql .operation .operation-heading{font-size:2.25em}}#spectaql .definition-group-name,#spectaql .group-heading,#spectaql .operation-group-name{border-top:2px solid #d8d8d8;padding-top:3px;color:#999;font-size:inherit;font-weight:inherit}#spectaql .definition-group-name a,#spectaql .group-heading a,#spectaql .operation-group-name a{color:#999}#spectaql .definition-group-name a:hover,#spectaql .group-heading a:hover,#spectaql .operation-group-name a:hover{font-weight:700}#spectaql .doc-examples{margin-top:20px}#spectaql .doc-examples .example-heading{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}#spectaql .doc-examples .example-section-is-code h5{color:#999;text-transform:uppercase;background:#000;font-size:.75em;font-weight:700;padding:.6em 0 .6em 20px;margin:0;opacity:1}@media (min-width:48em){#spectaql .doc-examples{margin-top:0}}#spectaql .doc-copy p{margin:0 0 20px 0}#spectaql .doc-copy p:last-child{margin-bottom:0}#spectaql .doc-copy table tr th{font-weight:400;border-bottom:2px solid #d8d8d8}#spectaql .doc-copy table tr td{border-bottom:1px solid #e0e0e0}#spectaql .doc-copy table tr.row-has-field-arguments td,#spectaql .doc-copy table tr:last-child td{border-bottom:none}#spectaql .doc-copy table tr td,#spectaql .doc-copy table tr th{padding:5px}#spectaql .doc-copy table tr td:first-child,#spectaql .doc-copy table tr th:first-child{padding-left:0}#spectaql .doc-copy table tr td:last-child,#spectaql .doc-copy table tr th:last-child{padding-right:0}#spectaql .doc-copy .doc-copy-section{margin-bottom:30px}#spectaql .doc-copy .doc-copy-section>h5{margin:0 0 5px 0;font-size:inherit;font-weight:inherit;color:#999}#spectaql .doc-copy .definition-description>h5,#spectaql .doc-copy .definition-properties>h5,#spectaql .doc-copy .operation-description>h5{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}#spectaql .field-arguments{font-size:.875em;background-color:#fafbfc;border:1px solid #e0e0e0;padding:10px;margin-bottom:5px}#spectaql .field-arguments p{margin:10px 0 0 0}#spectaql .field-arguments h5.field-arguments-heading{margin:0;padding:0 0 10px 0;font-weight:inherit;color:#999}#spectaql .field-arguments .field-argument{border-top:1px #e0e0e0 solid;padding:10px 0}#spectaql .field-arguments .field-argument:last-child{padding-bottom:0}#spectaql .field-arguments .field-argument-name{margin:0;font-size:inherit;font-weight:inherit}#spectaql .deprecation-reason{word-break:break-word}#spectaql .deprecation-reason::before{display:inline;content:"Deprecated";padding:2px 5px;margin-right:5px;background:#fed7d8;color:#c60609;font-weight:700;font-size:.875em}</style>
+    <script>"use strict";function scrollSpy(){var c=5,e=document.querySelector("html"),l=(e&&(e=window.getComputedStyle(e).scrollPaddingTop)&&"string"==typeof e&&"auto"!==e&&e.endsWith("px")&&(c+=parseInt(e.split("px")[0])),"nav-scroll-active"),i=null,d=[];function t(){i=null;var e=document.querySelectorAll("[data-traverse-target]");Array.prototype.forEach.call(e,function(e){d.push({id:e.id,top:e.offsetTop})})}var n=debounce(function(){t(),o()},500),o=debounce(function(){var e,t,n,o,r=function(e){for(var t=e+c,n=0;n<d.length;n++){var o=d[n+1];if(t>=d[n].top&&(!o||t<o.top))return n}return-1}(document.documentElement.scrollTop||document.body.scrollTop);r!==i&&(r=d[i=r],e=document.querySelector("."+l),t=s(r=r?document.querySelector("#nav a[href*="+r.id+"]"):null),n=(o=s(e))!==t,o&&n&&u(o,!1),t&&n&&u(t,!0),r&&(r.classList.add(l),r.scrollIntoViewIfNeeded?r.scrollIntoViewIfNeeded():!r.scrollIntoView||0<=(o=(o=r).getBoundingClientRect()).top&&0<=o.left&&o.bottom<=(window.innerHeight||document.documentElement.clientHeight)&&o.right<=(window.innerWidth||document.documentElement.clientWidth)||r.scrollIntoView({block:"center",inline:"start"})),e)&&e.classList.remove(l)},100);function u(e,t){for(var n=t?"add":"remove";e;)e.classList[n]("nav-scroll-expand"),e=s(e.parentNode)}function s(e){return e&&e.closest?e.closest(".nav-group-section"):null}setTimeout(function(){t(),o(),window.addEventListener("scroll",o),window.addEventListener("resize",n)},300)}function toggleMenu(){var t="drawer-open",e=document.querySelector("#spectaql .sidebar-open-button"),n=document.querySelector("#spectaql #sidebar .close-button"),o=document.querySelector("#spectaql .drawer-overlay");function r(){var e=document.querySelector("#spectaql #page");e.classList.contains(t)?e.classList.remove(t):e.classList.add(t)}e.addEventListener("click",r),n.addEventListener("click",r),o.addEventListener("click",r)}function debounce(e,t){var n=null;return function(){clearTimeout(n),n=setTimeout(function(){e.apply(null)},t)}}window.addEventListener("DOMContentLoaded",e=>{toggleMenu(),scrollSpy()});</script>
+  </head>
+  <body id="spectaql">
+    <div id="page" class="drawer-layout">
+      <div id="sidebar">
+        <div class="sidebar-top-container">
+          <div id="logo">
+          </div>
+          <button class="close-button" type="button">
+            <span aria-hidden="true">×</span>
+            <span class="sr-only">Close menu</span>
+          </button>
+        </div>
+        <nav id="nav" role="navigation">
+          <div class="nav-group">
+            <h4 class="nav-group-title">Introduction</h4>
+            <ul class="nav-group-items">
+              <li><a href="#introduction">Welcome</a></li>
+            </ul>
+          </div>
+          <div class="nav-group">
+            <h4 class="nav-group-title">Operations</h4>
+            <ul class="nav-group-items">
+              <li class="nav-group-section">
+                <h5 class="nav-group-section-title">
+                  <a href="#group-Operations-Queries">Queries</a>
+                </h5>
+                <ul class="nav-group-section-items">
+                  <li><a href="#query-article">article</a></li>
+                  <li><a href="#query-settings">settings</a></li>
+                  <li><a href="#query-videoByID">videoByID</a></li>
+                </ul>
+              </li>
+              <li><a href="#"></a></li>
+              <li><a href="#"></a></li>
+            </ul>
+          </div>
+          <div class="nav-group">
+            <h4 class="nav-group-title">Types</h4>
+            <ul class="nav-group-items">
+              <li><a href="#definition-Article">Article</a></li>
+              <li><a href="#definition-BoolWithDefault">BoolWithDefault</a></li>
+              <li><a href="#definition-Boolean">Boolean</a></li>
+              <li><a href="#definition-ContentBase">ContentBase</a></li>
+              <li><a href="#definition-Crop">Crop</a></li>
+              <li><a href="#definition-CropLink">CropLink</a></li>
+              <li><a href="#definition-CropLinkType">CropLinkType</a></li>
+              <li><a href="#definition-CropType">CropType</a></li>
+              <li><a href="#definition-HomeSection">HomeSection</a></li>
+              <li><a href="#definition-Int">Int</a></li>
+              <li><a href="#definition-Link">Link</a></li>
+              <li><a href="#definition-LinkAttributions">LinkAttributions</a></li>
+              <li><a href="#definition-LinkType">LinkType</a></li>
+              <li><a href="#definition-Map">Map</a></li>
+              <li><a href="#definition-Menus">Menus</a></li>
+              <li><a href="#definition-ParagraphExtra">ParagraphExtra</a></li>
+              <li><a href="#definition-ParagraphExtraBase">ParagraphExtraBase</a></li>
+              <li><a href="#definition-ParagraphExtraBaseType">ParagraphExtraBaseType</a></li>
+              <li><a href="#definition-Picture">Picture</a></li>
+              <li><a href="#definition-PictureType">PictureType</a></li>
+              <li><a href="#definition-Settings">Settings</a></li>
+              <li><a href="#definition-SettingsMenuItem">SettingsMenuItem</a></li>
+              <li><a href="#definition-SettingsParameters">SettingsParameters</a></li>
+              <li><a href="#definition-SettingsParametersAnalytics">SettingsParametersAnalytics</a></li>
+              <li><a href="#definition-SettingsParametersAnalyticsGemius">SettingsParametersAnalyticsGemius</a></li>
+              <li><a href="#definition-SettingsParametersSeo">SettingsParametersSeo</a></li>
+              <li><a href="#definition-SettingsPublication">SettingsPublication</a></li>
+              <li><a href="#definition-SettingsSection">SettingsSection</a></li>
+              <li><a href="#definition-StorylineCustomSource">StorylineCustomSource</a></li>
+              <li><a href="#definition-StorylineElement">StorylineElement</a></li>
+              <li><a href="#definition-StorylineHeadline">StorylineHeadline</a></li>
+              <li><a href="#definition-StorylineInlineAuthor">StorylineInlineAuthor</a></li>
+              <li><a href="#definition-StorylineInlineReporter">StorylineInlineReporter</a></li>
+              <li><a href="#definition-StorylineLeadText">StorylineLeadText</a></li>
+              <li><a href="#definition-StorylineParagraph">StorylineParagraph</a></li>
+              <li><a href="#definition-StorylinePicture">StorylinePicture</a></li>
+              <li><a href="#definition-StorylinePullQuote">StorylinePullQuote</a></li>
+              <li><a href="#definition-StorylineSocialEmbedFacebook">StorylineSocialEmbedFacebook</a></li>
+              <li><a href="#definition-StorylineSocialEmbedGeneric">StorylineSocialEmbedGeneric</a></li>
+              <li><a href="#definition-StorylineSocialEmbedInstagram">StorylineSocialEmbedInstagram</a></li>
+              <li><a href="#definition-StorylineSocialEmbedTikTok">StorylineSocialEmbedTikTok</a></li>
+              <li><a href="#definition-StorylineSocialEmbedTwitter">StorylineSocialEmbedTwitter</a></li>
+              <li><a href="#definition-StorylineSubhead">StorylineSubhead</a></li>
+              <li><a href="#definition-StorylineVideo">StorylineVideo</a></li>
+              <li><a href="#definition-String">String</a></li>
+              <li><a href="#definition-Video">Video</a></li>
+              <li><a href="#definition-VideoAsset">VideoAsset</a></li>
+              <li><a href="#definition-VideoFormat">VideoFormat</a></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+      <div id="docs">
+        <div id="mobile-navbar">
+          <button class="sidebar-open-button" type="button">
+            <span class="hamburger"></span>
+            <span class="sr-only">All topics</span>
+          </button>
+        </div>
+        <article id="content">
+          <h1 class="doc-heading"></h1>
+          <div id="introduction" data-traverse-target="introduction">
+            <div id="welcome" class="doc-row">
+              <div class="doc-copy">
+                <p>Geralt GraphQL docs</p>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section welcome-api-endpoints-section example-section-is-code">
+                  <h5>API Endpoints</h5>
+                  <pre><code>http://localhost:9000/graphql</code></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+          <h1 id="group-Operations-Queries" class="group-heading" data-traverse-target="group-Operations-Queries">Queries</h1>
+          <section id="query-article" class="operation operation-query" data-traverse-target="query-article">
+            <h2 class="operation-heading ">
+              <code>article</code>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-response doc-copy-section">
+                  <h5>Response</h5>
+                  <p> Returns an <a href="#definition-Article"><code>Article!</code></a>
+                  </p>
+                </div>
+                <div class="operation-arguments doc-copy-section">
+                  <h5>Arguments</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <span class="property-name"><code>publication</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <span class="property-name"><code>path</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <h4 class="example-heading">Example</h4>
+                <div class="example-section example-section-is-code operation-query-example">
+                  <h5>Query</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">query</span> article<span class="hljs-tag">(
+  <span class="hljs-code">$publication</span>:<span class="hljs-type"> String!</span>,
+  <span class="hljs-code">$path</span>:<span class="hljs-type"> String!</span>
+)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">article<span class="hljs-tag">(
+    publication: <span class="hljs-code">$publication</span>,
+    path: <span class="hljs-code">$path</span>
+  )</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">type</span>
+    <span class="hljs-symbol">title</span>
+    <span class="hljs-symbol">seoTitle</span>
+    <span class="hljs-symbol">seoDescription</span>
+    <span class="hljs-symbol">publishDate</span>
+    <span class="hljs-symbol">updateDate</span>
+    <span class="hljs-symbol">adTags</span>
+    <span class="hljs-symbol">homeSection <span class="hljs-tag">{
+      <span class="hljs-type">...HomeSectionFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">storyline <span class="hljs-tag">{
+      <span class="hljs-type">...StorylineElementFragment</span>
+    }</span></span>
+  }</span></span>
+}</span></span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+                <div class="example-section example-section-is-code operation-variables-example">
+                  <h5>Variables</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"publication"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"path"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+                <div class="example-section example-section-is-code operation-response-example">
+                  <h5>Response</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"data"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"article"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"title"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"seoTitle"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"seoDescription"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"publishDate"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"updateDate"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"adTags"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"homeSection"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">HomeSection</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"storyline"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">StorylineElement</span><span class="hljs-punctuation">]</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="query-settings" class="operation operation-query" data-traverse-target="query-settings">
+            <div class="operation-group-name">
+              <a href="#group-Operations-Queries">Queries</a>
+            </div>
+            <h2 class="operation-heading ">
+              <code>settings</code>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-response doc-copy-section">
+                  <h5>Response</h5>
+                  <p> Returns a <a href="#definition-Settings"><code>Settings!</code></a>
+                  </p>
+                </div>
+                <div class="operation-arguments doc-copy-section">
+                  <h5>Arguments</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <span class="property-name"><code>publication</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <span class="property-name"><code>path</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <h4 class="example-heading">Example</h4>
+                <div class="example-section example-section-is-code operation-query-example">
+                  <h5>Query</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">query</span> settings<span class="hljs-tag">(
+  <span class="hljs-code">$publication</span>:<span class="hljs-type"> String!</span>,
+  <span class="hljs-code">$path</span>:<span class="hljs-type"> String!</span>
+)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">settings<span class="hljs-tag">(
+    publication: <span class="hljs-code">$publication</span>,
+    path: <span class="hljs-code">$path</span>
+  )</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">section <span class="hljs-tag">{
+      <span class="hljs-type">...SettingsSectionFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">publication <span class="hljs-tag">{
+      <span class="hljs-type">...SettingsPublicationFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">parameters <span class="hljs-tag">{
+      <span class="hljs-type">...SettingsParametersFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">menus <span class="hljs-tag">{
+      <span class="hljs-type">...MenusFragment</span>
+    }</span></span>
+  }</span></span>
+}</span></span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+                <div class="example-section example-section-is-code operation-variables-example">
+                  <h5>Variables</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"publication"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"path"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+                <div class="example-section example-section-is-code operation-response-example">
+                  <h5>Response</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"data"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"settings"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">"section"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">SettingsSection</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"publication"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">SettingsPublication</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"parameters"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">SettingsParameters</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"menus"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">Menus</span><span class="hljs-punctuation">]</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="query-videoByID" class="operation operation-query" data-traverse-target="query-videoByID">
+            <div class="operation-group-name">
+              <a href="#group-Operations-Queries">Queries</a>
+            </div>
+            <h2 class="operation-heading ">
+              <code>videoByID</code>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-response doc-copy-section">
+                  <h5>Response</h5>
+                  <p> Returns a <a href="#definition-Video"><code>Video!</code></a>
+                  </p>
+                </div>
+                <div class="operation-arguments doc-copy-section">
+                  <h5>Arguments</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <span class="property-name"><code>publication</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <h4 class="example-heading">Example</h4>
+                <div class="example-section example-section-is-code operation-query-example">
+                  <h5>Query</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">query</span> videoByID<span class="hljs-tag">(
+  <span class="hljs-code">$publication</span>:<span class="hljs-type"> String!</span>,
+  <span class="hljs-code">$id</span>:<span class="hljs-type"> String!</span>
+)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">videoByID<span class="hljs-tag">(
+    publication: <span class="hljs-code">$publication</span>,
+    id: <span class="hljs-code">$id</span>
+  )</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">title</span>
+    <span class="hljs-symbol">description</span>
+    <span class="hljs-symbol">source</span>
+    <span class="hljs-symbol">keyframe <span class="hljs-tag">{
+      <span class="hljs-type">...PictureFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">duration</span>
+    <span class="hljs-symbol">assets <span class="hljs-tag">{
+      <span class="hljs-type">...VideoAssetFragment</span>
+    }</span></span>
+  }</span></span>
+}</span></span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+                <div class="example-section example-section-is-code operation-variables-example">
+                  <h5>Variables</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"publication"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+                <div class="example-section example-section-is-code operation-response-example">
+                  <h5>Response</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"data"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"videoByID"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"title"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"description"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"source"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"keyframe"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">Picture</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"duration"</span><span class="hljs-punctuation">:</span> <span class="hljs-number">123</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"assets"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">VideoAsset</span><span class="hljs-punctuation">]</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <h1 id="group-Types" class="group-heading" data-traverse-target="group-Types">Types</h1>
+          <section id="definition-Article" class="definition definition-object" data-traverse-target="definition-Article">
+            <h2 class="definition-heading">Article</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>type</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>title</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>seoTitle</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>seoDescription</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>publishDate</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>updateDate</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>adTags</code></span> - <span class="property-type"><a href="#definition-String"><code>[String!]</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>homeSection</code></span> - <span class="property-type"><a href="#definition-HomeSection"><code>HomeSection!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>storyline</code></span> - <span class="property-type"><a href="#definition-StorylineElement"><code>[StorylineElement!]!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"title"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"seoTitle"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"seoDescription"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"publishDate"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"updateDate"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"adTags"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"homeSection"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">HomeSection</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"storyline"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">StorylineElement</span><span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-BoolWithDefault" class="definition definition-enum" data-traverse-target="definition-BoolWithDefault">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">BoolWithDefault</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Values</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Enum Value</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <p><code>TRUE</code></p>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><code>FALSE</code></p>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><code>DEFAULT</code></p>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-gql"><span class="hljs-symbol">"TRUE"</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-Boolean" class="definition definition-scalar" data-traverse-target="definition-Boolean">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">Boolean</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>The <code>Boolean</code> scalar type represents <code>true</code> or <code>false</code>.</p>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-literal"><span class="hljs-keyword">true</span></span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-ContentBase" class="definition definition-interface" data-traverse-target="definition-ContentBase">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">ContentBase</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties definition-fields doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="definition-properties definition-possible-types doc-copy-section">
+                  <h5>Possible Types</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>ContentBase Types</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <p><a href="#definition-Video"><code>Video</code></a></p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><a href="#definition-Picture"><code>Picture</code></a></p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span><span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-Crop" class="definition definition-object" data-traverse-target="definition-Crop">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">Crop</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>type</code></span> - <span class="property-type"><a href="#definition-CropType"><code>CropType!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr class="row-has-field-arguments">
+                        <td data-property-name=""><span class="property-name"><code>links</code></span> - <span class="property-type"><a href="#definition-CropLink"><code>[CropLink!]!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr class="row-field-arguments">
+                        <td colspan="2">
+                          <div class="field-arguments">
+                            <h5 class="field-arguments-heading"> Arguments </h5>
+                            <div class="field-argument-list">
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>formats</code></span> - <span class="property-type"><a href="#definition-CropLinkType"><code>[CropLinkType]</code></a></span>
+                                </h6>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>widths</code></span> - <span class="property-type"><a href="#definition-Int"><code>[Int]</code></a></span>
+                                </h6>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span><span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"_free"</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">"links"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">CropLink</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-CropLink" class="definition definition-object" data-traverse-target="definition-CropLink">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">CropLink</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>type</code></span> - <span class="property-type"><a href="#definition-CropLinkType"><code>CropLinkType!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>uri</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>width</code></span> - <span class="property-type"><a href="#definition-Int"><code>Int!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"JPG"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"uri"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"width"</span><span class="hljs-punctuation">:</span> <span class="hljs-number">123</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-CropLinkType" class="definition definition-enum" data-traverse-target="definition-CropLinkType">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">CropLinkType</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Values</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Enum Value</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <p><code>JPG</code></p>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><code>WEBP</code></p>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-gql"><span class="hljs-symbol">"JPG"</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-CropType" class="definition definition-enum" data-traverse-target="definition-CropType">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">CropType</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Values</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Enum Value</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <p><code>_free</code></p>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><code>_1x1</code></p>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><code>_4x3</code></p>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><code>_9x16</code></p>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><code>_16x9</code></p>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-gql"><span class="hljs-symbol">"_free"</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-HomeSection" class="definition definition-object" data-traverse-target="definition-HomeSection">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">HomeSection</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>name</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-Int" class="definition definition-scalar" data-traverse-target="definition-Int">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">Int</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>The <code>Int</code> scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.</p>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-number">123</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-Link" class="definition definition-object" data-traverse-target="definition-Link">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">Link</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>linkType</code></span> - <span class="property-type"><a href="#definition-LinkType"><code>LinkType!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>index</code></span> - <span class="property-type"><a href="#definition-Int"><code>Int!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>length</code></span> - <span class="property-type"><a href="#definition-Int"><code>Int!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>attributions</code></span> - <span class="property-type"><a href="#definition-LinkAttributions"><code>LinkAttributions!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"linkType"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"INTERNAL"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"index"</span><span class="hljs-punctuation">:</span> <span class="hljs-number">123</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"length"</span><span class="hljs-punctuation">:</span> <span class="hljs-number">123</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"attributions"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">LinkAttributions</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-LinkAttributions" class="definition definition-object" data-traverse-target="definition-LinkAttributions">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">LinkAttributions</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>uri</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>newWindow</code></span> - <span class="property-type"><a href="#definition-BoolWithDefault"><code>BoolWithDefault!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>noFollow</code></span> - <span class="property-type"><a href="#definition-BoolWithDefault"><code>BoolWithDefault!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>sponsored</code></span> - <span class="property-type"><a href="#definition-BoolWithDefault"><code>BoolWithDefault!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"uri"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"newWindow"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"TRUE"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"noFollow"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"TRUE"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"sponsored"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"TRUE"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-LinkType" class="definition definition-enum" data-traverse-target="definition-LinkType">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">LinkType</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Values</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Enum Value</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <p><code>INTERNAL</code></p>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><code>EXTERNAL</code></p>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-gql"><span class="hljs-symbol">"INTERNAL"</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-Map" class="definition definition-scalar" data-traverse-target="definition-Map">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">Map</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-gql"><span class="hljs-symbol">Map</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-Menus" class="definition definition-object" data-traverse-target="definition-Menus">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">Menus</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>key</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>settings</code></span> - <span class="property-type"><a href="#definition-SettingsMenuItem"><code>[SettingsMenuItem!]!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"key"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"settings"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">SettingsMenuItem</span><span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-ParagraphExtra" class="definition definition-interface" data-traverse-target="definition-ParagraphExtra">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">ParagraphExtra</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties definition-fields doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>index</code></span> - <span class="property-type"><a href="#definition-Int"><code>Int!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>length</code></span> - <span class="property-type"><a href="#definition-Int"><code>Int!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="definition-properties definition-possible-types doc-copy-section">
+                  <h5>Possible Types</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>ParagraphExtra Types</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <p><a href="#definition-ParagraphExtraBase"><code>ParagraphExtraBase</code></a></p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><a href="#definition-Link"><code>Link</code></a></p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span><span class="hljs-attr">"index"</span><span class="hljs-punctuation">:</span> <span class="hljs-number">987</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">"length"</span><span class="hljs-punctuation">:</span> <span class="hljs-number">987</span><span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-ParagraphExtraBase" class="definition definition-object" data-traverse-target="definition-ParagraphExtraBase">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">ParagraphExtraBase</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>extraType</code></span> - <span class="property-type"><a href="#definition-ParagraphExtraBaseType"><code>ParagraphExtraBaseType!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>index</code></span> - <span class="property-type"><a href="#definition-Int"><code>Int!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>length</code></span> - <span class="property-type"><a href="#definition-Int"><code>Int!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span><span class="hljs-attr">"extraType"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"UNDERLINE"</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">"index"</span><span class="hljs-punctuation">:</span> <span class="hljs-number">123</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">"length"</span><span class="hljs-punctuation">:</span> <span class="hljs-number">123</span><span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-ParagraphExtraBaseType" class="definition definition-enum" data-traverse-target="definition-ParagraphExtraBaseType">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">ParagraphExtraBaseType</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Values</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Enum Value</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <p><code>UNDERLINE</code></p>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><code>ITALIC</code></p>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><code>BOLD</code></p>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><code>STRIKE</code></p>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><code>SUBSCRIPT</code></p>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><code>SUPERSCRIPT</code></p>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-gql"><span class="hljs-symbol">"UNDERLINE"</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-Picture" class="definition definition-object" data-traverse-target="definition-Picture">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">Picture</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>pictureType</code></span> - <span class="property-type"><a href="#definition-PictureType"><code>PictureType!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>baseMediaUrl</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>title</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"pictureType"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"PICTURE"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"baseMediaUrl"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"title"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-PictureType" class="definition definition-enum" data-traverse-target="definition-PictureType">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">PictureType</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Values</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Enum Value</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <p><code>PICTURE</code></p>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><code>KEYFRAME</code></p>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><code>INFOGRAPHIC</code></p>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-gql"><span class="hljs-symbol">"PICTURE"</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-Settings" class="definition definition-object" data-traverse-target="definition-Settings">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">Settings</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>section</code></span> - <span class="property-type"><a href="#definition-SettingsSection"><code>SettingsSection!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>publication</code></span> - <span class="property-type"><a href="#definition-SettingsPublication"><code>SettingsPublication!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>parameters</code></span> - <span class="property-type"><a href="#definition-SettingsParameters"><code>SettingsParameters</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>menus</code></span> - <span class="property-type"><a href="#definition-Menus"><code>[Menus!]!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"section"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">SettingsSection</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"publication"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">SettingsPublication</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"parameters"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">SettingsParameters</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"menus"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">Menus</span><span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-SettingsMenuItem" class="definition definition-object" data-traverse-target="definition-SettingsMenuItem">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">SettingsMenuItem</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>label</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>href</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"label"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"href"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-SettingsParameters" class="definition definition-object" data-traverse-target="definition-SettingsParameters">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">SettingsParameters</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>seo</code></span> - <span class="property-type"><a href="#definition-SettingsParametersSeo"><code>SettingsParametersSeo!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>analytics</code></span> - <span class="property-type"><a href="#definition-SettingsParametersAnalytics"><code>SettingsParametersAnalytics!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"seo"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">SettingsParametersSeo</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"analytics"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">SettingsParametersAnalytics</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-SettingsParametersAnalytics" class="definition definition-object" data-traverse-target="definition-SettingsParametersAnalytics">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">SettingsParametersAnalytics</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>terminal</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>subterminal</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>sitename</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>gemius</code></span> - <span class="property-type"><a href="#definition-SettingsParametersAnalyticsGemius"><code>SettingsParametersAnalyticsGemius!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"terminal"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"subterminal"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"sitename"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"gemius"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">SettingsParametersAnalyticsGemius</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-SettingsParametersAnalyticsGemius" class="definition definition-object" data-traverse-target="definition-SettingsParametersAnalyticsGemius">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">SettingsParametersAnalyticsGemius</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>viewId</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"viewId"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-SettingsParametersSeo" class="definition definition-object" data-traverse-target="definition-SettingsParametersSeo">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">SettingsParametersSeo</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>titlePrefix</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>titleSuffix</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"titlePrefix"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"titleSuffix"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-SettingsPublication" class="definition definition-object" data-traverse-target="definition-SettingsPublication">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">SettingsPublication</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>name</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-SettingsSection" class="definition definition-object" data-traverse-target="definition-SettingsSection">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">SettingsSection</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>name</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>uniqueName</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>href</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"uniqueName"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"href"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-StorylineCustomSource" class="definition definition-object" data-traverse-target="definition-StorylineCustomSource">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">StorylineCustomSource</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>source</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"source"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-StorylineElement" class="definition definition-interface" data-traverse-target="definition-StorylineElement">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">StorylineElement</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties definition-fields doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="definition-properties definition-possible-types doc-copy-section">
+                  <h5>Possible Types</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>StorylineElement Types</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <p><a href="#definition-StorylineHeadline"><code>StorylineHeadline</code></a></p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><a href="#definition-StorylineLeadText"><code>StorylineLeadText</code></a></p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><a href="#definition-StorylineSubhead"><code>StorylineSubhead</code></a></p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><a href="#definition-StorylineParagraph"><code>StorylineParagraph</code></a></p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><a href="#definition-StorylinePullQuote"><code>StorylinePullQuote</code></a></p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><a href="#definition-StorylineInlineAuthor"><code>StorylineInlineAuthor</code></a></p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><a href="#definition-StorylineCustomSource"><code>StorylineCustomSource</code></a></p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><a href="#definition-StorylineVideo"><code>StorylineVideo</code></a></p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><a href="#definition-StorylineInlineReporter"><code>StorylineInlineReporter</code></a></p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><a href="#definition-StorylineSocialEmbedGeneric"><code>StorylineSocialEmbedGeneric</code></a></p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><a href="#definition-StorylineSocialEmbedFacebook"><code>StorylineSocialEmbedFacebook</code></a></p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><a href="#definition-StorylineSocialEmbedTwitter"><code>StorylineSocialEmbedTwitter</code></a></p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><a href="#definition-StorylineSocialEmbedInstagram"><code>StorylineSocialEmbedInstagram</code></a></p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><a href="#definition-StorylineSocialEmbedTikTok"><code>StorylineSocialEmbedTikTok</code></a></p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><a href="#definition-StorylinePicture"><code>StorylinePicture</code></a></p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span><span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-StorylineHeadline" class="definition definition-object" data-traverse-target="definition-StorylineHeadline">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">StorylineHeadline</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>headline</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"headline"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-StorylineInlineAuthor" class="definition definition-object" data-traverse-target="definition-StorylineInlineAuthor">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">StorylineInlineAuthor</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>author</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"author"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-StorylineInlineReporter" class="definition definition-object" data-traverse-target="definition-StorylineInlineReporter">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">StorylineInlineReporter</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>reporter</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"reporter"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-StorylineLeadText" class="definition definition-object" data-traverse-target="definition-StorylineLeadText">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">StorylineLeadText</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>leadText</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"leadText"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-StorylineParagraph" class="definition definition-object" data-traverse-target="definition-StorylineParagraph">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">StorylineParagraph</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>paragraph</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>extra</code></span> - <span class="property-type"><a href="#definition-ParagraphExtra"><code>[ParagraphExtra!]</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"paragraph"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"extra"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">ParagraphExtra</span><span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-StorylinePicture" class="definition definition-object" data-traverse-target="definition-StorylinePicture">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">StorylinePicture</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>crop</code></span> - <span class="property-type"><a href="#definition-Crop"><code>Crop!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>title</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>description</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>source</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"crop"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">Crop</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"title"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"description"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"source"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-StorylinePullQuote" class="definition definition-object" data-traverse-target="definition-StorylinePullQuote">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">StorylinePullQuote</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>quote</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>attributions</code></span> - <span class="property-type"><a href="#definition-Map"><code>Map</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"quote"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"attributions"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">Map</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-StorylineSocialEmbedFacebook" class="definition definition-object" data-traverse-target="definition-StorylineSocialEmbedFacebook">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">StorylineSocialEmbedFacebook</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>html</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"html"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-StorylineSocialEmbedGeneric" class="definition definition-object" data-traverse-target="definition-StorylineSocialEmbedGeneric">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">StorylineSocialEmbedGeneric</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>html</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>provider</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"html"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"provider"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-StorylineSocialEmbedInstagram" class="definition definition-object" data-traverse-target="definition-StorylineSocialEmbedInstagram">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">StorylineSocialEmbedInstagram</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>html</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"html"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-StorylineSocialEmbedTikTok" class="definition definition-object" data-traverse-target="definition-StorylineSocialEmbedTikTok">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">StorylineSocialEmbedTikTok</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>html</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"html"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-StorylineSocialEmbedTwitter" class="definition definition-object" data-traverse-target="definition-StorylineSocialEmbedTwitter">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">StorylineSocialEmbedTwitter</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>html</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"html"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-StorylineSubhead" class="definition definition-object" data-traverse-target="definition-StorylineSubhead">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">StorylineSubhead</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>subhead</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"subhead"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-StorylineVideo" class="definition definition-object" data-traverse-target="definition-StorylineVideo">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">StorylineVideo</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>type</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>video</code></span> - <span class="property-type"><a href="#definition-Video"><code>Video!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>title</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>source</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>description</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"video"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">Video</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"title"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"source"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"description"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-String" class="definition definition-scalar" data-traverse-target="definition-String">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">String</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>The <code>String</code> scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.</p>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-gql"><span class="hljs-symbol">"abc123"</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-Video" class="definition definition-object" data-traverse-target="definition-Video">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">Video</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>title</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>description</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>source</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>keyframe</code></span> - <span class="property-type"><a href="#definition-Picture"><code>Picture!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>duration</code></span> - <span class="property-type"><a href="#definition-Int"><code>Int!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>assets</code></span> - <span class="property-type"><a href="#definition-VideoAsset"><code>[VideoAsset!]!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"title"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"description"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"source"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"xyz789"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"keyframe"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">Picture</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"duration"</span><span class="hljs-punctuation">:</span> <span class="hljs-number">123</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"assets"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">VideoAsset</span><span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-VideoAsset" class="definition definition-object" data-traverse-target="definition-VideoAsset">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">VideoAsset</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>format</code></span> - <span class="property-type"><a href="#definition-VideoFormat"><code>VideoFormat!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><span class="property-name"><code>asset</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span><span class="hljs-attr">"format"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"HLS"</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">"asset"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"abc123"</span><span class="hljs-punctuation">}</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-VideoFormat" class="definition definition-enum" data-traverse-target="definition-VideoFormat">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">VideoFormat</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-properties doc-copy-section">
+                  <h5>Values</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Enum Value</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <p><code>HLS</code></p>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><code>MP4</code></p>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="doc-examples">
+                <div class="example-section example-section-is-code">
+                  <h5>Example</h5>
+                  <html>
+                    <head></head>
+                    <body><pre><code class="hljs language-gql"><span class="hljs-symbol">"HLS"</span>
+</code></pre>
+                    </body>
+                  </html>
+                </div>
+              </div>
+            </div>
+          </section>
+          <div class="doc-row no-margin">
+            <div class="doc-copy doc-separator">
+              <a class="powered-by" href="https://github.com/anvilco/spectaql">Documentation by <span>Anvil SpectaQL</span></a>
+            </div>
+          </div>
+        </article>
+        <div class="drawer-overlay"></div>
+      </div>
+    </div>
+  </body>
+</html>
