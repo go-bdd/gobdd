@@ -51,15 +51,18 @@ func TestParameterTypes(t *testing.T) {
 	suite.AddStep(`the result should equal {int}`, check)
 	suite.AddStep(`I add floats {float} and {float}`, addf)
 	suite.AddStep(`the result should equal float {float}`, checkf)
+	suite.AddStep(`the result should equal text {text}`, checkt)
 	suite.AddStep(`I use word {word}`, func(t StepTest, ctx Context, word string) {
 		if word != "pizza" {
 			t.Fatal("it should be pizza")
 		}
 	})
 	suite.AddStep(`I use text {text}`, func(t StepTest, ctx Context, text string) {
-		if text != "I like pizza" {
-			t.Fatal("it should say that I like pizza")
-		}
+		ctx.Set("stringRes", text)
+	})
+	suite.AddStep(`I concat word {word} and text {text}`, concat)
+	suite.AddStep(`I format text {text} with int {int}`, func(t StepTest, ctx Context, format string, value int) {
+		ctx.Set("stringRes", fmt.Sprintf(format, value))
 	})
 
 	suite.Run()
@@ -275,6 +278,23 @@ func add(_ StepTest, ctx Context, var1, var2 int) {
 	ctx.Set("sumRes", res)
 }
 
+func concat(_ StepTest, ctx Context, var1, var2 string) {
+	ctx.Set("stringRes", var1+var2)
+}
+
+func checkt(t StepTest, ctx Context, text string) {
+	received, err := ctx.GetString("stringRes")
+	if err != nil {
+		t.Error(err.Error())
+
+		return
+	}
+
+	if text != received {
+		t.Errorf("expected %s but %s received", text, received)
+	}
+}
+
 func checkf(t StepTest, ctx Context, sum float32) {
 	received, err := ctx.Get("sumRes")
 	if err != nil {
@@ -284,7 +304,7 @@ func checkf(t StepTest, ctx Context, sum float32) {
 	}
 
 	if sum != received {
-		t.Error("the sum doesn't match")
+		t.Errorf("expected %f but %f received", sum, received)
 	}
 }
 
