@@ -193,10 +193,11 @@ func NewSuite(t TestingT, optionClosures ...func(*SuiteOptions)) *Suite {
 		parameterTypes: map[string][]string{},
 	}
 
-	s.AddParameterTypes(`{int}`, []string{`(\d)`})
-	s.AddParameterTypes(`{float}`, []string{`([-+]?\d*\.?\d*)`})
-	s.AddParameterTypes(`{word}`, []string{`([\d\w]+)`})
-	s.AddParameterTypes(`{text}`, []string{`"([\d\w\-\s]+)"`, `'([\d\w\-\s]+)'`})
+	// see https://github.com/cucumber/cucumber-expressions/blob/main/go/parameter_type_registry.go
+	s.AddParameterTypes(`{int}`, []string{`(-?\d+)`})
+	s.AddParameterTypes(`{float}`, []string{`([-+]?\d*\.?\d+)`})
+	s.AddParameterTypes(`{word}`, []string{`([^\s]+)`})
+	s.AddParameterTypes(`{text}`, []string{`"([^"\\]*(?:\\.[^"\\]*)*)"`, `'([^'\\]*(?:\\.[^'\\]*)*)'`})
 
 	return s
 }
@@ -206,7 +207,7 @@ func NewSuite(t TestingT, optionClosures ...func(*SuiteOptions)) *Suite {
 // The first argument is the parameter type and the second parameter is a list of regular expressions
 // that should replace the parameter type.
 //
-//    s.AddParameterTypes(`{int}`, []string{`(\d)`})
+//	s.AddParameterTypes(`{int}`, []string{`(\d)`})
 //
 // The regular expression should compile, otherwise will produce an error and stop executing.
 func (s *Suite) AddParameterTypes(from string, to []string) {
@@ -228,8 +229,8 @@ func (s *Suite) AddParameterTypes(from string, to []string) {
 // A step function can have any number of parameters (even zero),
 // but it MUST accept a gobdd.StepTest and gobdd.Context as the first parameters (if there is any):
 //
-// 	func myStepFunction(t gobdd.StepTest, ctx gobdd.Context, first int, second int) {
-// 	}
+//	func myStepFunction(t gobdd.StepTest, ctx gobdd.Context, first int, second int) {
+//	}
 func (s *Suite) AddStep(expr string, step interface{}) {
 	err := validateStepFunc(step)
 	if err != nil {
@@ -263,7 +264,7 @@ func (s *Suite) applyParameterTypes(expr string) []string {
 	for from, to := range s.parameterTypes {
 		for _, t := range to {
 			if strings.Contains(expr, from) {
-				exprs = append(exprs, strings.ReplaceAll(expr, from, t))
+				exprs = append(exprs, s.applyParameterTypes(strings.ReplaceAll(expr, from, t))...)
 			}
 		}
 	}
@@ -279,8 +280,8 @@ func (s *Suite) applyParameterTypes(expr string) []string {
 // A step function can have any number of parameters (even zero),
 // but it MUST accept a gobdd.StepTest and gobdd.Context as the first parameters (if there is any):
 //
-// 	func myStepFunction(t gobdd.StepTest, ctx gobdd.Context, first int, second int) {
-// 	}
+//	func myStepFunction(t gobdd.StepTest, ctx gobdd.Context, first int, second int) {
+//	}
 func (s *Suite) AddRegexStep(expr *regexp.Regexp, step interface{}) {
 	err := validateStepFunc(step)
 	if err != nil {
@@ -322,14 +323,14 @@ func (s *Suite) Run() {
 }
 
 func (s *Suite) executeFeature(feature feature) error {
-  f, err := feature.Open()
+	f, err := feature.Open()
 	if err != nil {
 		return err
 	}
 
-  if closer, ok := f.(io.Closer); ok {
-    defer closer.Close()
-  }
+	if closer, ok := f.(io.Closer); ok {
+		defer closer.Close()
+	}
 
 	featureIO := bufio.NewReader(f)
 
