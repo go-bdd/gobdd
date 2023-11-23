@@ -541,6 +541,9 @@ func (s *Suite) runStep(ctx Context, t *testing.T, step *msgs.GherkinDocument_Fe
 	}
 
 	params := def.expr.FindSubmatch([]byte(step.Text))[1:]
+	if argument, ok := step.Argument.(*msgs.GherkinDocument_Feature_Step_DocString_); ok {
+		params = append(params, []byte(argument.DocString.Content))
+	}
 	t.Run(fmt.Sprintf("%s %s", strings.TrimSpace(step.Keyword), step.Text), func(t *testing.T) {
 		// NOTE consider passing t as argument to step hooks
 		ctx.Set(TestingTKey{}, t)
