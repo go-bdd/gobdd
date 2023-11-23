@@ -152,12 +152,12 @@ type stepDef struct {
 }
 
 type StepTest interface {
-	Log(...interface{})
-	Logf(string, ...interface{})
-	Fatal(...interface{})
-	Fatalf(string, ...interface{})
-	Errorf(string, ...interface{})
-	Error(...interface{})
+	Log(args ...interface{})
+	Logf(format string, args ...interface{})
+	Fatal(args ...interface{})
+	Fatalf(format string, args ...interface{})
+	Errorf(format string, args ...interface{})
+	Error(args ...interface{})
 
 	Fail()
 	FailNow()
@@ -544,6 +544,7 @@ func (s *Suite) runStep(ctx Context, t *testing.T, step *msgs.GherkinDocument_Fe
 	if argument, ok := step.Argument.(*msgs.GherkinDocument_Feature_Step_DocString_); ok {
 		params = append(params, []byte(argument.DocString.Content))
 	}
+
 	t.Run(fmt.Sprintf("%s %s", strings.TrimSpace(step.Keyword), step.Text), func(t *testing.T) {
 		// NOTE consider passing t as argument to step hooks
 		ctx.Set(TestingTKey{}, t)

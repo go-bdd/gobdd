@@ -16,6 +16,7 @@ linters:
     - golint
     - scopelint
     - gosec
+    - depguard
 
     # Disabled after upgrading golangci-lint
     # Enable them after issues are resolved

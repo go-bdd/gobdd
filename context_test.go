@@ -3,7 +3,7 @@ package gobdd
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestContextNilInGetError(t *testing.T) {
@@ -11,6 +11,6 @@ func TestContextNilInGetError(t *testing.T) {
 	ctx.Set("err", nil)
 
 	res, err := ctx.GetError("err")
-	assert.NoError(t, err)
-	assert.Nil(t, res)
+	require.NoError(t, err)
+	require.NoError(t, res)
 }
