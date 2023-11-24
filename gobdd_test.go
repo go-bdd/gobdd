@@ -68,6 +68,14 @@ func TestParameterTypes(t *testing.T) {
 	suite.Run()
 }
 
+func TestArguments(t *testing.T) {
+	suite := NewSuite(t, WithFeaturesPath("features/argument.feature"))
+	suite.AddStep(`the result should equal argument:`, checkt)
+	suite.AddStep(`I concat text {text} and argument:`, concat)
+
+	suite.Run()
+}
+
 func TestScenarioOutlineExecutesAllTests(t *testing.T) {
 	c := 0
 	suite := NewSuite(t, WithFeaturesPath("features/outline.feature"))

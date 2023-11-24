@@ -13,7 +13,7 @@ import (
 func WithFeaturesFS(fs fs.FS, path string) func(*SuiteOptions) {
 	return func(options *SuiteOptions) {
 		options.featureSource = fsFeatureSource{
-			fs:      fs,
+			fs:   fs,
 			path: path,
 		}
 	}
