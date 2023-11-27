@@ -1,12 +1,13 @@
-// Code generated .* DO NOT EDIT.
+// Code generated .* DO NOT EDIT.	
 package gobdd
 
 import "fmt"
 
+
 func (ctx Context) GetString(key interface{}, defaultValue ...string) (string, error) {
 	if len(defaultValue) > 1 {
-		return "", fmt.Errorf("allowed to pass only 1 default value but %d got", len(defaultValue))
-	}
+        return "", fmt.Errorf("allowed to pass only 1 default value but %d got", len(defaultValue))
+    }
 
 	if _, ok := ctx.values[key]; !ok {
 		if len(defaultValue) == 1 {
@@ -24,8 +25,8 @@ func (ctx Context) GetString(key interface{}, defaultValue ...string) (string, e
 
 func (ctx Context) GetInt(key interface{}, defaultValue ...int) (int, error) {
 	if len(defaultValue) > 1 {
-		return 0, fmt.Errorf("allowed to pass only 1 default value but %d got", len(defaultValue))
-	}
+        return 0, fmt.Errorf("allowed to pass only 1 default value but %d got", len(defaultValue))
+    }
 
 	if _, ok := ctx.values[key]; !ok {
 		if len(defaultValue) == 1 {
@@ -43,8 +44,8 @@ func (ctx Context) GetInt(key interface{}, defaultValue ...int) (int, error) {
 
 func (ctx Context) GetInt8(key interface{}, defaultValue ...int8) (int8, error) {
 	if len(defaultValue) > 1 {
-		return 0, fmt.Errorf("allowed to pass only 1 default value but %d got", len(defaultValue))
-	}
+        return 0, fmt.Errorf("allowed to pass only 1 default value but %d got", len(defaultValue))
+    }
 
 	if _, ok := ctx.values[key]; !ok {
 		if len(defaultValue) == 1 {
@@ -62,8 +63,8 @@ func (ctx Context) GetInt8(key interface{}, defaultValue ...int8) (int8, error) 
 
 func (ctx Context) GetInt16(key interface{}, defaultValue ...int16) (int16, error) {
 	if len(defaultValue) > 1 {
-		return 0, fmt.Errorf("allowed to pass only 1 default value but %d got", len(defaultValue))
-	}
+        return 0, fmt.Errorf("allowed to pass only 1 default value but %d got", len(defaultValue))
+    }
 
 	if _, ok := ctx.values[key]; !ok {
 		if len(defaultValue) == 1 {
@@ -81,8 +82,8 @@ func (ctx Context) GetInt16(key interface{}, defaultValue ...int16) (int16, erro
 
 func (ctx Context) GetInt32(key interface{}, defaultValue ...int32) (int32, error) {
 	if len(defaultValue) > 1 {
-		return 0, fmt.Errorf("allowed to pass only 1 default value but %d got", len(defaultValue))
-	}
+        return 0, fmt.Errorf("allowed to pass only 1 default value but %d got", len(defaultValue))
+    }
 
 	if _, ok := ctx.values[key]; !ok {
 		if len(defaultValue) == 1 {
@@ -100,8 +101,8 @@ func (ctx Context) GetInt32(key interface{}, defaultValue ...int32) (int32, erro
 
 func (ctx Context) GetInt64(key interface{}, defaultValue ...int64) (int64, error) {
 	if len(defaultValue) > 1 {
-		return 0, fmt.Errorf("allowed to pass only 1 default value but %d got", len(defaultValue))
-	}
+        return 0, fmt.Errorf("allowed to pass only 1 default value but %d got", len(defaultValue))
+    }
 
 	if _, ok := ctx.values[key]; !ok {
 		if len(defaultValue) == 1 {
@@ -119,8 +120,8 @@ func (ctx Context) GetInt64(key interface{}, defaultValue ...int64) (int64, erro
 
 func (ctx Context) GetFloat32(key interface{}, defaultValue ...float32) (float32, error) {
 	if len(defaultValue) > 1 {
-		return 0, fmt.Errorf("allowed to pass only 1 default value but %d got", len(defaultValue))
-	}
+        return 0, fmt.Errorf("allowed to pass only 1 default value but %d got", len(defaultValue))
+    }
 
 	if _, ok := ctx.values[key]; !ok {
 		if len(defaultValue) == 1 {
@@ -138,8 +139,8 @@ func (ctx Context) GetFloat32(key interface{}, defaultValue ...float32) (float32
 
 func (ctx Context) GetFloat64(key interface{}, defaultValue ...float64) (float64, error) {
 	if len(defaultValue) > 1 {
-		return 0, fmt.Errorf("allowed to pass only 1 default value but %d got", len(defaultValue))
-	}
+        return 0, fmt.Errorf("allowed to pass only 1 default value but %d got", len(defaultValue))
+    }
 
 	if _, ok := ctx.values[key]; !ok {
 		if len(defaultValue) == 1 {
@@ -157,8 +158,8 @@ func (ctx Context) GetFloat64(key interface{}, defaultValue ...float64) (float64
 
 func (ctx Context) GetBool(key interface{}, defaultValue ...bool) (bool, error) {
 	if len(defaultValue) > 1 {
-		return false, fmt.Errorf("allowed to pass only 1 default value but %d got", len(defaultValue))
-	}
+        return false, fmt.Errorf("allowed to pass only 1 default value but %d got", len(defaultValue))
+    }
 
 	if _, ok := ctx.values[key]; !ok {
 		if len(defaultValue) == 1 {
@@ -173,3 +174,4 @@ func (ctx Context) GetBool(key interface{}, defaultValue ...bool) (bool, error) 
 	}
 	return value, nil
 }
+

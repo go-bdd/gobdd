@@ -3,7 +3,7 @@ package gobdd_test
 import (
 	"testing"
 
-	"github.com/go-bdd/gobdd"
+	gobdd "github.com/go-bdd/gobdd"
 	"github.com/go-bdd/gobdd/context"
 )
 
