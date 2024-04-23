@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"testing"
 
-	msgs "github.com/cucumber/messages-go/v12"
+	msgs "github.com/cucumber/messages/go/v24"
 	"github.com/go-bdd/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -94,8 +94,8 @@ func TestScenarioOutlineExecutesAllTests(t *testing.T) {
 
 func TestStepFromExample(t *testing.T) {
 	s := NewSuite(t)
-	st, expr := s.stepFromExample("I add <d1> and <d2>", &msgs.GherkinDocument_Feature_TableRow{
-		Cells: []*msgs.GherkinDocument_Feature_TableRow_TableCell{
+	st, expr := s.stepFromExample("I add <d1> and <d2>", &msgs.TableRow{
+		Cells: []*msgs.TableCell{
 			{Value: "1"},
 			{Value: "2"},
 		},
@@ -178,14 +178,14 @@ func TestWithAfterStep(t *testing.T) {
 		// feature should be *msgs.GherkinDocument_Feature
 		feature, err := ctx.Get(FeatureKey{})
 		require.NoError(t, err)
-		if _, ok := feature.(*msgs.GherkinDocument_Feature); !ok {
+		if _, ok := feature.(*msgs.Feature); !ok {
 			t.Errorf("expected feature but got %T", feature)
 		}
 
 		// scenario should be *msgs.GherkinDocument_Feature_Scenario
 		scenario, err := ctx.Get(ScenarioKey{})
 		require.NoError(t, err)
-		if _, ok := scenario.(*msgs.GherkinDocument_Feature_Scenario); !ok {
+		if _, ok := scenario.(*msgs.Scenario); !ok {
 			t.Errorf("expected scenario but got %T", scenario)
 		}
 	}))
@@ -352,6 +352,7 @@ func (m *mockTester) Log(...interface{}) {
 
 func (m *mockTester) Logf(string, ...interface{}) {
 }
+
 func (m *mockTester) Fatal(...interface{}) {
 	m.fatalCalled++
 }
