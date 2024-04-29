@@ -13,8 +13,8 @@ import (
 	"strings"
 	"testing"
 
-	gherkin "github.com/cucumber/gherkin-go/v13"
-	msgs "github.com/cucumber/messages-go/v12"
+	gherkin "github.com/cucumber/gherkin/go/v28"
+	msgs "github.com/cucumber/messages/go/v24"
 )
 
 // Suite holds all the information about the suite (options, steps to execute etc)
@@ -346,10 +346,10 @@ func (s *Suite) executeFeature(feature feature) error {
 	return s.runFeature(doc.Feature)
 }
 
-func (s *Suite) runFeature(feature *msgs.GherkinDocument_Feature) error {
-	for _, tag := range feature.GetTags() {
+func (s *Suite) runFeature(feature *msgs.Feature) error {
+	for _, tag := range feature.Tags {
 		if contains(s.options.ignoreTags, tag.Name) {
-			s.t.Logf("the feature (%s) is ignored ", feature.GetName())
+			s.t.Logf("the feature (%s) is ignored ", feature.Name)
 			return nil
 		}
 	}
@@ -357,19 +357,19 @@ func (s *Suite) runFeature(feature *msgs.GherkinDocument_Feature) error {
 	hasErrors := false
 
 	s.t.Run(fmt.Sprintf("%s %s", strings.TrimSpace(feature.Keyword), feature.Name), func(t *testing.T) {
-		var bkgSteps *msgs.GherkinDocument_Feature_Background
+		var bkgSteps *msgs.Background
 
 		for _, child := range feature.Children {
-			if child.GetBackground() != nil {
-				bkgSteps = child.GetBackground()
+			if child.Background != nil {
+				bkgSteps = child.Background
 			}
 
-			scenario := child.GetScenario()
+			scenario := child.Scenario
 			if scenario == nil {
 				continue
 			}
 
-			if s.skipScenario(append(feature.GetTags(), scenario.GetTags()...)) {
+			if s.skipScenario(append(feature.Tags, scenario.Tags...)) {
 				t.Log(fmt.Sprintf("Skipping scenario %s", scenario.Name))
 				continue
 			}
@@ -389,9 +389,10 @@ func (s *Suite) runFeature(feature *msgs.GherkinDocument_Feature) error {
 }
 
 func (s *Suite) getOutlineStep(
-	steps []*msgs.GherkinDocument_Feature_Step,
-	examples []*msgs.GherkinDocument_Feature_Scenario_Examples) []*msgs.GherkinDocument_Feature_Step {
-	stepsList := make([][]*msgs.GherkinDocument_Feature_Step, len(steps))
+	steps []*msgs.Step,
+	examples []*msgs.Examples,
+) []*msgs.Step {
+	stepsList := make([][]*msgs.Step, len(steps))
 
 	for i, outlineStep := range steps {
 		for _, example := range examples {
@@ -399,7 +400,7 @@ func (s *Suite) getOutlineStep(
 		}
 	}
 
-	var newSteps []*msgs.GherkinDocument_Feature_Step
+	var newSteps []*msgs.Step
 
 	if len(stepsList) == 0 {
 		return newSteps
@@ -417,21 +418,25 @@ func (s *Suite) getOutlineStep(
 }
 
 func (s *Suite) stepsFromExamples(
-	sourceStep *msgs.GherkinDocument_Feature_Step,
-	example *msgs.GherkinDocument_Feature_Scenario_Examples) []*msgs.GherkinDocument_Feature_Step {
-	steps := []*msgs.GherkinDocument_Feature_Step{}
+	sourceStep *msgs.Step,
+	example *msgs.Examples,
+) []*msgs.Step {
+	steps := []*msgs.Step{}
 
-	placeholders := example.GetTableHeader().GetCells()
+	placeholders := []*msgs.TableCell{}
+	if example.TableHeader != nil {
+		placeholders = example.TableHeader.Cells
+	}
 	placeholdersValues := []string{}
 
 	for _, placeholder := range placeholders {
-		ph := "<" + placeholder.GetValue() + ">"
+		ph := "<" + placeholder.Value + ">"
 		placeholdersValues = append(placeholdersValues, ph)
 	}
 
-	text := sourceStep.GetText()
+	text := sourceStep.Text
 
-	for _, row := range example.GetTableBody() {
+	for _, row := range example.TableBody {
 		// iterate over the cells and update the text
 		stepText, expr := s.stepFromExample(text, row, placeholdersValues)
 
@@ -445,11 +450,10 @@ func (s *Suite) stepsFromExamples(
 		s.AddStep(expr, def.f)
 
 		// clone a step
-		step := &msgs.GherkinDocument_Feature_Step{
+		step := &msgs.Step{
 			Location: sourceStep.Location,
 			Keyword:  sourceStep.Keyword,
 			Text:     stepText,
-			Argument: sourceStep.Argument,
 		}
 
 		steps = append(steps, step)
@@ -460,7 +464,8 @@ func (s *Suite) stepsFromExamples(
 
 func (s *Suite) stepFromExample(
 	stepName string,
-	row *msgs.GherkinDocument_Feature_TableRow, placeholders []string) (string, string) {
+	row *msgs.TableRow, placeholders []string,
+) (string, string) {
 	expr := stepName
 
 	for i, ph := range placeholders {
@@ -496,8 +501,9 @@ func (s *Suite) callAfterSteps(ctx Context) {
 	}
 }
 
-func (s *Suite) runScenario(ctx Context, scenario *msgs.GherkinDocument_Feature_Scenario,
-	bkg *msgs.GherkinDocument_Feature_Background, t *testing.T) {
+func (s *Suite) runScenario(ctx Context, scenario *msgs.Scenario,
+	bkg *msgs.Background, t *testing.T,
+) {
 	t.Run(fmt.Sprintf("%s %s", strings.TrimSpace(scenario.Keyword), scenario.Name), func(t *testing.T) {
 		// NOTE consider passing t as argument to scenario hooks
 		ctx.Set(TestingTKey{}, t)
@@ -511,9 +517,9 @@ func (s *Suite) runScenario(ctx Context, scenario *msgs.GherkinDocument_Feature_
 			s.runSteps(ctx, t, steps)
 		}
 		steps := scenario.Steps
-		if examples := scenario.GetExamples(); len(examples) > 0 {
+		if examples := scenario.Examples; len(examples) > 0 {
 			c := ctx.Clone()
-			steps = s.getOutlineStep(scenario.GetSteps(), examples)
+			steps = s.getOutlineStep(scenario.Steps, examples)
 			s.runSteps(c, t, steps)
 		} else {
 			c := ctx.Clone()
@@ -522,13 +528,13 @@ func (s *Suite) runScenario(ctx Context, scenario *msgs.GherkinDocument_Feature_
 	})
 }
 
-func (s *Suite) runSteps(ctx Context, t *testing.T, steps []*msgs.GherkinDocument_Feature_Step) {
+func (s *Suite) runSteps(ctx Context, t *testing.T, steps []*msgs.Step) {
 	for _, step := range steps {
 		s.runStep(ctx, t, step)
 	}
 }
 
-func (s *Suite) runStep(ctx Context, t *testing.T, step *msgs.GherkinDocument_Feature_Step) {
+func (s *Suite) runStep(ctx Context, t *testing.T, step *msgs.Step) {
 	defer func() {
 		if r := recover(); r != nil {
 			t.Error(r)
@@ -541,8 +547,8 @@ func (s *Suite) runStep(ctx Context, t *testing.T, step *msgs.GherkinDocument_Fe
 	}
 
 	params := def.expr.FindSubmatch([]byte(step.Text))[1:]
-	if argument, ok := step.Argument.(*msgs.GherkinDocument_Feature_Step_DocString_); ok {
-		params = append(params, []byte(argument.DocString.Content))
+	if step.DocString != nil {
+		params = append(params, []byte(step.DocString.Content))
 	}
 
 	t.Run(fmt.Sprintf("%s %s", strings.TrimSpace(step.Keyword), step.Text), func(t *testing.T) {
@@ -636,7 +642,7 @@ func (s *Suite) findStepDef(text string) (stepDef, error) {
 	return sd, nil
 }
 
-func (s *Suite) skipScenario(scenarioTags []*msgs.GherkinDocument_Feature_Tag) bool {
+func (s *Suite) skipScenario(scenarioTags []*msgs.Tag) bool {
 	for _, tag := range scenarioTags {
 		if contains(s.options.ignoreTags, tag.Name) {
 			return true
@@ -656,7 +662,7 @@ func (s *Suite) skipScenario(scenarioTags []*msgs.GherkinDocument_Feature_Tag) b
 	return true
 }
 
-func (s *Suite) getBackgroundSteps(bkg *msgs.GherkinDocument_Feature_Background) []*msgs.GherkinDocument_Feature_Step {
+func (s *Suite) getBackgroundSteps(bkg *msgs.Background) []*msgs.Step {
 	return bkg.Steps
 }
 
