@@ -1,7 +1,7 @@
 package context
 
 import (
-	"github.com/go-bdd/gobdd"
+	gobdd "github.com/go-bdd/gobdd"
 )
 
 // Holds data from previously executed steps

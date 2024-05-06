@@ -172,10 +172,13 @@ type TestingT interface {
 // TestingTKey is used to store reference to current *testing.T instance
 type TestingTKey struct{}
 
-// FeatureKey is used to store reference to current *msgs.GherkinDocument_Feature instance
+// FeatureKey is used to store reference to current *msgs.Feature instance
 type FeatureKey struct{}
 
-// ScenarioKey is used to store reference to current *msgs.GherkinDocument_Feature_Scenario instance
+// RuleKey is used to store reference to current *msgs.Rule instance
+type RuleKey struct{}
+
+// ScenarioKey is used to store reference to current *msgs.Scenario instance
 type ScenarioKey struct{}
 
 // Creates a new suites with given configuration and empty steps defined
@@ -214,7 +217,7 @@ func (s *Suite) AddParameterTypes(from string, to []string) {
 	for _, to := range to {
 		_, err := regexp.Compile(to)
 		if err != nil {
-			s.t.Fatalf(`the regular expresion for key %s doesn't compile: %s`, from, to)
+			s.t.Fatalf(`the regular expression for key %s doesn't compile: %s`, from, to)
 		}
 
 		s.parameterTypes[from] = append(s.parameterTypes[from], to)
@@ -347,37 +350,29 @@ func (s *Suite) executeFeature(feature feature) error {
 }
 
 func (s *Suite) runFeature(feature *msgs.Feature) error {
-	for _, tag := range feature.Tags {
-		if contains(s.options.ignoreTags, tag.Name) {
-			s.t.Logf("the feature (%s) is ignored ", feature.Name)
-			return nil
-		}
+	if s.shouldSkipFeatureOrRule(feature.Tags) {
+		s.t.Logf("the feature (%s) is ignored ", feature.Name)
+		return nil
 	}
 
 	hasErrors := false
 
 	s.t.Run(fmt.Sprintf("%s %s", strings.TrimSpace(feature.Keyword), feature.Name), func(t *testing.T) {
-		var bkgSteps *msgs.Background
+		backgrounds := []*msgs.Background{}
 
 		for _, child := range feature.Children {
 			if child.Background != nil {
-				bkgSteps = child.Background
+				backgrounds = append(backgrounds, child.Background)
 			}
 
-			scenario := child.Scenario
-			if scenario == nil {
-				continue
+			if rule := child.Rule; rule != nil {
+				s.runRule(feature, rule, backgrounds, t)
 			}
-
-			if s.skipScenario(append(feature.Tags, scenario.Tags...)) {
-				t.Log(fmt.Sprintf("Skipping scenario %s", scenario.Name))
-				continue
+			if scenario := child.Scenario; scenario != nil {
+				ctx := NewContext()
+				ctx.Set(FeatureKey{}, feature)
+				s.runScenario(ctx, scenario, backgrounds, t, feature.Tags)
 			}
-			ctx := NewContext()
-			ctx.Set(FeatureKey{}, feature)
-			ctx.Set(ScenarioKey{}, scenario)
-
-			s.runScenario(ctx, scenario, bkgSteps, t)
 		}
 	})
 
@@ -390,8 +385,7 @@ func (s *Suite) runFeature(feature *msgs.Feature) error {
 
 func (s *Suite) getOutlineStep(
 	steps []*msgs.Step,
-	examples []*msgs.Examples,
-) []*msgs.Step {
+	examples []*msgs.Examples) []*msgs.Step {
 	stepsList := make([][]*msgs.Step, len(steps))
 
 	for i, outlineStep := range steps {
@@ -419,19 +413,17 @@ func (s *Suite) getOutlineStep(
 
 func (s *Suite) stepsFromExamples(
 	sourceStep *msgs.Step,
-	example *msgs.Examples,
-) []*msgs.Step {
+	example *msgs.Examples) []*msgs.Step {
 	steps := []*msgs.Step{}
 
-	placeholders := []*msgs.TableCell{}
-	if example.TableHeader != nil {
-		placeholders = example.TableHeader.Cells
-	}
 	placeholdersValues := []string{}
 
-	for _, placeholder := range placeholders {
-		ph := "<" + placeholder.Value + ">"
-		placeholdersValues = append(placeholdersValues, ph)
+	if example.TableHeader != nil {
+		placeholders := example.TableHeader.Cells
+		for _, placeholder := range placeholders {
+			ph := "<" + placeholder.Value + ">"
+			placeholdersValues = append(placeholdersValues, ph)
+		}
 	}
 
 	text := sourceStep.Text
@@ -451,9 +443,13 @@ func (s *Suite) stepsFromExamples(
 
 		// clone a step
 		step := &msgs.Step{
-			Location: sourceStep.Location,
-			Keyword:  sourceStep.Keyword,
-			Text:     stepText,
+			Location:    sourceStep.Location,
+			Keyword:     sourceStep.Keyword,
+			Text:        stepText,
+			KeywordType: sourceStep.KeywordType,
+			DocString:   sourceStep.DocString,
+			DataTable:   sourceStep.DataTable,
+			Id:          sourceStep.Id,
 		}
 
 		steps = append(steps, step)
@@ -464,8 +460,7 @@ func (s *Suite) stepsFromExamples(
 
 func (s *Suite) stepFromExample(
 	stepName string,
-	row *msgs.TableRow, placeholders []string,
-) (string, string) {
+	row *msgs.TableRow, placeholders []string) (string, string) {
 	expr := stepName
 
 	for i, ph := range placeholders {
@@ -500,20 +495,51 @@ func (s *Suite) callAfterSteps(ctx Context) {
 		f(ctx)
 	}
 }
+func (s *Suite) runRule(feature *msgs.Feature, rule *msgs.Rule,
+	backgrounds []*msgs.Background, t *testing.T) {
+	ruleTags := feature.Tags
+	ruleTags = append(ruleTags, rule.Tags...)
 
+	if s.shouldSkipFeatureOrRule(ruleTags) {
+		s.t.Logf("the rule (%s) is ignored ", feature.Name)
+		return
+	}
+
+	ruleBackgrounds := []*msgs.Background{}
+	ruleBackgrounds = append(ruleBackgrounds, backgrounds...)
+
+	t.Run(fmt.Sprintf("%s %s", strings.TrimSpace(rule.Keyword), rule.Name), func(t *testing.T) {
+		for _, ruleChild := range rule.Children {
+			if ruleChild.Background != nil {
+				ruleBackgrounds = append(ruleBackgrounds, ruleChild.Background)
+			}
+			if scenario := ruleChild.Scenario; scenario != nil {
+				ctx := NewContext()
+				ctx.Set(FeatureKey{}, feature)
+				ctx.Set(RuleKey{}, rule)
+				s.runScenario(ctx, scenario, ruleBackgrounds, t, ruleTags)
+			}
+		}
+	})
+}
 func (s *Suite) runScenario(ctx Context, scenario *msgs.Scenario,
-	bkg *msgs.Background, t *testing.T,
-) {
+	backgrounds []*msgs.Background, t *testing.T, parentTags []*msgs.Tag) {
+	if s.shouldSkipScenario(append(parentTags, scenario.Tags...)) {
+		t.Logf("Skipping scenario %s", scenario.Name)
+		return
+	}
+
 	t.Run(fmt.Sprintf("%s %s", strings.TrimSpace(scenario.Keyword), scenario.Name), func(t *testing.T) {
 		// NOTE consider passing t as argument to scenario hooks
+		ctx.Set(ScenarioKey{}, scenario)
 		ctx.Set(TestingTKey{}, t)
 		defer ctx.Set(TestingTKey{}, nil)
 
 		s.callBeforeScenarios(ctx)
 		defer s.callAfterScenarios(ctx)
 
-		if bkg != nil {
-			steps := s.getBackgroundSteps(bkg)
+		if len(backgrounds) > 0 {
+			steps := s.getBackgroundSteps(backgrounds)
 			s.runSteps(ctx, t, steps)
 		}
 		steps := scenario.Steps
@@ -642,7 +668,17 @@ func (s *Suite) findStepDef(text string) (stepDef, error) {
 	return sd, nil
 }
 
-func (s *Suite) skipScenario(scenarioTags []*msgs.Tag) bool {
+func (s *Suite) shouldSkipFeatureOrRule(featureOrRuleTags []*msgs.Tag) bool {
+	for _, tag := range featureOrRuleTags {
+		if contains(s.options.ignoreTags, tag.Name) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (s *Suite) shouldSkipScenario(scenarioTags []*msgs.Tag) bool {
 	for _, tag := range scenarioTags {
 		if contains(s.options.ignoreTags, tag.Name) {
 			return true
@@ -662,8 +698,13 @@ func (s *Suite) skipScenario(scenarioTags []*msgs.Tag) bool {
 	return true
 }
 
-func (s *Suite) getBackgroundSteps(bkg *msgs.Background) []*msgs.Step {
-	return bkg.Steps
+func (s *Suite) getBackgroundSteps(backgrounds []*msgs.Background) []*msgs.Step {
+	result := []*msgs.Step{}
+	for _, background := range backgrounds {
+		result = append(result, background.Steps...)
+	}
+
+	return result
 }
 
 // contains tells whether a contains x.

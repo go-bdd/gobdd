@@ -17,7 +17,15 @@ func TestScenarios(t *testing.T) {
 	suite.AddRegexStep(compiled, add)
 	compiled = regexp.MustCompile(`the result should equal (\d+)`)
 	suite.AddRegexStep(compiled, check)
+	suite.Run()
+}
 
+func TestRule(t *testing.T) {
+	suite := NewSuite(t, WithFeaturesPath("features/example_rule.feature"))
+	compiled := regexp.MustCompile(`I add (\d+) and (\d+)`)
+	suite.AddRegexStep(compiled, add)
+	compiled = regexp.MustCompile(`the result should equal (\d+)`)
+	suite.AddRegexStep(compiled, check)
 	suite.Run()
 }
 
@@ -117,6 +125,8 @@ func TestStepFromExample(t *testing.T) {
 func TestBackground(t *testing.T) {
 	suite := NewSuite(t, WithFeaturesPath("features/background.feature"))
 	suite.AddStep(`I add (\d+) and (\d+)`, add)
+	suite.AddStep(`I concat word {word} and text {text}`, concat)
+	suite.AddStep(`the result should equal text {text}`, checkt)
 	suite.AddStep(`the result should equal (\d+)`, check)
 
 	suite.Run()
@@ -175,14 +185,14 @@ func TestWithAfterStep(t *testing.T) {
 	suite := NewSuite(t, WithFeaturesPath("features/background.feature"), WithAfterStep(func(ctx Context) {
 		c++
 
-		// feature should be *msgs.GherkinDocument_Feature
+		// feature should be *msgs.Feature
 		feature, err := ctx.Get(FeatureKey{})
 		require.NoError(t, err)
 		if _, ok := feature.(*msgs.Feature); !ok {
 			t.Errorf("expected feature but got %T", feature)
 		}
 
-		// scenario should be *msgs.GherkinDocument_Feature_Scenario
+		// scenario should be *msgs.Scenario
 		scenario, err := ctx.Get(ScenarioKey{})
 		require.NoError(t, err)
 		if _, ok := scenario.(*msgs.Scenario); !ok {
@@ -191,10 +201,12 @@ func TestWithAfterStep(t *testing.T) {
 	}))
 	suite.AddStep(`I add (\d+) and (\d+)`, add)
 	suite.AddStep(`the result should equal (\d+)`, check)
+	suite.AddStep(`I concat word {word} and text {text}`, concat)
+	suite.AddStep(`the result should equal text {text}`, checkt)
 
 	suite.Run()
 
-	if err := assert.Equals(2, c); err != nil {
+	if err := assert.Equals(6, c); err != nil {
 		t.Error(err)
 	}
 }
@@ -206,22 +218,19 @@ func TestWithBeforeStep(t *testing.T) {
 	}))
 	suite.AddStep(`I add (\d+) and (\d+)`, add)
 	suite.AddStep(`the result should equal (\d+)`, check)
+	suite.AddStep(`I concat word {word} and text {text}`, concat)
+	suite.AddStep(`the result should equal text {text}`, checkt)
 
 	suite.Run()
 
-	if err := assert.Equals(2, c); err != nil {
+	if err := assert.Equals(6, c); err != nil {
 		t.Error(err)
 	}
 }
 
 func TestIgnoredTags(t *testing.T) {
-	suite := NewSuite(t, WithFeaturesPath("features/ignored_tags.feature"), WithIgnoredTags("@ignore"))
-	suite.AddStep(`fail the test`, fail)
-	suite.Run()
-}
-
-func TestIgnorFeatureWithTags(t *testing.T) {
-	suite := NewSuite(t, WithFeaturesPath("features/ignored_feature_tags.feature"), WithIgnoredTags("@ignore"))
+	suite := NewSuite(t, WithFeaturesPath("features/ignored_*tags.feature"), WithIgnoredTags("@ignore"))
+	suite.AddStep(`the test should pass`, pass)
 	suite.AddStep(`fail the test`, fail)
 	suite.Run()
 }
