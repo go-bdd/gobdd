@@ -19,7 +19,7 @@ There is godog library for BDD tests in Go. I found this library useful but it r
 Add the package to your project:
 
 ```
-go get github.com/go-bdd/gobdd
+go install github.com/go-bdd/gobdd@latest
 ```
 
 Inside `features` folder create your scenarios. Here is an example:
