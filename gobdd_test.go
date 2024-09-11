@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"strings"
 	"testing"
 
 	msgs "github.com/cucumber/messages/go/v24"
@@ -80,6 +81,14 @@ func TestArguments(t *testing.T) {
 	suite := NewSuite(t, WithFeaturesPath("features/argument.feature"))
 	suite.AddStep(`the result should equal argument:`, checkt)
 	suite.AddStep(`I concat text {text} and argument:`, concat)
+
+	suite.Run()
+}
+
+func TestDatatable(t *testing.T) {
+	suite := NewSuite(t, WithFeaturesPath("features/datatable.feature"))
+	suite.AddStep(`I concat all the columns and row together using {text} to separate the columns`, concatTable)
+	suite.AddStep(`the result should equal argument:`, checkt)
 
 	suite.Run()
 }
@@ -297,6 +306,20 @@ func add(_ StepTest, ctx Context, var1, var2 int) {
 
 func concat(_ StepTest, ctx Context, var1, var2 string) {
 	ctx.Set("stringRes", var1+var2)
+}
+
+func concatTable(_ StepTest, ctx Context, separator string, table msgs.DataTable) {
+	rows := make([]string, 0, len(table.Rows))
+	for _, row := range table.Rows {
+		values := make([]string, 0, len(row.Cells))
+		for _, cell := range row.Cells {
+			values = append(values, cell.Value)
+		}
+
+		rows = append(rows, strings.Join(values, separator))
+	}
+
+	ctx.Set("stringRes", strings.Join(rows, "\n"))
 }
 
 func checkt(t StepTest, ctx Context, text string) {
