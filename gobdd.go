@@ -572,9 +572,17 @@ func (s *Suite) runStep(ctx Context, t *testing.T, step *msgs.Step) {
 		t.Fatalf("cannot find step definition for step: %s%s", step.Keyword, step.Text)
 	}
 
-	params := def.expr.FindSubmatch([]byte(step.Text))[1:]
+	matches := def.expr.FindSubmatch([]byte(step.Text))[1:]
+	params := make([]interface{}, 0, len(matches)) // defining the slices capacity instead of the length to use append
+	for _, m := range matches {
+		params = append(params, m)
+	}
+
 	if step.DocString != nil {
-		params = append(params, []byte(step.DocString.Content))
+		params = append(params, step.DocString.Content)
+	}
+	if step.DataTable != nil {
+		params = append(params, *step.DataTable)
 	}
 
 	t.Run(fmt.Sprintf("%s %s", strings.TrimSpace(step.Keyword), step.Text), func(t *testing.T) {
@@ -589,7 +597,7 @@ func (s *Suite) runStep(ctx Context, t *testing.T, step *msgs.Step) {
 	})
 }
 
-func (def *stepDef) run(ctx Context, t TestingT, params [][]byte) { // nolint:interfacer
+func (def *stepDef) run(ctx Context, t TestingT, params []interface{}) { // nolint:interfacer
 	defer func() {
 		if r := recover(); r != nil {
 			t.Errorf("%+v", r)
@@ -611,38 +619,98 @@ func (def *stepDef) run(ctx Context, t TestingT, params [][]byte) { // nolint:in
 		}
 
 		inType := d.Type().In(i + 2)
-		paramType := paramType(v, inType)
+
+		paramType, err := paramType(v, inType)
+		if err != nil {
+			t.Fatal(err)
+		}
+
 		in = append(in, paramType)
 	}
 
 	d.Call(in)
 }
 
-func paramType(param []byte, inType reflect.Type) reflect.Value {
-	paramType := reflect.ValueOf(param)
-	if inType.Kind() == reflect.String {
-		paramType = reflect.ValueOf(string(paramType.Interface().([]uint8)))
+func paramType(param interface{}, inType reflect.Type) (reflect.Value, error) {
+	switch inType.Kind() { // nolint:exhaustive - the linter does not recognize 'default:' to satisfy exhaustiveness
+	case reflect.String:
+		s, err := shouldBeString(param)
+		return reflect.ValueOf(s), err
+	case reflect.Int:
+		v, err := shouldBeInt(param)
+		return reflect.ValueOf(v), err
+	case reflect.Float32:
+		v, err := shouldBeFloat(param, 32)
+		return reflect.ValueOf(float32(v)), err
+	case reflect.Float64:
+		v, err := shouldBeFloat(param, 64)
+		return reflect.ValueOf(v), err
+	case reflect.Slice:
+		// only []byte is supported
+		if inType != reflect.TypeOf([]byte(nil)) {
+			return reflect.Value{}, fmt.Errorf("the slice argument type %s is not supported", inType.Kind())
+		}
+
+		v, err := shouldBeByteSlice(param)
+
+		return reflect.ValueOf(v), err
+	case reflect.Struct:
+		// the only struct supported is the one introduced by cucumber
+		if inType != reflect.TypeOf(msgs.DataTable{}) {
+			return reflect.Value{}, fmt.Errorf("the struct argument type %s is not supported", inType.Kind())
+		}
+
+		v, err := shouldBeDataTable(param)
+
+		return reflect.ValueOf(v), err
+	default:
+		return reflect.Value{}, fmt.Errorf("the type %s is not supported", inType.Kind())
+	}
+}
+
+func shouldBeDataTable(input interface{}) (msgs.DataTable, error) {
+	if v, ok := input.(msgs.DataTable); ok {
+		return v, nil
 	}
 
-	if inType.Kind() == reflect.Int {
-		s := paramType.Interface().([]uint8)
-		p, _ := strconv.Atoi(string(s))
-		paramType = reflect.ValueOf(p)
+	return msgs.DataTable{}, fmt.Errorf("cannot convert %v of type %T to messages.DataTable", input, input)
+}
+
+func shouldBeByteSlice(input interface{}) ([]byte, error) {
+	if v, ok := input.([]byte); ok {
+		return v, nil
 	}
 
-	if inType.Kind() == reflect.Float32 {
-		s := paramType.Interface().([]uint8)
-		p, _ := strconv.ParseFloat(string(s), 32)
-		paramType = reflect.ValueOf(float32(p))
+	return nil, fmt.Errorf("cannot convert %v of type %T to []byte", input, input)
+}
+
+func shouldBeInt(input interface{}) (int, error) {
+	s, err := shouldBeString(input)
+	if err != nil {
+		return 0, err
 	}
 
-	if inType.Kind() == reflect.Float64 {
-		s := paramType.Interface().([]uint8)
-		p, _ := strconv.ParseFloat(string(s), 32)
-		paramType = reflect.ValueOf(p)
+	return strconv.Atoi(s)
+}
+
+func shouldBeFloat(input interface{}, bitSize int) (float64, error) {
+	s, err := shouldBeString(input)
+	if err != nil {
+		return 0, err
 	}
 
-	return paramType
+	return strconv.ParseFloat(s, bitSize)
+}
+
+func shouldBeString(input interface{}) (string, error) {
+	switch v := input.(type) {
+	case string:
+		return v, nil
+	case []byte:
+		return string(v), nil
+	default:
+		return "", fmt.Errorf("cannot convert %v of type %T to string", input, input)
+	}
 }
 
 func (s *Suite) findStepDef(text string) (stepDef, error) {
