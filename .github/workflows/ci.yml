@@ -6,6 +6,7 @@ on:
       - master
   pull_request:
 
+
 jobs:
   golangci:
     name: Lint
@@ -18,14 +19,14 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           # Required: the version of golangci-lint is required and must be specified without patch version: we always use the latest patch version.
-          version: v1.55
+          version: v1.63
 
   coverage:
     name: Build
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: ['1.17', '1.18', '1.19', '1.20', '1.21', '1.22']
+        go: [ '1.17', '1.18', '1.19', '1.20', '1.21', '1.22', '1.23' ]
     env:
       GOFLAGS: -mod=readonly
       GOPROXY: https://proxy.golang.org
@@ -53,11 +54,11 @@ jobs:
       - name: Convert coverage to lcov
         uses: jandelgado/gcov2lcov-action@v1
         with:
-            infile: coverage.out
-            outfile: coverage.lcov
+          infile: coverage.out
+          outfile: coverage.lcov
 
       - name: Coveralls
         uses: coverallsapp/github-action@v1
         with:
-            github-token: ${{ secrets.github_token }}
-            path-to-lcov: coverage.lcov
+          github-token: ${{ secrets.github_token }}
+          path-to-lcov: coverage.lcov

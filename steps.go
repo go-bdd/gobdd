@@ -11,7 +11,7 @@ func validateStepFunc(f interface{}) error {
 		return errors.New("the parameter should be a function")
 	}
 
-	if value.Type().NumIn() < 2 {
+	if value.Type().NumIn() < contextArgumentsNumber {
 		return errors.New("the function should have StepTest and Context as the first argument")
 	}
 

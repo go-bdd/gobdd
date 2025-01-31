@@ -76,7 +76,7 @@ func (ctx Context) GetError(key interface{}, defaultValue ...error) (error, erro
 	}
 
 	if ctx.values[key] == nil {
-		return nil, nil
+		return nil, nil // nolint:nilnil
 	}
 
 	value, ok := ctx.values[key].(error)

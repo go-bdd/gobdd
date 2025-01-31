@@ -7,14 +7,11 @@ linters:
   enable-all: true
   disable:
     - funlen
-    - goerr113
+    - err113
     - gofumpt
-    - gomnd
     - godot
     - testpackage
     - nolintlint
-    - golint
-    - scopelint
     - gosec
     - depguard
 
@@ -23,13 +20,11 @@ linters:
     - gofmt
     - goimports
     - exhaustruct
-    - exhaustivestruct
     - forcetypeassert
     - gosimple
-    - ifshort
     - nlreturn
-    - nosnakecase
     - paralleltest
     - thelper
     - varnamelen
     - wrapcheck
+    - wsl
