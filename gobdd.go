@@ -17,6 +17,8 @@ import (
 	msgs "github.com/cucumber/messages/go/v24"
 )
 
+const contextArgumentsNumber = 2
+
 // Suite holds all the information about the suite (options, steps to execute etc)
 type Suite struct {
 	t              TestingT
@@ -152,15 +154,7 @@ type stepDef struct {
 }
 
 type StepTest interface {
-	Log(args ...interface{})
-	Logf(format string, args ...interface{})
-	Fatal(args ...interface{})
-	Fatalf(format string, args ...interface{})
-	Errorf(format string, args ...interface{})
-	Error(args ...interface{})
-
-	Fail()
-	FailNow()
+	testing.TB
 }
 
 type TestingT interface {
@@ -237,7 +231,7 @@ func (s *Suite) AddParameterTypes(from string, to []string) {
 func (s *Suite) AddStep(expr string, step interface{}) {
 	err := validateStepFunc(step)
 	if err != nil {
-		s.t.Errorf("the step function for step `%s` is incorrect: %w", expr, err)
+		s.t.Errorf("the step function for step `%s` is incorrect: %s", expr, err.Error())
 		s.hasStepErrors = true
 
 		return
@@ -248,7 +242,7 @@ func (s *Suite) AddStep(expr string, step interface{}) {
 	for _, expr := range exprs {
 		compiled, err := regexp.Compile(expr)
 		if err != nil {
-			s.t.Errorf("the step function is incorrect: %w", err)
+			s.t.Errorf("the step function is incorrect: %s", err.Error())
 			s.hasStepErrors = true
 
 			return
@@ -288,7 +282,7 @@ func (s *Suite) applyParameterTypes(expr string) []string {
 func (s *Suite) AddRegexStep(expr *regexp.Regexp, step interface{}) {
 	err := validateStepFunc(step)
 	if err != nil {
-		s.t.Errorf("the step function is incorrect: %w", err)
+		s.t.Errorf("the step function is incorrect: %s", err.Error())
 		s.hasStepErrors = true
 
 		return
@@ -310,7 +304,7 @@ func (s *Suite) Run() {
 
 	features, err := s.options.featureSource.loadFeatures()
 	if err != nil {
-		s.t.Fatalf(err.Error())
+		s.t.Fatal(err.Error())
 	}
 
 	if s.options.runInParallel {
@@ -605,8 +599,11 @@ func (def *stepDef) run(ctx Context, t TestingT, params []interface{}) { // noli
 	}()
 
 	d := reflect.ValueOf(def.f)
-	if len(params)+2 != d.Type().NumIn() {
-		t.Fatalf("the step function %s accepts %d arguments but %d received", d.String(), d.Type().NumIn(), len(params)+2)
+	if len(params)+contextArgumentsNumber != d.Type().NumIn() {
+		t.Fatalf("the step function %s accepts %d arguments but %d received",
+			d.String(),
+			d.Type().NumIn(),
+			len(params)+contextArgumentsNumber)
 
 		return
 	}
@@ -618,7 +615,7 @@ func (def *stepDef) run(ctx Context, t TestingT, params []interface{}) { // noli
 			break
 		}
 
-		inType := d.Type().In(i + 2)
+		inType := d.Type().In(i + contextArgumentsNumber)
 
 		paramType, err := paramType(v, inType)
 		if err != nil {
@@ -632,7 +629,7 @@ func (def *stepDef) run(ctx Context, t TestingT, params []interface{}) { // noli
 }
 
 func paramType(param interface{}, inType reflect.Type) (reflect.Value, error) {
-	switch inType.Kind() { // nolint:exhaustive - the linter does not recognize 'default:' to satisfy exhaustiveness
+	switch inType.Kind() { // nolint:exhaustive // the linter does not recognize 'default:' to satisfy exhaustiveness
 	case reflect.String:
 		s, err := shouldBeString(param)
 		return reflect.ValueOf(s), err
@@ -640,10 +637,10 @@ func paramType(param interface{}, inType reflect.Type) (reflect.Value, error) {
 		v, err := shouldBeInt(param)
 		return reflect.ValueOf(v), err
 	case reflect.Float32:
-		v, err := shouldBeFloat(param, 32)
+		v, err := shouldBeFloat(param, 32) // nolint:mnd
 		return reflect.ValueOf(float32(v)), err
 	case reflect.Float64:
-		v, err := shouldBeFloat(param, 64)
+		v, err := shouldBeFloat(param, 64) // nolint:mnd
 		return reflect.ValueOf(v), err
 	case reflect.Slice:
 		// only []byte is supported

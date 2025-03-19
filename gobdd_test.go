@@ -61,16 +61,16 @@ func TestParameterTypes(t *testing.T) {
 	suite.AddStep(`I add floats {float} and {float}`, addf)
 	suite.AddStep(`the result should equal float {float}`, checkf)
 	suite.AddStep(`the result should equal text {text}`, checkt)
-	suite.AddStep(`I use word {word}`, func(t StepTest, ctx Context, word string) {
+	suite.AddStep(`I use word {word}`, func(t StepTest, _ Context, word string) {
 		if word != "pizza" {
 			t.Fatal("it should be pizza")
 		}
 	})
-	suite.AddStep(`I use text {text}`, func(t StepTest, ctx Context, text string) {
+	suite.AddStep(`I use text {text}`, func(_ StepTest, ctx Context, text string) {
 		ctx.Set("stringRes", text)
 	})
 	suite.AddStep(`I concat word {word} and text {text}`, concat)
-	suite.AddStep(`I format text {text} with int {int}`, func(t StepTest, ctx Context, format string, value int) {
+	suite.AddStep(`I format text {text} with int {int}`, func(_ StepTest, ctx Context, format string, value int) {
 		ctx.Set("stringRes", fmt.Sprintf(format, value))
 	})
 
@@ -167,7 +167,7 @@ func TestFilterFeatureWithTags(t *testing.T) {
 
 func TestWithAfterScenario(t *testing.T) {
 	c := false
-	suite := NewSuite(t, WithFeaturesPath("features/empty.feature"), WithAfterScenario(func(ctx Context) {
+	suite := NewSuite(t, WithFeaturesPath("features/empty.feature"), WithAfterScenario(func(_ Context) {
 		c = true
 	}))
 	suite.Run()
@@ -179,7 +179,7 @@ func TestWithAfterScenario(t *testing.T) {
 
 func TestWithBeforeScenario(t *testing.T) {
 	c := false
-	suite := NewSuite(t, WithFeaturesPath("features/empty.feature"), WithBeforeScenario(func(ctx Context) {
+	suite := NewSuite(t, WithFeaturesPath("features/empty.feature"), WithBeforeScenario(func(_ Context) {
 		c = true
 	}))
 	suite.Run()
@@ -222,7 +222,7 @@ func TestWithAfterStep(t *testing.T) {
 
 func TestWithBeforeStep(t *testing.T) {
 	c := 0
-	suite := NewSuite(t, WithFeaturesPath("features/background.feature"), WithBeforeStep(func(ctx Context) {
+	suite := NewSuite(t, WithFeaturesPath("features/background.feature"), WithBeforeStep(func(_ Context) {
 		c++
 	}))
 	suite.AddStep(`I add (\d+) and (\d+)`, add)
@@ -249,10 +249,10 @@ func TestInvalidFunctionSignature(t *testing.T) {
 		f interface{}
 	}{
 		"nil":                              {},
-		"func without return value":        {f: func(ctx Context) {}},
-		"func with invalid return value":   {f: func(ctx Context) int { return 0 }},
+		"func without return value":        {f: func(_ Context) {}},
+		"func with invalid return value":   {f: func(_ Context) int { return 0 }},
 		"func without arguments":           {f: func() error { return errors.New("") }},
-		"func with invalid first argument": {f: func(i int) error { return errors.New("") }},
+		"func with invalid first argument": {f: func(_ int) error { return errors.New("") }},
 	}
 
 	for name, testCase := range testCases {
@@ -261,8 +261,7 @@ func TestInvalidFunctionSignature(t *testing.T) {
 			suite := NewSuite(tester)
 			suite.AddStep("", testCase.f)
 			suite.Run()
-			err := assert.Equals(1, tester.fatalCalled)
-			if err != nil {
+			if err := assert.Equals(1, tester.fatalCalled); err != nil {
 				t.Fatal(err)
 			}
 		})
@@ -375,22 +374,22 @@ func panics(_ StepTest, _ Context) {
 func pass(_ StepTest, _ Context) {}
 
 type mockTester struct {
+	testing.T
 	fatalCalled int
 	errors      []string
 }
 
-func (m *mockTester) Log(...interface{}) {
-}
+var _ TestingT = (*mockTester)(nil)
 
-func (m *mockTester) Logf(string, ...interface{}) {
-}
+func (m *mockTester) Log(...interface{}) {}
+
+func (m *mockTester) Logf(string, ...interface{}) {}
 
 func (m *mockTester) Fatal(...interface{}) {
 	m.fatalCalled++
 }
 
-func (m *mockTester) Fatalf(string, ...interface{}) {
-}
+func (m *mockTester) Fatalf(string, ...interface{}) {}
 
 func (m *mockTester) Error(a ...interface{}) {
 	m.errors = append(m.errors, fmt.Sprintf("%s", a...))
@@ -400,15 +399,8 @@ func (m *mockTester) Errorf(format string, a ...interface{}) {
 	m.errors = append(m.errors, fmt.Sprintf(format, a...))
 }
 
-func (m *mockTester) Parallel() {
-}
+func (m *mockTester) Parallel() {}
 
-func (m *mockTester) Fail() {
-}
+func (m *mockTester) Fail() {}
 
-func (m *mockTester) FailNow() {
-}
-
-func (m *mockTester) Run(_ string, _ func(t *testing.T)) bool {
-	return true
-}
+func (m *mockTester) FailNow() {}
