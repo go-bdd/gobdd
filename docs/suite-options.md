@@ -9,7 +9,7 @@ The suite can be confiugred using one of these functions:
 
 * `RunInParallel()` - enables running steps in parallel. It uses the stanard `T.Parallel` function.
 * `WithFeaturesPath(path string)` - configures the path where GoBDD should look for features. The default value is `features/*.feature`.
-* `WithFeaturesFS(fs fs.FS, path string)` - configures the filesystem and a path (glob pattern) where GoBDD should look for features.
+* `WithFeaturesFS(fs fs.FS, patterns ...string)` - configures the filesystem and glob patterns where GoBDD should look for features.
 * `WithTags(tags ...string)` - configures which tags should be run. Every tag has to start with `@`.
 * `WithBeforeScenario(f func())` - this function `f` will be called before every scenario.
 * `WithAfterScenario(f func())` - this funcion `f` will be called after every scenario.

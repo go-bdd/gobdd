@@ -10,29 +10,33 @@ import (
 )
 
 // WithFeaturesFS configures a filesystem and a path (glob pattern) where features can be found.
-func WithFeaturesFS(fs fs.FS, path string) func(*SuiteOptions) {
+func WithFeaturesFS(fs fs.FS, patterns ...string) func(*SuiteOptions) {
 	return func(options *SuiteOptions) {
 		options.featureSource = fsFeatureSource{
-			fs:   fs,
-			path: path,
+			fs:       fs,
+			patterns: patterns,
 		}
 	}
 }
 
 type fsFeatureSource struct {
-	fs   fs.FS
-	path string
+	fs       fs.FS
+	patterns []string
 }
 
 func (s fsFeatureSource) loadFeatures() ([]feature, error) {
-	files, err := fs.Glob(s.fs, s.path)
-	if err != nil {
-		return nil, fmt.Errorf("loading features: %w", err)
+	var allFiles []string
+	for _, pattern := range s.patterns {
+		files, err := fs.Glob(s.fs, pattern)
+		if err != nil {
+			return nil, fmt.Errorf("loading features: %w", err)
+		}
+		allFiles = append(allFiles, files...)
 	}
 
-	features := make([]feature, 0, len(files))
+	features := make([]feature, 0, len(allFiles))
 
-	for _, f := range files {
+	for _, f := range allFiles {
 		features = append(features, fsFeature{
 			fs:   s.fs,
 			file: f,
