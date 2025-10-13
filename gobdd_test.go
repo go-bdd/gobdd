@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	msgs "github.com/cucumber/messages/go/v28"
+	msgs "github.com/cucumber/messages/go/v32"
 	"github.com/go-bdd/assert"
 	"github.com/stretchr/testify/require"
 )
