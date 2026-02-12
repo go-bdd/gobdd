@@ -3,10 +3,10 @@ module github.com/go-bdd/gobdd
 go 1.17
 
 require (
-	github.com/cucumber/gherkin/go/v33 v33.0.0
-	github.com/cucumber/messages/go/v28 v28.0.0
+	github.com/cucumber/gherkin/go/v38 v38.0.0
+	github.com/cucumber/messages/go/v32 v32.0.1
 	github.com/go-bdd/assert v0.0.0-20200713105154-236f01430281
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
 )
 
 require (

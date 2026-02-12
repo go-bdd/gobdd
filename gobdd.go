@@ -13,8 +13,8 @@ import (
 	"strings"
 	"testing"
 
-	gherkin "github.com/cucumber/gherkin/go/v33"
-	msgs "github.com/cucumber/messages/go/v28"
+	gherkin "github.com/cucumber/gherkin/go/v38"
+	msgs "github.com/cucumber/messages/go/v32"
 )
 
 const contextArgumentsNumber = 2
